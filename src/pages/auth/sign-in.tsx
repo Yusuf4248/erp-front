@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Input, Card, Typography } from "antd";
+import { Button, Input, Card, Typography, message } from "antd";
 import { authService } from "@services";
 import { useNavigate } from "react-router-dom";
 import { setItem } from "@helpers";
@@ -13,62 +13,76 @@ const SignIn = () => {
   const navigate = useNavigate();
 
   const submit = async () => {
+    if (!role) {
+      message.warning("Iltimos, rol tanlang!");
+      return;
+    }
+
     const payload = { email, password };
-    const res = await authService.signIn(payload, role);
-    if (res.status == 201) {
-      setItem("access_token", res.data.access_token);
-      setItem("role", role);
-      navigate(`/${role}`);
+    try {
+      const res = await authService.signIn(payload, role);
+      if (res.status === 201) {
+        setItem("access_token", res.data.access_token);
+        setItem("role", role);
+        navigate(`/${role}`);
+      }
+    } catch (error) {
+      message.error("Login muvaffaqiyatsiz! Email yoki parol noto'g'ri.");
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+    <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
       <Card
-        className="w-full max-w-sm p-3 shadow-md rounded-lg"
-        style={{ border: "none", maxWidth: "300px", background: "#ffffff" }}
+        className="w-full max-w-sm p-5 shadow-lg rounded-xl"
+        style={{ border: "none", background: "#ffffff" }}
       >
-        <div className="text-center mb-2">
-          <Title level={5} className="text-gray-900 font-light">
+        <div className="text-center mb-5">
+          <Title level={4} className="text-gray-800">
             Sign In
           </Title>
         </div>
-        <div className="space-y-1.5">
+
+        <div className="space-y-3">
           <Input
             type="email"
-            placeholder="Email..."
+            placeholder="Email"
             size="large"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="rounded-md border-gray-200 focus:border-gray-300"
-            style={{ padding: "0.3rem", fontSize: "14px" }}
           />
+
           <Input.Password
-            placeholder="Password..."
+            placeholder="Password"
             size="large"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="rounded-md border-gray-200 focus:border-gray-300"
-            style={{ padding: "0.3rem", fontSize: "14px" }}
           />
+
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring focus:ring-blue-200"
+          >
+            <option value="">-- Rolni tanlang --</option>
+            <option value="teacher">Teacher</option>
+            <option value="student">Student</option>
+            <option value="admin">Admin</option>
+            <option value="lid">Lid</option>
+          </select>
+
           <Button
             type="primary"
             size="large"
             onClick={submit}
             block
             className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-md text-white"
-            style={{ height: "34px", fontSize: "14px" }}
+            style={{ height: "40px", fontSize: "14px" }}
           >
             Submit
           </Button>
         </div>
       </Card>
-      <select onChange={(e) => setRole(e.target.value)}>
-        <option value="teacher">Teacher</option>
-        <option value="student">Student</option>
-        <option value="admin">Admin</option>
-        <option value="lid">Lid</option>
-      </select>
     </div>
   );
 };
