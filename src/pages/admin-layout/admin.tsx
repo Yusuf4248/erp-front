@@ -1,5 +1,6 @@
 import {
 	DashboardOutlined,
+	LoginOutlined,
 	LogoutOutlined,
 	MenuFoldOutlined,
 	MenuUnfoldOutlined,
@@ -64,9 +65,14 @@ const AdminLayout: React.FC = () => {
 
 	const userMenu = (
 		<Menu theme={currentTheme}>
-			<Menu.Item key="profile">Profile</Menu.Item>
-			<Menu.Item key="logout" icon={<LogoutOutlined />}>
-				Logout
+			<Menu.Item
+				key="logoin"
+				icon={<LoginOutlined />}
+				onClick={() => {
+					navigate("/");
+				}}
+			>
+				Login
 			</Menu.Item>
 		</Menu>
 	);
