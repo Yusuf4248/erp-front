@@ -61,6 +61,12 @@ const AdminLayout: React.FC = () => {
 			label: "Groups",
 			onClick: () => navigate("/admin/groups"),
 		},
+		{
+			key: "/students",
+			icon: <UserOutlined />,
+			label: "Students",
+			onClick: () => navigate("/admin/students"),
+		},
 	];
 
 	const userMenu = (

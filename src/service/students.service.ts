@@ -1,0 +1,24 @@
+import { ApiUrls } from "@api/api-urls";
+import { apiConfig } from "@api/config";
+
+export const studentService = {
+	async getStudent() {
+		const res = await apiConfig().getRequest(ApiUrls.STUDENTS);
+		return res;
+	},
+	async deleteStudent(id: number) {
+		const res = await apiConfig().deleteRequest(`${ApiUrls.STUDENTS}/${id}`);
+		return res;
+	},
+	async updateStudent(id: number, body: object) {
+		const res = await apiConfig().updateRequest(
+			`${ApiUrls.STUDENTS}/${id}`,
+			body
+		);
+		return res;
+	},
+	async createStudent(body: object) {
+		const res = await apiConfig().postRequest(`${ApiUrls.STUDENTS}`, body);
+		return res;
+	},
+};

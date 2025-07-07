@@ -5,6 +5,7 @@ import {
 	SignIn,
 	SignUp,
 	Student,
+	StudentsTbl,
 	Teacher,
 } from "@pages";
 import { lazy } from "react";
@@ -25,6 +26,7 @@ const Router = () => {
 					{/* ADMIN */}
 					<Route path="admin" element={<Admin />}>
 						<Route path="groups" element={<Groups />} />
+						<Route path="students" element={<StudentsTbl />} />
 					</Route>
 					{/* STUDENT */}
 					<Route path="student" element={<Student />}></Route>
