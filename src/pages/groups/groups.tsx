@@ -1,4 +1,4 @@
-import { groupsService } from "@service";
+import { courseService, groupsService } from "@service";
 import type { TableProps } from "antd";
 import { Button, Input, Modal, Select, Table } from "antd";
 import React, { useEffect, useState } from "react";
@@ -44,6 +44,7 @@ const columns: TableProps<DataType>["columns"] = [
 
 const Groups: React.FC = () => {
 	const [group, setGroup] = useState<DataType[]>([]);
+	const [course, setCourse] = useState([]);
 	const [data, setData] = useState<DataType[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [isModalOpen, setIsModalOpen] = useState(false);
@@ -84,7 +85,14 @@ const Groups: React.FC = () => {
 		};
 		fetchGroups();
 	}, []);
-
+	useEffect(() => {
+		const fetchCourse = async () => {
+			const res = await courseService.getCourses();
+			// console.log(res);
+			setCourse(res?.data.courses);
+		};
+		fetchCourse();
+	}, []);
 	const handleRowClick = (data: DataType) => {
 		setSelectedGroup(data);
 		setFormData({
@@ -113,6 +121,7 @@ const Groups: React.FC = () => {
 		setSubmitLoading(true);
 		try {
 			const res = await groupsService.deleteGroup(id);
+			console.log(res)
 			if (res?.status === 200 || res?.status === 201) {
 				Notification("info", "Group successfully deleted");
 				setData(data.filter((item) => item.id !== id));
@@ -213,7 +222,6 @@ const Groups: React.FC = () => {
 		});
 		setIsModalOpen(true);
 	};
-
 	return (
 		<div style={{ padding: "24px" }}>
 			<h1 style={{ marginBottom: "16px", fontWeight: 600, color: "#1a1a1a" }}>
@@ -316,7 +324,7 @@ const Groups: React.FC = () => {
 						<label>
 							<strong>Course:</strong>
 						</label>
-						<Input
+						{/* <Input
 							value={formData.course}
 							onChange={(e) => handleInputChange("course", e.target.value)}
 							style={{
@@ -325,7 +333,22 @@ const Groups: React.FC = () => {
 								marginLeft: "5px",
 								width: "calc(100% - 80px)",
 							}}
-						/>
+						/> */}
+						<Select
+							onChange={(value) => handleInputChange("course", value)}
+							value={formData.course}
+							style={{
+								borderRadius: "3px",
+								marginLeft: "5px",
+								width: "calc(100% - 80px)",
+							}}
+						>
+							{course.map((item: any) => (
+								<Select.Option key={item.id} value={String(item.id)}>
+									{item.title}
+								</Select.Option>
+							))}
+						</Select>
 					</p>
 					<p>
 						<label>
@@ -337,7 +360,6 @@ const Groups: React.FC = () => {
 							onChange={(e) => handleInputChange("start_date", e.target.value)}
 							style={{
 								borderRadius: "3px",
-								padding: "6px",
 								marginLeft: "5px",
 								width: "calc(100% - 80px)",
 							}}

@@ -6,5 +6,6 @@ const Teacher = lazy(() => import("./teacher-layout/teacher"));
 const Admin = lazy(() => import("./admin-layout/admin"));
 const Student = lazy(() => import("./student-layout/student"));
 const Groups = lazy(() => import("./groups/groups"));
+const NotFound = lazy(() => import("./not-found/not-found"));
 
-export { Admin, Groups, SignIn, SignUp, Student, Teacher };
+export { Admin, Groups, NotFound, SignIn, SignUp, Student, Teacher };

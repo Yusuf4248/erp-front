@@ -1,4 +1,12 @@
-import { Admin, Groups, SignIn, SignUp, Student, Teacher } from "@pages";
+import {
+	Admin,
+	Groups,
+	NotFound,
+	SignIn,
+	SignUp,
+	Student,
+	Teacher,
+} from "@pages";
 import { lazy } from "react";
 import {
 	createBrowserRouter,
@@ -22,7 +30,7 @@ const Router = () => {
 					<Route path="student" element={<Student />}></Route>
 					{/* Teacher */}
 					<Route path="teacher" element={<Teacher />}></Route>
-					<Route path="*" element={<h1>404 Page Not Found</h1>} />
+					<Route path="*" element={<NotFound />} />
 				</Route>
 			</>
 		)
