@@ -84,14 +84,14 @@ const Groups: React.FC = () => {
 						onClick={() => handleEditClick(record)}
 						style={{ marginRight: 8 }}
 					>
-						Tahrirlash
+						Edit
 					</Button>
 					<Button
 						danger
 						onClick={() => handleDeleteClick(record.id)}
 						loading={isDeleting}
 					>
-						O'chirish
+						Delete
 					</Button>
 				</div>
 			),
@@ -186,18 +186,18 @@ const Groups: React.FC = () => {
 		data?.data?.data?.map((item: any) => ({
 			id: item.id,
 			name: item.name,
-			course: item.course?.title || "Noma'lum",
+			course: item.course?.title || "N/A",
 			start_date: item.start_date || "N/A",
 			end_date: item.end_date || "N/A",
 			status: item.status || "N/A",
 		})) || [];
 	return (
 		<div style={{ padding: 24 }}>
-			<h1 style={{ marginBottom: 16 }}>Guruhlar</h1>
+			<h1 style={{ marginBottom: 16 }}>Groups</h1>
 
 			<div style={{ marginBottom: 16, textAlign: "right" }}>
 				<Button type="primary" onClick={handleAddNewGroup}>
-					Yangi guruh qo'shish
+					Add new group
 				</Button>
 			</div>
 
@@ -209,12 +209,12 @@ const Groups: React.FC = () => {
 				loading={!data}
 			/>
 			<Modal
-				title={selectedGroup ? "Guruhni tahrirlash" : "Yangi guruh qo'shish"}
+				title={selectedGroup ? "Edit Group" : "Add new group"}
 				open={isModalOpen}
 				onCancel={handleModalClose}
 				footer={[
 					<Button key="cancel" onClick={handleModalClose}>
-						Bekor qilish
+						Cancel
 					</Button>,
 					selectedGroup ? (
 						<Button
@@ -223,7 +223,7 @@ const Groups: React.FC = () => {
 							onClick={handleUpdateGroup}
 							loading={isUpdating}
 						>
-							Saqlash
+							Save
 						</Button>
 					) : (
 						<Button
@@ -232,13 +232,13 @@ const Groups: React.FC = () => {
 							onClick={handleCreateGroup}
 							loading={isCreating}
 						>
-							Yaratish
+							Create
 						</Button>
 					),
 				]}
 			>
 				<div style={{ marginBottom: 16 }}>
-					<label>Nomi</label>
+					<label>Name</label>
 					<Input
 						value={formData.name}
 						onChange={(e) => handleInputChange("name", e.target.value)}
@@ -247,12 +247,12 @@ const Groups: React.FC = () => {
 				</div>
 
 				<div style={{ marginBottom: 16 }}>
-					<label>Kurs</label>
+					<label>Course</label>
 					<Select
 						style={{ width: "100%" }}
 						value={formData.course}
 						onChange={(value) => handleInputChange("course", value)}
-						placeholder="Kursni tanlang"
+						placeholder="Select course"
 					>
 						{courses.map((course) => (
 							<Select.Option key={course.id} value={course.id}>
@@ -263,7 +263,7 @@ const Groups: React.FC = () => {
 				</div>
 
 				<div style={{ marginBottom: 16 }}>
-					<label>Boshlanish sanasi</label>
+					<label>Start Date</label>
 					<Input
 						type="date"
 						value={formData.start_date}
@@ -272,7 +272,7 @@ const Groups: React.FC = () => {
 				</div>
 
 				<div style={{ marginBottom: 16 }}>
-					<label>Tugash sanasi</label>
+					<label>End Date</label>
 					<Input
 						type="date"
 						value={formData.end_date}
@@ -281,16 +281,16 @@ const Groups: React.FC = () => {
 				</div>
 
 				<div style={{ marginBottom: 16 }}>
-					<label>Holati</label>
+					<label>Status</label>
 					<Select
 						style={{ width: "100%" }}
 						value={formData.status}
 						onChange={(value) => handleInputChange("status", value)}
-						placeholder="Holatni tanlang"
+						placeholder="Select status"
 					>
-						<Select.Option value="new">Yangi</Select.Option>
-						<Select.Option value="active">Faol</Select.Option>
-						<Select.Option value="end">Tugagan</Select.Option>
+						<Select.Option value="new">New</Select.Option>
+						<Select.Option value="active">Active</Select.Option>
+						<Select.Option value="end">End</Select.Option>
 					</Select>
 				</div>
 			</Modal>
