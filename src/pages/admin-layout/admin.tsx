@@ -1,267 +1,266 @@
 import {
+	BellOutlined,
 	DashboardOutlined,
-	LoginOutlined,
 	LogoutOutlined,
 	MenuFoldOutlined,
 	MenuUnfoldOutlined,
 	MoonOutlined,
+	SettingOutlined,
 	SunOutlined,
 	TeamOutlined,
 	UserOutlined,
 } from "@ant-design/icons";
 import {
 	Avatar,
+	Badge,
 	Button,
-	Divider,
 	Dropdown,
+	Input,
 	Layout,
 	Menu,
 	Space,
 	Switch,
-	theme,
-	Typography,
 } from "antd";
 import React, { useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import { removeItem } from "../../helpers";
+import { removeItem, setItem } from "../../helpers";
 
 const { Header, Sider, Content } = Layout;
-const { Title, Text } = Typography;
+const { Search } = Input;
 
 const AdminLayout: React.FC = () => {
 	const [collapsed, setCollapsed] = useState(false);
-	const [currentTheme, setCurrentTheme] = useState<"light" | "dark">("light");
+	const [darkMode, setDarkMode] = useState(false);
 	const navigate = useNavigate();
-
-	const {
-		token: {
-			colorBgContainer,
-			borderRadiusLG,
-			colorTextBase,
-			colorPrimary,
-			colorBorder,
-		},
-	} = theme.useToken();
-
-	const themeConfig = {
-		algorithm:
-			currentTheme === "dark" ? theme.darkAlgorithm : theme.defaultAlgorithm,
-	};
-
-	const menuItems = [
+	const userMenuItems = [
 		{
-			key: "/dashboard",
+			key: "profile",
+			icon: <UserOutlined />,
+			label: "Profile",
+		},
+		{
+			key: "settings",
+			icon: <SettingOutlined />,
+			label: "Settings",
+		},
+		{
+			type: "divider" as const,
+		},
+		{
+			key: "logout",
+			icon: <LogoutOutlined />,
+			label: "Logout",
+			danger: true,
+		},
+	];
+
+	const sidebarItems = [
+		{
+			key: "dashboard",
 			icon: <DashboardOutlined />,
 			label: "Dashboard",
-			onClick: () => navigate("/admin"),
+			onClick: () => navigate("/admin/dashboard"),
 		},
 		{
-			key: "/groups",
-			icon: <TeamOutlined />,
-			label: "Groups",
-			onClick: () => navigate("/admin/groups"),
-		},
-		{
-			key: "/students",
+			key: "students",
 			icon: <UserOutlined />,
 			label: "Students",
 			onClick: () => navigate("/admin/students"),
 		},
+		{
+			key: "groups",
+			icon: <TeamOutlined />,
+			label: "Groups",
+			onClick: () => navigate("/admin/groups"),
+		},
 	];
 
-	const userMenu = (
-		<Menu theme={currentTheme}>
-			<Menu.Item
-				key="logoin"
-				icon={<LoginOutlined />}
-				onClick={() => {
-					navigate("/");
-				}}
-			>
-				Login
-			</Menu.Item>
-		</Menu>
-	);
-
-	const toggleTheme = () => {
-		setCurrentTheme(currentTheme === "light" ? "dark" : "light");
+	const handleThemeToggle = (checked: boolean) => {
+		setDarkMode(checked);
+		if (checked) {
+			removeItem("dark_mode");
+			setItem("dark_mode", "true");
+		} else {
+			removeItem("dark_mode");
+			setItem("dark_mode", "false");
+		}
 	};
 
 	return (
 		<Layout
 			style={{
 				minHeight: "100vh",
-				background: currentTheme === "dark" ? "#000" : "#f0f2f5",
+				background: darkMode ? "#1a1f24" : "#f5f7fa",
+				marginTop: "-10px",
+				marginBottom: "0px",
 			}}
 		>
 			<Sider
 				trigger={null}
 				collapsible
 				collapsed={collapsed}
-				width={250}
 				style={{
-					overflow: "auto",
-					height: "100vh",
 					position: "fixed",
+					height: "100vh",
 					left: 0,
 					top: 0,
 					bottom: 0,
-					background: currentTheme === "dark" ? "#1f1f1f" : colorBgContainer,
-					boxShadow: "2px 0 8px 0 rgba(29, 35, 41, 0.05)",
+					zIndex: 1000,
+					background: darkMode ? "#1a1f24" : "#ffffff",
+					boxShadow: "2px 0 8px rgba(0,0,0,0.08)",
+					borderRight: darkMode ? "none" : "1px solid #e8e8e8",
+					overflow: "auto",
 				}}
-				theme={currentTheme}
 			>
 				<div
 					style={{
-						height: 64,
+						height: "64px",
 						display: "flex",
 						alignItems: "center",
 						justifyContent: "center",
-						borderBottom: `1px solid ${
-							currentTheme === "dark" ? "#303030" : colorBorder
-						}`,
+						background: darkMode ? "#2a3a4a" : "#2a3a4a",
+						color: "#fff",
+						fontSize: collapsed ? "18px" : "20px",
+						fontWeight: "600",
+						marginBottom: "8px",
 					}}
 				>
-					<Title
-						level={4}
-						style={{
-							color: currentTheme === "dark" ? "#fff" : colorPrimary,
-							margin: 0,
-							whiteSpace: "nowrap",
-							overflow: "hidden",
-							textOverflow: "ellipsis",
-							maxWidth: collapsed ? 0 : "100%",
-							transition: "max-width 0.2s",
-						}}
-					>
-						Admin Page
-					</Title>
+					{collapsed ? "CRM" : "CRM Admin"}
 				</div>
 
 				<Menu
-					theme={currentTheme}
+					theme={darkMode ? "dark" : "light"}
 					mode="inline"
-					defaultSelectedKeys={["/dashboard"]}
-					items={menuItems}
+					defaultSelectedKeys={["dashboard"]}
+					items={sidebarItems}
 					style={{
-						borderRight: 0,
-						background: "transparent",
+						borderRight: "none",
+						padding: "8px 0",
+						background: darkMode ? "#1a1f24" : "#ffffff",
 					}}
 				/>
 			</Sider>
 
 			<Layout
 				style={{
-					marginLeft: collapsed ? 80 : 250,
-					transition: "margin 0.2s",
-					background: "transparent",
+					marginLeft: collapsed ? 80 : 200,
+					transition: "margin-left 0.2s",
+					background: darkMode ? "#1a1f24" : "#f5f7fa",
+					marginRight: "-10px",
+					marginTop: "-10px",
+					marginBottom: "-10px",
 				}}
 			>
 				<Header
 					style={{
 						padding: "0 24px",
-						background: currentTheme === "dark" ? "#1f1f1f" : colorBgContainer,
+						background: darkMode ? "#2a3a4a" : "#ffffff",
+						borderBottom: darkMode ? "none" : "1px solid #e8e8e8",
+						position: "sticky",
+						top: 0,
+						zIndex: 999,
 						display: "flex",
 						alignItems: "center",
 						justifyContent: "space-between",
-						boxShadow: "0 1px 4px rgba(0, 21, 41, 0.08)",
-						borderBottom: `1px solid ${
-							currentTheme === "dark" ? "#303030" : colorBorder
-						}`,
-						position: "sticky",
-						top: 0,
-						zIndex: 1,
+						boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
+						height: "64px",
 					}}
 				>
-					<Button
-						type="text"
-						icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-						onClick={() => setCollapsed(!collapsed)}
-						style={{
-							fontSize: "16px",
-							width: 64,
-							height: 64,
-							color: currentTheme === "dark" ? "#fff" : "inherit",
-						}}
-					/>
-
-					<Space size="middle" align="center">
-						<Switch
-							checkedChildren={
-								<MoonOutlined
-									style={{
-										color: currentTheme === "dark" ? "#fff" : "inherit",
-									}}
-								/>
-							}
-							unCheckedChildren={
-								<SunOutlined
-									style={{
-										color: currentTheme === "light" ? "#000" : "inherit",
-									}}
-								/>
-							}
-							checked={currentTheme === "dark"}
-							onChange={toggleTheme}
-						/>
-						<Divider
-							type="vertical"
+					<div style={{ display: "flex", alignItems: "center" }}>
+						<Button
+							type="text"
+							icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+							onClick={() => setCollapsed(!collapsed)}
 							style={{
-								background: currentTheme === "dark" ? "#303030" : colorBorder,
+								fontSize: "16px",
+								width: 48,
+								height: 48,
+								color: darkMode ? "#fff" : "#5a5a5a",
 							}}
 						/>
 
-						<Dropdown
-							overlay={userMenu}
-							placement="bottomRight"
-							trigger={["click"]}
-						>
+						<Search
+							placeholder="Search..."
+							style={{
+								width: 240,
+								marginLeft: 12,
+								backgroundColor: darkMode ? "#2a3a4a" : "#ffffff",
+								borderColor: darkMode ? "#3d4d5d" : "#d9d9d9",
+								color: darkMode ? "#fff" : "#000",
+							}}
+							size="middle"
+							allowClear
+						/>
+					</div>
+
+					<Space size="middle" align="center">
+						<Switch
+							checked={darkMode}
+							onChange={handleThemeToggle}
+							checkedChildren={<MoonOutlined />}
+							unCheckedChildren={<SunOutlined />}
+							style={{
+								backgroundColor: darkMode ? "#394b59" : "#e6e6e6",
+							}}
+						/>
+
+						<Badge count={5} size="small" dot={false}>
+							<Button
+								type="text"
+								icon={<BellOutlined />}
+								size="middle"
+								style={{
+									color: darkMode ? "#fff" : "#5a5a5a",
+									width: 40,
+									height: 40,
+								}}
+							/>
+						</Badge>
+
+						<Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
 							<div
 								style={{
 									display: "flex",
 									alignItems: "center",
-									gap: 8,
 									cursor: "pointer",
-									color: currentTheme === "dark" ? "#fff" : "inherit",
+									padding: "8px 0 8px 12px",
+									borderRadius: "4px",
+									transition: "background 0.3s",
 								}}
 							>
 								<Avatar
 									icon={<UserOutlined />}
 									style={{
-										backgroundColor:
-											currentTheme === "dark" ? "#1890ff" : colorPrimary,
+										backgroundColor: "#4a6da7",
+										marginRight: 8,
 									}}
 								/>
 								{!collapsed && (
-									<Text strong style={{ color: "inherit" }}></Text>
+									<span
+										style={{
+											color: darkMode ? "#fff" : "#333",
+											fontWeight: 500,
+											fontSize: "14px",
+										}}
+									>
+										Admin User
+									</span>
 								)}
 							</div>
 						</Dropdown>
-						<Button
-							onClick={() => {
-								removeItem("access_token");
-								navigate("/");
-							}}
-							style={{ border: "0", borderRadius: "50%" }}
-							size="large"
-						>
-							<LogoutOutlined />
-						</Button>
 					</Space>
 				</Header>
 
 				<Content
 					style={{
-						margin: "24px 16px",
+						margin: "26px 20px 0",
 						padding: 24,
-						minHeight: "calc(100vh - 112px)",
-						background: currentTheme === "dark" ? "#1f1f1f" : colorBgContainer,
-						borderRadius: borderRadiusLG,
-						color:
-							currentTheme === "dark" ? "rgba(255, 255, 255, 0.85)" : "inherit",
-						border: `1px solid ${
-							currentTheme === "dark" ? "#303030" : colorBorder
-						}`,
+						minHeight: 280,
+						background: darkMode ? "#2a3a4a" : "#ffffff",
+						borderRadius: "8px",
+						boxShadow: darkMode
+							? "0 1px 2px 0 rgba(0, 0, 0, 0.1)"
+							: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
 					}}
 				>
 					<Outlet />

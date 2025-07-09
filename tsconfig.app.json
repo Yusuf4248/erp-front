@@ -13,7 +13,8 @@
 			"@types": ["./src/types"],
 			"@pages": ["./src/pages"],
 			"@service": ["./src/service"],
-			"@helpers": ["./src/helpers"]
+			"@helpers": ["./src/helpers"],
+			"@hooks": ["./src/hooks"]
 		},
 		/* Bundler mode */
 		"moduleResolution": "bundler",
