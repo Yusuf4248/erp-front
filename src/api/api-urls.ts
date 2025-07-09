@@ -4,4 +4,6 @@ export class ApiUrls {
 	public static GROUPS: string = "/group";
 	public static COURSES: string = "/courses";
 	public static STUDENTS: string = "/student";
+	public static LOGOUT: string = "/log-out";
+	public static BRANCHES: string = "/branches";
 }

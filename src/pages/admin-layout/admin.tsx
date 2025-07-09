@@ -22,9 +22,11 @@ import {
 	Switch,
 } from "antd";
 import React, { useState } from "react";
+import { FaCodeBranch } from "react-icons/fa";
+import { MdCastForEducation } from "react-icons/md";
 import { Outlet, useNavigate } from "react-router-dom";
+import { ApiUrls } from "../../api/api-urls";
 import { removeItem, setItem } from "../../helpers";
-
 const { Header, Sider, Content } = Layout;
 const { Search } = Input;
 
@@ -51,6 +53,15 @@ const AdminLayout: React.FC = () => {
 			icon: <LogoutOutlined />,
 			label: "Logout",
 			danger: true,
+			onClick: async () => {
+				// const res = await logoutService.signOut("admin");
+				// console.log(res)
+				// if (res?.status === 200) {
+				removeItem("access_token");
+				removeItem("role");
+				navigate("/");
+				// }
+			},
 		},
 	];
 
@@ -72,6 +83,18 @@ const AdminLayout: React.FC = () => {
 			icon: <TeamOutlined />,
 			label: "Groups",
 			onClick: () => navigate("/admin/groups"),
+		},
+		{
+			key: "branches",
+			icon: <FaCodeBranch />,
+			label: "Branches",
+			onClick: () => navigate(`/admin${ApiUrls.BRANCHES}`),
+		},
+		{
+			key: "courses",
+			icon: <MdCastForEducation />,
+			label: "Courses",
+			onClick: () => navigate(`/admin${ApiUrls.COURSES}`),
 		},
 	];
 
@@ -146,14 +169,14 @@ const AdminLayout: React.FC = () => {
 					marginLeft: collapsed ? 80 : 200,
 					transition: "margin-left 0.2s",
 					background: darkMode ? "#1a1f24" : "#f5f7fa",
-					marginRight: "-10px",
+					marginRight: "-8px",
 					marginTop: "-10px",
 					marginBottom: "-10px",
 				}}
 			>
 				<Header
 					style={{
-						padding: "0 24px",
+						padding: "0 20px",
 						background: darkMode ? "#2a3a4a" : "#ffffff",
 						borderBottom: darkMode ? "none" : "1px solid #e8e8e8",
 						position: "sticky",
@@ -243,7 +266,7 @@ const AdminLayout: React.FC = () => {
 											fontSize: "14px",
 										}}
 									>
-										Admin User
+										Admin
 									</span>
 								)}
 							</div>
@@ -253,7 +276,7 @@ const AdminLayout: React.FC = () => {
 
 				<Content
 					style={{
-						margin: "26px 20px 0",
+						margin: "26px 26px 0",
 						padding: 24,
 						minHeight: 280,
 						background: darkMode ? "#2a3a4a" : "#ffffff",

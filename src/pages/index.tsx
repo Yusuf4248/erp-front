@@ -7,12 +7,18 @@ const Admin = lazy(() => import("./admin-layout/admin"));
 const Student = lazy(() => import("./student-layout/student"));
 const Groups = lazy(() => import("./groups/groups"));
 const NotFound = lazy(() => import("./not-found/not-found"));
-const StudentsTbl = lazy(() => import("./students/student"));
+const StudentsTbl = lazy(() => import("./student-layout/student"));
+const ProtectLayout = lazy(() => import("./protect-route/protect-layout"));
+const ProtectLogin = lazy(() => import("./protect-route/protect-login"));
+const Courses = lazy(() => import("./course-layout/course"));
 
 export {
 	Admin,
+	Courses,
 	Groups,
 	NotFound,
+	ProtectLayout,
+	ProtectLogin,
 	SignIn,
 	SignUp,
 	Student,

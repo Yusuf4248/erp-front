@@ -1,9 +1,11 @@
-import { courseService } from "@service";
-import type { TableProps } from "antd";
-import { Button, Input, Modal, Select, Table, message } from "antd";
-import React, { useEffect, useState } from "react";
-import { Notification } from "../../helpers";
-import { useGroups } from "../../hooks/useGroups";
+import { courseService } from "@service"
+import type { TableProps } from "antd"
+import { Button, Input, Modal, Select, Table, message } from "antd"
+import React, { useEffect, useState } from "react"
+import { FaEdit } from "react-icons/fa"
+import { MdDelete } from "react-icons/md"
+import { Notification } from "../../helpers"
+import { useGroups } from "../../hooks/useGroups"
 interface GroupType {
 	id: number;
 	name: string;
@@ -30,7 +32,7 @@ const Groups: React.FC = () => {
 	useEffect(() => {
 		const fetchCourses = async () => {
 			try {
-				const res = await courseService.getCourses();
+				const res = await courseService.getCourse();
 				setCourses(res?.data.courses || []);
 			} catch (error) {
 				message.error("Kurslarni yuklashda xato yuz berdi");
@@ -84,13 +86,16 @@ const Groups: React.FC = () => {
 						onClick={() => handleEditClick(record)}
 						style={{ marginRight: 8 }}
 					>
+					<FaEdit />
 						Edit
 					</Button>
 					<Button
 						danger
 						onClick={() => handleDeleteClick(record.id)}
 						loading={isDeleting}
+						style={{ backgroundColor: "red", color: "#fff" }}
 					>
+						<MdDelete />
 						Delete
 					</Button>
 				</div>
@@ -112,8 +117,8 @@ const Groups: React.FC = () => {
 		Modal.confirm({
 			title: "Delete group",
 			content: "Are you sure do you want to delete this group?",
-			okText: "Ha",
-			cancelText: "Yo'q",
+			okText: "Yes",
+			cancelText: "No",
 			onOk: () =>
 				deleteGroup(groupId, {
 					onSuccess: () =>
@@ -193,7 +198,9 @@ const Groups: React.FC = () => {
 		})) || [];
 	return (
 		<div style={{ padding: 24 }}>
-			<h1 style={{ marginBottom: 16 }}>Groups</h1>
+			<div style={{ marginBottom: "-38px", textAlign: "left" }}>
+				<span style={{ marginTop: "100px", fontSize: "40px" }}>Groups</span>
+			</div>
 
 			<div style={{ marginBottom: 16, textAlign: "right" }}>
 				<Button type="primary" onClick={handleAddNewGroup}>
