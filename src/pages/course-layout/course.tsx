@@ -175,7 +175,7 @@ const Courses: React.FC = () => {
 			description: item.description,
 			price: Number(item.price),
 			duration: item.duration,
-			lesson_in_a_week: Number(item.lesson_in_a_week),
+			lessons_in_a_week: Number(item.lesson_in_a_week),
 			lesson_duration: item.lesson_duration,
 		};
 		createCourse(payload, {
@@ -196,7 +196,7 @@ const Courses: React.FC = () => {
 			description: item.description,
 			price: Number(item.price),
 			duration: item.duration,
-			lesson_in_a_week: Number(item.lesson_in_a_week),
+			lessons_in_a_week: Number(item.lesson_in_a_week),
 			lesson_duration: item.lesson_duration,
 		};
 		updateCourse(

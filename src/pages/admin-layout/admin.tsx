@@ -24,6 +24,7 @@ import {
 import React, { useState } from "react";
 import { FaCodeBranch } from "react-icons/fa";
 import { MdCastForEducation } from "react-icons/md";
+import { PiChalkboardTeacherFill } from "react-icons/pi";
 import { Outlet, useNavigate } from "react-router-dom";
 import { ApiUrls } from "../../api/api-urls";
 import { removeItem, setItem } from "../../helpers";
@@ -95,6 +96,12 @@ const AdminLayout: React.FC = () => {
 			icon: <MdCastForEducation />,
 			label: "Courses",
 			onClick: () => navigate(`/admin${ApiUrls.COURSES}`),
+		},
+		{
+			key: "teachers",
+			icon: <PiChalkboardTeacherFill />,
+			label: "Teachers",
+			onClick: () => navigate(`/admin${ApiUrls.TEACHER}`),
 		},
 	];
 
