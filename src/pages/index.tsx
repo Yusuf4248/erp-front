@@ -7,6 +7,8 @@ const TeacherLayout = lazy(() => import("./teacher-layout/teacher"));
 const StudentLayout = lazy(() => import("./student-layout/student"));
 const AdminLayout = lazy(() => import("./admin-layout/admin"));
 const Groups = lazy(() => import("./groups/groups"));
+const Courses = lazy(() => import("./courses/course"));
+const Branches = lazy(() => import("./branches/branch"));
 
 export {
   SignIn,
@@ -16,4 +18,6 @@ export {
   StudentLayout,
   AdminLayout,
   Groups,
+  Courses,
+  Branches,
 };

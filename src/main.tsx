@@ -2,5 +2,11 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import "@ant-design/v5-patch-for-react-19";
 import Router from "./routes/route.tsx";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-createRoot(document.getElementById("root")!).render(<Router />);
+const queryClient = new QueryClient();
+createRoot(document.getElementById("root")!).render(
+  <QueryClientProvider client={queryClient}>
+    <Router />
+  </QueryClientProvider>
+);

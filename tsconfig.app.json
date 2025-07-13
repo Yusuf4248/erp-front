@@ -14,6 +14,7 @@
       "@pages":["./src/pages"],
       "@services":["./src/services"],
       "@helpers":["./src/helpers"],
+      "@hooks":["./src/hooks"],
     },
     /* Bundler mode */
     "moduleResolution": "bundler",

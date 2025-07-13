@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Button, Input, Card, Typography, message } from "antd";
-import { authService } from "@services";
+// import { authService } from "@services";
 import { useNavigate } from "react-router-dom";
 import { setItem } from "@helpers";
+import { useAuth } from "@hooks";
 
 const { Title } = Typography;
 
@@ -11,6 +12,7 @@ const SignIn = () => {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
   const navigate = useNavigate();
+  const { mutate, isPending } = useAuth();
 
   const submit = async () => {
     if (!role) {
@@ -20,12 +22,18 @@ const SignIn = () => {
 
     const payload = { email, password };
     try {
-      const res = await authService.signIn(payload, role);
-      if (res.status === 201) {
-        setItem("access_token", res.data.access_token);
-        setItem("role", role);
-        navigate(`/${role}`);
-      }
+      mutate(
+        { data: payload, role },
+        {
+          onSuccess: (res: any) => {
+            if (res.status === 201) {
+              setItem("access_token", res.data.access_token);
+              setItem("role", role);
+              navigate(`/${role}`);
+            }
+          },
+        }
+      );
     } catch (error) {
       message.error("Login muvaffaqiyatsiz! Email yoki parol noto'g'ri.");
     }
@@ -78,6 +86,7 @@ const SignIn = () => {
             block
             className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-md text-white"
             style={{ height: "40px", fontSize: "14px" }}
+            loading={isPending}
           >
             Submit
           </Button>

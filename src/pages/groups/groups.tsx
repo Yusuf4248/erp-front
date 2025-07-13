@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { Table, Button, Tag, Popconfirm, Space } from "antd";
 import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
 import GroupModal from "./group-modal";
-import { groupService } from "@services";
 import { type Group, type GroupFormValues, GroupStatus } from "@types";
 import { Notification } from "@helpers";
+import { useGroup } from "@hooks";
 
 const Groups = () => {
   const [groups, setGroups] = useState<Group[]>([]);
@@ -17,44 +17,40 @@ const Groups = () => {
     total: 0,
   });
 
-  const fetchGroups = async (page: number, pageSize: number) => {
-    setLoading(true);
-    try {
-      const response = await groupService.getGroups();
-      const data = response?.data?.data || [];
-      setGroups(data);
-      setPagination({
-        ...pagination,
-        current: page,
-        pageSize,
-        total: data.length,
-      });
-    } catch (err) {
-      Notification("error", "Guruhlarni yuklashda xatolik yuz berdi");
-    }
-    setLoading(false);
-  };
+  const { getGroups, createGroup, updateGroup, deleteGroup } = useGroup();
+  const createGroupMutation = createGroup();
+  const updateGroupMutation = updateGroup();
+  const deleteGroupMutation = deleteGroup();
 
   useEffect(() => {
-    fetchGroups(pagination.current!, pagination.pageSize!);
-  }, []);
+    if (getGroups.data?.data?.data) {
+      setGroups(getGroups.data.data.data);
+      setPagination((prev) => ({
+        ...prev,
+        total: getGroups?.data?.data.data.length,
+      }));
+    }
+    setLoading(getGroups.isLoading);
+  }, [getGroups.data, getGroups.isLoading]);
 
   const handleTableChange = (pagination: TablePaginationConfig) => {
-    fetchGroups(pagination.current!, pagination.pageSize!);
+    setPagination(pagination);
   };
 
   const handleCreateOrUpdate = async (values: GroupFormValues) => {
     try {
       if (editingGroup) {
-        await groupService.updateGroup(values, editingGroup.id);
+        await updateGroupMutation.mutateAsync({
+          id: editingGroup.id,
+          data: values,
+        });
         Notification("success", "Guruh muvaffaqiyatli yangilandi");
       } else {
-        await groupService.createGroup(values);
+        await createGroupMutation.mutateAsync(values);
         Notification("success", "Guruh muvaffaqiyatli qo'shildi");
       }
       setModalOpen(false);
       setEditingGroup(null);
-      fetchGroups(pagination.current!, pagination.pageSize!);
     } catch (err) {
       Notification("error", "Amalni bajarishda xatolik yuz berdi");
     }
@@ -67,9 +63,8 @@ const Groups = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      await groupService.deleteGroup(id);
+      await deleteGroupMutation.mutateAsync(id);
       Notification("success", "Guruh o'chirildi");
-      fetchGroups(pagination.current!, pagination.pageSize!);
     } catch (err) {
       Notification("error", "Guruhni o'chirishda xatolik yuz berdi");
     }
