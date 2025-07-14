@@ -1,23 +1,32 @@
 import { useEffect, useState } from "react";
-import { Table, Button, Tag, Popconfirm, Space } from "antd";
+import { Table, Button, Tag, Space } from "antd";
 import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
 import GroupModal from "./group-modal";
 import { type Group, type GroupFormValues, GroupStatus } from "@types";
 import { Notification } from "@helpers";
 import { useGroup } from "@hooks";
+import { PopConfirm } from "@components";
+import { EditOutlined } from "@ant-design/icons";
+import { useSearchParams } from "react-router-dom";
 
 const Groups = () => {
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingGroup, setEditingGroup] = useState<Group | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [pagination, setPagination] = useState<TablePaginationConfig>({
     current: 1,
     pageSize: 5,
     total: 0,
+    showSizeChanger: true,
+    pageSizeOptions: ["3", "5", "10", "20"],
   });
 
-  const { getGroups, createGroup, updateGroup, deleteGroup } = useGroup();
+  const { getGroups, createGroup, updateGroup, deleteGroup } = useGroup({
+    page: pagination.current!,
+    limit: pagination.pageSize!,
+  });
   const createGroupMutation = createGroup();
   const updateGroupMutation = updateGroup();
   const deleteGroupMutation = deleteGroup();
@@ -27,15 +36,32 @@ const Groups = () => {
       setGroups(getGroups.data.data.data);
       setPagination((prev) => ({
         ...prev,
-        total: getGroups?.data?.data.data.length,
+        total: getGroups?.data?.data.total ?? getGroups?.data?.data.data.length,
       }));
     }
     setLoading(getGroups.isLoading);
   }, [getGroups.data, getGroups.isLoading]);
 
   const handleTableChange = (pagination: TablePaginationConfig) => {
-    setPagination(pagination);
+    setSearchParams({
+      page: String(pagination.current ?? 1),
+      limit: String(pagination.pageSize ?? 5),
+    });
+    setPagination((prev) => ({
+      ...prev,
+      current: pagination.current ?? prev.current,
+      pageSize: pagination.pageSize ?? prev.pageSize,
+    }));
   };
+  useEffect(() => {
+    const page = Number(searchParams.get("page")) || 1;
+    const limit = Number(searchParams.get("limit")) || 5;
+    setPagination((prev) => ({
+      ...prev,
+      current: page,
+      pageSize: limit,
+    }));
+  }, [searchParams]);
 
   const handleCreateOrUpdate = async (values: GroupFormValues) => {
     try {
@@ -51,6 +77,7 @@ const Groups = () => {
       }
       setModalOpen(false);
       setEditingGroup(null);
+      getGroups.refetch();
     } catch (err) {
       Notification("error", "Amalni bajarishda xatolik yuz berdi");
     }
@@ -65,6 +92,7 @@ const Groups = () => {
     try {
       await deleteGroupMutation.mutateAsync(id);
       Notification("success", "Guruh o'chirildi");
+      getGroups.refetch();
     } catch (err) {
       Notification("error", "Guruhni o'chirishda xatolik yuz berdi");
     }
@@ -95,9 +123,10 @@ const Groups = () => {
       ),
     },
     {
-      title: "Kurs ID",
-      dataIndex: "course_id",
-      key: "course_id",
+      title: "Kurs nomi",
+      dataIndex: "course",
+      key: "course",
+      render: (course) => <span>{course.title}</span>,
     },
     {
       title: "Boshlanish",
@@ -115,18 +144,9 @@ const Groups = () => {
       render: (_, record) => (
         <Space>
           <Button type="link" onClick={() => handleEdit(record)}>
-            Edit
+            <EditOutlined />
           </Button>
-          <Popconfirm
-            title="Ishonchingiz komilmi?"
-            okText="Ha"
-            cancelText="Yo'q"
-            onConfirm={() => handleDelete(record.id)}
-          >
-            <Button type="link" danger>
-              Delete
-            </Button>
-          </Popconfirm>
+          <PopConfirm handleDelete={() => handleDelete(record.id)} />
         </Space>
       ),
     },

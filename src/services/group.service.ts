@@ -1,9 +1,9 @@
 import { apiConfig } from "@api/config";
 import { ApiUrls } from "@api/api-urls";
-import type { GroupFormValues } from "@types";
+import type { GroupFormValues, PaginationParams } from "@types";
 export const groupService = {
-  async getGroups() {
-    const res = await apiConfig().getRequest(ApiUrls.GROUPS);
+  async getGroups(params: PaginationParams): Promise<any> {
+    const res = await apiConfig().getRequest(ApiUrls.GROUPS, params);
     return res;
   },
   async createGroup(model: GroupFormValues): Promise<any> {

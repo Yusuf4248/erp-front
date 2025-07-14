@@ -1,11 +1,12 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { groupService } from "@services";
 import { type GroupFormValues } from "@types";
+import type { PaginationParams } from "@types";
 
-export const useGroup = () => {
+export const useGroup = (params: PaginationParams) => {
   const getGroups = useQuery({
-    queryKey: ["groups"],
-    queryFn: async () => groupService.getGroups(),
+    queryKey: ["groups", params],
+    queryFn: async () => groupService.getGroups(params),
   });
 
   const createGroup = () =>

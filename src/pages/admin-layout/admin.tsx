@@ -18,7 +18,7 @@ const menuItems = [
   {
     key: "groups",
     icon: <TeamOutlined />,
-    label: <Link to="/admin/groups">Guruhlar</Link>,
+    label: <Link to="/admin/groups">Groups</Link>,
   },
   {
     key: "branches",
