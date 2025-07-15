@@ -47,6 +47,13 @@ const Branches: React.FC = () => {
 			title: "Teachers",
 			dataIndex: "teachers",
 			key: "Teachers",
+			render: (teachers) => (
+				<span>
+      {Array.isArray(teachers) && teachers.length > 0
+		  ? teachers.map((teacher) => teacher.first_name || "N/A").join("\n")
+		  : "No teachers"}
+    </span>
+			),
 		},
 		{
 			title: "Actions",
@@ -155,7 +162,7 @@ const Branches: React.FC = () => {
 			}
 		);
 	};
-	const datas = data?.data?.branch;
+	const datas = data?.data?.branch ||[];
 	const tableData = datas
 		? datas.map((item: any) => ({
 				id: item.id,
@@ -165,6 +172,7 @@ const Branches: React.FC = () => {
 				teachers: item.teachers || "N/A",
 		  }))
 		: [];
+	console.log(tableData);
 	return (
 		<div style={{ padding: 24 }}>
 			<div style={{ marginBottom: "-38px", textAlign: "left" }}>

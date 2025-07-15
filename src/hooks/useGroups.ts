@@ -1,11 +1,12 @@
+import { groupsService } from "@service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { groupsService } from "../service";
+import type { ParamsType } from "@types";
 
-export const useGroups = () => {
+export const useGroups = (params: ParamsType) => {
 	const queryClient = useQueryClient();
 	const { data } = useQuery({
-		queryKey: ["groups"],
-		queryFn: async () => groupsService.getGroup(),
+		queryKey: ["groups", params],
+		queryFn: async () => groupsService.getGroup(params),
 	});
 	const useGroupCreate = () => {
 		return useMutation({
@@ -17,7 +18,8 @@ export const useGroups = () => {
 	};
 	const useGroupUpdate = () => {
 		return useMutation({
-			mutationFn: async ({ id, data }: { id: number; data: any }) => groupsService.updateGroup(id, data),
+			mutationFn: async ({ id, data }: { id: number; data: any }) =>
+				groupsService.updateGroup(id, data),
 			onSuccess: () => {
 				queryClient.invalidateQueries({ queryKey: ["groups"] });
 			},
