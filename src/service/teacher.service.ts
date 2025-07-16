@@ -1,9 +1,10 @@
 import { ApiUrls } from "@api/api-urls";
 import { apiConfig } from "@api/config";
+import type { ParamsType } from "@types";
 
 export const teacherService = {
-	async getTeacher() {
-		const res = await apiConfig().getRequest(ApiUrls.TEACHER);
+	async getTeacher(params: ParamsType) {
+		const res = await apiConfig().getRequest(ApiUrls.TEACHER, params);
 		return res;
 	},
 	async deleteTeacher(id: number) {

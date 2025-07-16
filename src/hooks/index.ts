@@ -4,3 +4,4 @@ export * from "./useCourses";
 export * from "./useGroups";
 export * from "./useStudents";
 export * from "./useTeacher";
+export * from "./useGeneral.ts";

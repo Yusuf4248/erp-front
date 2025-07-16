@@ -13,7 +13,7 @@ export const PopConfirm = ({ handleDelete, loading }: PopConfirmProps) => {
 			cancelText="No"
 			onConfirm={handleDelete}
 		>
-			<Button danger type="primary" loading={loading}>
+			<Button danger 	size='small' type="primary" loading={loading}>
 				<DeleteOutlined />
 			</Button>
 		</Popconfirm>

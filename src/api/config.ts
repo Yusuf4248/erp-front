@@ -13,7 +13,9 @@ export function apiConfig() {
 	async function postRequest(url: string, body: object = {}) {
 		try {
 			const res = await axiosInstance.post(url, body);
+			Notification("success", "Created");
 			return res;
+
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
 			Notification("error", error?.message);
@@ -22,6 +24,7 @@ export function apiConfig() {
 	async function deleteRequest(url: string, params: object = {}) {
 		try {
 			const res = await axiosInstance.delete(url, params);
+			Notification("info", "Deleted");
 			return res;
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
@@ -31,6 +34,7 @@ export function apiConfig() {
 	async function updateRequest(url: string, body: object) {
 		try {
 			const res = await axiosInstance.patch(url, body);
+			Notification("success", "Updated");
 			return res;
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {

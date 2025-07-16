@@ -1,3 +1,4 @@
+import { removeItem } from "@helpers";
 import axios from "axios";
 
 const axiosInstance = axios.create({
@@ -11,5 +12,17 @@ axiosInstance.interceptors.request.use((config) => {
 	}
 	return config;
 });
+
+axiosInstance.interceptors.response.use(
+	(res) => res,
+	async (err) => {
+		if (err.response && err.response.status === 401) {
+			removeItem("access_token");
+			removeItem("role");
+			window.location.href = "/";
+		}
+		return Promise.reject(err);
+	}
+);
 
 export default axiosInstance;

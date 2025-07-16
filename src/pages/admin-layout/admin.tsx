@@ -15,7 +15,6 @@ import {
 	Badge,
 	Button,
 	Dropdown,
-	Input,
 	Layout,
 	Menu,
 	Space,
@@ -29,7 +28,6 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { ApiUrls } from "../../api/api-urls";
 import { removeItem, setItem } from "../../helpers";
 const { Header, Sider, Content } = Layout;
-const { Search } = Input;
 
 const AdminLayout: React.FC = () => {
 	const [collapsed, setCollapsed] = useState(false);
@@ -194,6 +192,7 @@ const AdminLayout: React.FC = () => {
 						justifyContent: "space-between",
 						boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
 						height: "64px",
+						marginLeft: "-8px",
 					}}
 				>
 					<div style={{ display: "flex", alignItems: "center" }}>
@@ -208,19 +207,6 @@ const AdminLayout: React.FC = () => {
 								color: darkMode ? "#fff" : "#5a5a5a",
 							}}
 						/>
-
-						<Search
-							placeholder="Search..."
-							style={{
-								width: 240,
-								marginLeft: 12,
-								backgroundColor: darkMode ? "#2a3a4a" : "#ffffff",
-								borderColor: darkMode ? "#3d4d5d" : "#d9d9d9",
-								color: darkMode ? "#fff" : "#000",
-							}}
-							size="middle"
-							allowClear
-						/>
 					</div>
 
 					<Space size="middle" align="center">
@@ -233,7 +219,6 @@ const AdminLayout: React.FC = () => {
 								backgroundColor: darkMode ? "#394b59" : "#e6e6e6",
 							}}
 						/>
-
 						<Badge count={5} size="small" dot={false}>
 							<Button
 								type="text"
@@ -246,7 +231,6 @@ const AdminLayout: React.FC = () => {
 								}}
 							/>
 						</Badge>
-
 						<Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
 							<div
 								style={{
@@ -283,7 +267,7 @@ const AdminLayout: React.FC = () => {
 
 				<Content
 					style={{
-						margin: "26px 26px 0",
+						margin: "32px 12px",
 						padding: 24,
 						minHeight: 280,
 						background: darkMode ? "#2a3a4a" : "#ffffff",

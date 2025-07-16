@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { studentService } from "../service";
+import { studentService } from "@service";
+import type { ParamsType } from '@types'
 
-export const useStudents = () => {
+export const useStudents = (params:ParamsType) => {
 	const queryClient = useQueryClient();
 	const { data } = useQuery({
-		queryKey: ["student"],
-		queryFn: async () => studentService.getStudent(),
+		queryKey: ["student",params],
+		queryFn: async () => studentService.getStudent(params),
 	});
 	const useStudentCreate = () => {
 		return useMutation({

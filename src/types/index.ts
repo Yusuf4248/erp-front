@@ -1,3 +1,3 @@
 export * from "./auth.ts";
-export * from './group.ts'
+export * from './section.ts'
 export * from './general.ts'
