@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {  courseService } from "../service";
+import {  courseService } from "@service";
+import type { ParamsType } from '@types'
 
-export const useCourses = () => {
+export const useCourses = (params:ParamsType) => {
 	const queryClient = useQueryClient();
 	const { data } = useQuery({
-		queryKey: ["course"],
-		queryFn: async () => courseService.getCourse(),
+		queryKey: ["course",params],
+		queryFn: async () => courseService.getCourse(params),
 	});
 	const useCourseCreate = () => {
 		return useMutation({

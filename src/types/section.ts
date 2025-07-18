@@ -30,3 +30,25 @@ export interface TeacherType {
 	role: string;
 	branchId: [];
 }
+export interface BranchType {
+	id: number;
+	name: string;
+	address: string;
+	call_number: string;
+	teachers: [];
+}
+
+export interface CourseType {
+	id: number;
+	title: string;
+	description: string;
+	price: number;
+	duration: string;
+	lesson_in_a_week: string;
+	lesson_duration: string;
+}
+
+export interface AddStudentOrTeacher {
+	teacherId: number;
+	studentId: number;
+}

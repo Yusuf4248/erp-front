@@ -35,7 +35,7 @@ const TeacherModal = ({ open, toggle, update }: TeacherProps) => {
 		page: 1,
 		limit: 10,
 	});
-	const { data: brachData } = useBranches();
+	const { data: brachData } = useBranches({ page: 1, limit: 100 });
 	const fullBranchData = brachData?.data.branch || [];
 	const { mutate: createTeacher, isPending: isCreating } = useTeacherCreate();
 	const { mutate: updateTeacher, isPending: isUpdating } = useTeacherUpdate();
@@ -140,7 +140,11 @@ const TeacherModal = ({ open, toggle, update }: TeacherProps) => {
 						name="phone"
 						control={control}
 						render={({ field }) => (
-							<MaskedInput {...field} mask="+998 (00) 000-00-00" value={update?update.phone:''} />
+							<MaskedInput
+								{...field}
+								mask="+998 (00) 000-00-00"
+								value={update ? update.phone : ""}
+							/>
 						)}
 					/>
 				</Form.Item>

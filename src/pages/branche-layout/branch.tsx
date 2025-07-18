@@ -1,270 +1,104 @@
-import type { TableProps } from "antd";
-import { Button, Input, Modal, Table } from "antd";
-import React, { useState } from "react";
-import { FaEdit } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
-import { Notification } from "../../helpers";
-import { useBranches } from "../../hooks/useBranches";
-interface BranchType {
-	id: number;
-	name: string;
-	address: string;
-	call_number: string;
-	teachers: [];
-}
-const Branches: React.FC = () => {
-	// const [teachers, setTeachers] = useState<any[]>([]);
-	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [selectedBranch, setSelectedBranch] = useState<BranchType | null>(null);
-	const [formData, setFormData] = useState({
-		name: "",
-		address: "",
-		call_number: "",
-		teachers: [],
+import { EditOutlined } from "@ant-design/icons";
+import { BranchColumn, PopConfirm } from "@components";
+import { useBranches, useGeneral } from "@hooks";
+import type { BranchType } from "@types";
+import {
+	Button,
+	Space,
+	Table,
+	type TablePaginationConfig,
+	type TableProps,
+} from "antd";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import BranchModal from "./modal";
+const Branchs: React.FC = () => {
+	const [open, setOpen] = useState(false);
+	const [update, setUpdate] = useState<BranchType | null>(null);
+	const location = useLocation();
+	const { handlePagination } = useGeneral();
+	const [params, setParams] = useState({
+		page: 1,
+		limit: 10,
 	});
-	const { data, useBranchCreate, useBranchUpdate, useBranchDelete } =
-		useBranches();
-	const { mutate: createBranch, isPending: isCreating } = useBranchCreate();
-	const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdate();
+	const { data, useBranchDelete } = useBranches(params);
+
 	const { mutate: deleteBranch, isPending: isDeleting } = useBranchDelete();
+	useEffect(() => {
+		const searchParams = new URLSearchParams(location.search);
+		const page = searchParams.get("page") || "1";
+		const limit = searchParams.get("limit") || "10";
+		if (page && limit) {
+			setParams({
+				page: Number(page),
+				limit: Number(limit),
+			});
+		}
+		// navigate({search:`?page=${page}&limit=${limit}`});
+	}, [location.search]);
+	const deleteItem = (id: number) => {
+		deleteBranch(id);
+	};
+	const updateItem = (branchData: BranchType) => {
+		setOpen(true);
+		setUpdate(branchData);
+	};
+	const toggle = () => {
+		setOpen(!open);
+		if (update) {
+			setUpdate(null);
+		}
+	};
+	const handleTableChange = (pagination: TablePaginationConfig) => {
+		handlePagination({ pagination, setParams });
+	};
 	const columns: TableProps<BranchType>["columns"] = [
+		...(BranchColumn ?? []),
 		{
-			title: "Name",
-			dataIndex: "name",
-			key: "Name",
-		},
-		{
-			title: "Address",
-			dataIndex: "address",
-			key: "Address",
-		},
-		{
-			title: "Call Number",
-			dataIndex: "call_number",
-			key: "Call Number",
-		},
-		{
-			title: "Teachers",
-			dataIndex: "teachers",
-			key: "Teachers",
-			render: (teachers) => (
-				<span>
-      {Array.isArray(teachers) && teachers.length > 0
-		  ? teachers.map((teacher) => teacher.first_name || "N/A").join("\n")
-		  : "No teachers"}
-    </span>
-			),
-		},
-		{
-			title: "Actions",
-			key: "actions",
-			render: (_, record) => (
-				<div>
+			title: "Action",
+			key: "action",
+			render: (_, record: BranchType) => (
+				<Space size="middle">
 					<Button
-						type="primary"
-						onClick={() => handleEditClick(record)}
-						style={{ marginRight: 8 }}
+						type={"primary"}
+						size="small"
+						onClick={() => updateItem(record)}
 					>
-						<FaEdit />
-						Edit
+						<EditOutlined />
 					</Button>
-					<Button
-						danger
-						onClick={() => handleDeleteClick(record.id)}
+					<PopConfirm
+						handleDelete={() => deleteItem(record.id)}
 						loading={isDeleting}
-						style={{ backgroundColor: "red", color: "#fff" }}
-					>
-						<MdDelete />
-						Delete
-					</Button>
-				</div>
+					/>
+				</Space>
 			),
 		},
 	];
-	const handleEditClick = (branch: BranchType) => {
-		setSelectedBranch(branch);
-		setFormData({
-			name: branch.name,
-			address: branch.address,
-			call_number: branch.call_number,
-			teachers: branch.teachers,
-		});
-		setIsModalOpen(true);
-	};
-	const handleDeleteClick = (branchId: number) => {
-		Modal.confirm({
-			title: "Delete branch",
-			content: "Are you sure do you want to delete this branch?",
-			okText: "Yes",
-			cancelText: "No",
-			onOk: () =>
-				deleteBranch(branchId, {
-					onSuccess: () =>
-						Notification("success", "Branch deleted successfully"),
-				}),
-		});
-	};
-	const handleModalClose = () => {
-		setIsModalOpen(false);
-		setSelectedBranch(null);
-		setFormData({
-			name: "",
-			address: "",
-			call_number: "",
-			teachers: [],
-		});
-	};
-	const handleInputChange = (field: keyof typeof formData, value: string) => {
-		setFormData((prev) => ({ ...prev, [field]: value }));
-	};
-	const handleAddNewGroup = () => {
-		setSelectedBranch(null);
-		setIsModalOpen(true);
-	};
-	const handleCreateGroup = () => {
-		if (!formData.name || !formData.address || !formData.call_number) {
-			Notification("error", "Feel all required area.");
-			return;
-		}
-		const payload = {
-			name: formData.name,
-			address: formData.address,
-			call_number: formData.call_number,
-			// teachers: formData.teachers,
-		};
-		createBranch(payload, {
-			onSuccess: () => {
-				Notification("success", "Branch created successfully.");
-				handleModalClose();
-			},
-		});
-	};
-	const handleUpdateGroup = () => {
-		if (!selectedBranch) return;
-		if (!formData.name || !formData.call_number || !formData.address) {
-			Notification("error", "Feel all required area.");
-			return;
-		}
-		const payload = {
-			// id: selectedGroup.id,
-			name: formData.name,
-			address: formData.address,
-			call_number: formData.call_number,
-			// teachers: formData.teachers,
-		};
-		updateBranch(
-			{ id: selectedBranch.id, data: payload },
-			{
-				onSuccess: () => {
-					Notification("success", "Branch updated successfully");
-					handleModalClose();
-				},
-			}
-		);
-	};
-	const datas = data?.data?.branch ||[];
-	const tableData = datas
-		? datas.map((item: any) => ({
-				id: item.id,
-				name: item.name || "N/A",
-				address: item.address || "N/A",
-				call_number: item.call_number || "N/A",
-				teachers: item.teachers || "N/A",
-		  }))
-		: [];
-	console.log(tableData);
 	return (
-		<div style={{ padding: 24 }}>
-			<div style={{ marginBottom: "-38px", textAlign: "left" }}>
-				<span style={{ marginTop: "100px", fontSize: "40px" }}>Branches</span>
-			</div>
-
-			<div style={{ marginBottom: 16, textAlign: "right" }}>
-				<Button type="primary" onClick={handleAddNewGroup}>
-					Add new branch
+		<>
+			{open && <BranchModal open={open} toggle={toggle} update={update} />}
+			<div style={{ display: "flex", justifyContent: "space-between" }}>
+				<h1 className="mb-4 text-1xl font-bold tracking-tight text-gray-900 md:text-3xl lg:text-1xl dark:text-dark">
+					Branches
+				</h1>
+				<Button className="mb-4" type="primary" onClick={() => setOpen(true)}>
+					Add New Branch
 				</Button>
 			</div>
-
-			<Table
+			<Table<BranchType>
 				columns={columns}
-				dataSource={tableData}
-				rowKey="id"
-				pagination={{ pageSize: 10 }}
-				loading={!data}
+				dataSource={data?.data.branch}
+				rowKey={(record) => record.id}
+				pagination={{
+					current: params.page,
+					pageSize: params.limit,
+					total: data?.data.total,
+					showSizeChanger: true,
+					pageSizeOptions: [2, 6, 10, 14, 18, 20],
+				}}
+				onChange={handleTableChange}
 			/>
-			<Modal
-				title={selectedBranch ? "Edit Branch" : "Add new branch"}
-				open={isModalOpen}
-				onCancel={handleModalClose}
-				footer={[
-					<Button key="cancel" onClick={handleModalClose}>
-						Cancel
-					</Button>,
-					selectedBranch ? (
-						<Button
-							key="update"
-							type="primary"
-							onClick={handleUpdateGroup}
-							loading={isUpdating}
-						>
-							Save
-						</Button>
-					) : (
-						<Button
-							key="create"
-							type="primary"
-							onClick={handleCreateGroup}
-							loading={isCreating}
-						>
-							Create
-						</Button>
-					),
-				]}
-			>
-				<div style={{ marginBottom: 16 }}>
-					<label>Name</label>
-					<Input
-						value={formData.name}
-						onChange={(e) => handleInputChange("name", e.target.value)}
-						placeholder="Branch name..."
-					/>
-				</div>
-
-				<div style={{ marginBottom: 16 }}>
-					<label>Address</label>
-					<Input
-						style={{ width: "100%" }}
-						value={formData.address}
-						onChange={(e) => handleInputChange("address", e.target.value)}
-						placeholder="Address..."
-					></Input>
-				</div>
-
-				<div style={{ marginBottom: 16 }}>
-					<label>Call Number</label>
-					<Input
-						type="text"
-						value={formData.call_number}
-						onChange={(e) => handleInputChange("call_number", e.target.value)}
-						placeholder="Call Number..."
-					/>
-				</div>
-
-				{/* <div style={{ marginBottom: 16 }}>
-					<label>Teachers</label>
-					<Select
-						style={{ width: "100%" }}
-						value={formData.teachers}
-						onChange={(value) => handleInputChange("teachers", value)}
-						placeholder="Select status"
-					>
-						<Select.Option value="new">New</Select.Option>
-						<Select.Option value="active">Active</Select.Option>
-						<Select.Option value="end">End</Select.Option>
-					</Select>
-				</div> */}
-			</Modal>
-		</div>
+		</>
 	);
 };
-export default Branches;
+export default Branchs;

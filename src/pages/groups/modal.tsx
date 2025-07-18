@@ -24,7 +24,7 @@ const GroupModal = ({ open, toggle, update }: GroupProps) => {
 		page: 1,
 		limit: 10,
 	});
-	const { data: courseData } = useCourses();
+	const { data: courseData } = useCourses({ page: 1, limit: 100 });
 	const courses = courseData?.data.courses || [];
 	const { mutate: createGroup, isPending: isCreating } = useGroupCreate();
 	const { mutate: updateGroup, isPending: isUpdating } = useGroupUpdate();

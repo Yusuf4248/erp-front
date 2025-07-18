@@ -58,7 +58,11 @@ const Teachers: React.FC = () => {
 			fixed: "right",
 			render: (_, record: TeacherType) => (
 				<Space size="middle">
-					<Button type={"primary"} 	size='small' onClick={() => updateItem(record)}>
+					<Button
+						type={"primary"}
+						size="small"
+						onClick={() => updateItem(record)}
+					>
 						<EditOutlined />
 					</Button>
 					<PopConfirm
@@ -73,12 +77,10 @@ const Teachers: React.FC = () => {
 		<>
 			{open && <TeacherModal open={open} toggle={toggle} update={update} />}
 			<div style={{ display: "flex", justifyContent: "space-between" }}>
-				<h1>Teachers</h1>
-				<Button
-					style={{ marginTop: "25px", marginRight: "50px" }}
-					type="primary"
-					onClick={() => setOpen(true)}
-				>
+				<h1 className="mb-4 text-1xl font-bold tracking-tight text-gray-900 md:text-3xl lg:text-1xl dark:text-dark">
+					Teachers
+				</h1>
+				<Button className="mb-4" type="primary" onClick={() => setOpen(true)}>
 					Add New Teacher
 				</Button>
 			</div>

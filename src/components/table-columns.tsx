@@ -1,4 +1,4 @@
-import type { GroupType, StudentType, TeacherType } from "@types";
+import type { BranchType, CourseType, GroupType, StudentType, TeacherType } from "@types";
 import type { TableProps } from "antd";
 
 export const GroupColumns: TableProps<GroupType>["columns"] = [
@@ -124,7 +124,7 @@ export const TeacherColumn: TableProps<TeacherType>["columns"] = [
 		dataIndex: "password",
 		key: "passwordhash",
 		width: 150,
-		render: (text) => (text ? `${text.slice(1,10)}...` : "N/A"),
+		render: (text) => (text ? `${text.slice(1, 10)}...` : "N/A"),
 	},
 	{
 		title: "Role",
@@ -137,5 +137,74 @@ export const TeacherColumn: TableProps<TeacherType>["columns"] = [
 		dataIndex: "BranchId",
 		key: "branch",
 		width: 120,
+	},
+];
+
+export const BranchColumn: TableProps<BranchType>["columns"] = [
+	{
+		title: "Name",
+		dataIndex: "name",
+		key: "Name",
+	},
+	{
+		title: "Address",
+		dataIndex: "address",
+		key: "Address",
+	},
+	{
+		title: "Call Number",
+		dataIndex: "call_number",
+		key: "Call Number",
+	},
+	{
+		title: "Teachers",
+		dataIndex: "teachers",
+		key: "Teachers",
+		render: (teachers) => (
+			<span>
+				{Array.isArray(teachers) && teachers.length > 0
+					? teachers.map((teacher) => teacher.first_name || "N/A").join("\n")
+					: "No teachers"}
+			</span>
+		),
+	},
+];
+
+export const CourseColumns: TableProps<CourseType>["columns"] = [
+	{
+		title: "Title",
+		dataIndex: "title",
+		key: "title",
+		// width: 150,
+	},
+	{
+		title: "Description",
+		dataIndex: "description",
+		key: "description",
+		// width: 150,
+	},
+	{
+		title: "Price",
+		dataIndex: "price",
+		key: "price",
+		// width: 150,
+	},
+	{
+		title: "Duration",
+		dataIndex: "duration",
+		key: "duration",
+		// width: 150,
+	},
+	{
+		title: "Lesson in week",
+		dataIndex: "lessons_in_a_week",
+		key: "lessons_in_a_week",
+		// width: 150,
+	},
+	{
+		title: "Lesson Duration",
+		dataIndex: "lesson_duration",
+		key: "gender",
+		// width: 150,
 	},
 ];

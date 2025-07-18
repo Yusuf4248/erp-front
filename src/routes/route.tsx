@@ -4,6 +4,7 @@ import {
 	NotFound,
 	SignIn,
 	SignUp,
+	SingleGroup,
 	Student,
 	StudentsTbl,
 	Teacher,
@@ -47,6 +48,7 @@ const Router = () => {
 					>
 						<Route path="dashboard" element={<Dashboard />} />
 						<Route path="groups" element={<Groups />} />
+						<Route path="groups/:id" element={<SingleGroup />} />
 						<Route path="students" element={<StudentsTbl />} />
 						<Route path="branches" element={<Branches />} />
 						<Route path="courses" element={<Courses />} />

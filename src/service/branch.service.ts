@@ -1,9 +1,10 @@
 import { ApiUrls } from "@api/api-urls";
 import { apiConfig } from "@api/config";
+import type { ParamsType } from "@types";
 
 export const branchService = {
-	async getBranch() {
-		const res = await apiConfig().getRequest(ApiUrls.BRANCHES);
+	async getBranch(params: ParamsType) {
+		const res = await apiConfig().getRequest(ApiUrls.BRANCHES, params);
 		return res;
 	},
 	async deleteBrnach(id: number) {

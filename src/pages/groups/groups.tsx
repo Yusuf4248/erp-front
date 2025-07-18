@@ -10,7 +10,7 @@ import {
 	type TableProps,
 } from "antd";
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import GroupModal from "./modal";
 const Groups: React.FC = () => {
 	const [open, setOpen] = useState(false);
@@ -21,6 +21,7 @@ const Groups: React.FC = () => {
 		page: 1,
 		limit: 10,
 	});
+	const navigate = useNavigate();
 	const { data, useGroupDelete } = useGroups(params);
 	const { mutate: deleteGroup, isPending: isDeleting } = useGroupDelete();
 	useEffect(() => {
@@ -33,7 +34,6 @@ const Groups: React.FC = () => {
 				limit: Number(limit),
 			});
 		}
-		// navigate({search:`?page=${page}&limit=${limit}`});
 	}, [location.search]);
 	const deleteItem = (id: number) => {
 		deleteGroup(id);
@@ -77,9 +77,11 @@ const Groups: React.FC = () => {
 		<>
 			{open && <GroupModal open={open} toggle={toggle} update={update} />}
 			<div style={{ display: "flex", justifyContent: "space-between" }}>
-				<h1>Groups</h1>
+				<h1 className="mb-4 text-1xl font-bold tracking-tight text-gray-900 md:text-3xl lg:text-1xl dark:text-dark">
+					Groups
+				</h1>
 				<Button
-					style={{ marginTop: "25px", marginRight: "50px" }}
+					className="mb-4"
 					type="primary"
 					onClick={() => setOpen(true)}
 				>
@@ -89,6 +91,12 @@ const Groups: React.FC = () => {
 			<Table<GroupType>
 				columns={columns}
 				dataSource={data?.data.data}
+				onRow={(record) => ({
+					onClick: () => {
+						navigate(`${record.id}`);
+					},
+					style: { cursor: "pointer" },
+				})}
 				rowKey={(record) => record.id}
 				pagination={{
 					current: params.page,
