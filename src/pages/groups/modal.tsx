@@ -71,6 +71,7 @@ const GroupModal = ({ open, toggle, update }: GroupProps) => {
 			width={600}
 			closeIcon
 			footer={null}
+			
 		>
 			<Form
 				layout="vertical"
