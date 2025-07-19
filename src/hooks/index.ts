@@ -5,3 +5,4 @@ export * from "./useGroups";
 export * from "./useStudents";
 export * from "./useTeacher";
 export * from "./useGeneral.ts";
+export * from "./useRooms";

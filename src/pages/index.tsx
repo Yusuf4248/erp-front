@@ -13,6 +13,7 @@ const ProtectLogin = lazy(() => import("./protect-route/protect-login"));
 const Courses = lazy(() => import("./course-layout/course"));
 const Worker = lazy(() => import("./workers/worker"));
 const SingleGroup = lazy(() => import("./groups/single-group"));
+const Rooms = lazy(() => import("./rooms-layout/rooms"));
 
 export {
 	Admin,
@@ -27,5 +28,6 @@ export {
 	StudentsTbl,
 	Teacher,
 	Worker,
+	Rooms,
 	SingleGroup
 };

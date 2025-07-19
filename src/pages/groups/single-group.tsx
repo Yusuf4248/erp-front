@@ -13,6 +13,7 @@ import {
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Student from "../student-layout/student";
+import Teachers from "../teacher-layout/teacher";
 import AddTeacherorStudentModal from "./single-modal";
 const SingleGroupPage = () => {
 	const navigate = useNavigate();
@@ -25,6 +26,7 @@ const SingleGroupPage = () => {
 	const toggle = () => {
 		setOpen(!open);
 	};
+	console.log(selectedGroup)
 	return (
 		<>
 			{open && (
@@ -68,7 +70,7 @@ const SingleGroupPage = () => {
 										All students
 									</p>
 									<p className="text-2xl font-bold text-gray-900">
-										{selectedGroup?.students.length || 0}
+										{selectedGroup?.students?.length || 0}
 									</p>
 								</div>
 							</div>
@@ -82,7 +84,7 @@ const SingleGroupPage = () => {
 										Active Students
 									</p>
 									<p className="text-2xl font-bold text-gray-900">
-										{selectedGroup?.students.length || 0}
+										{selectedGroup?.students?.length || 0}
 									</p>
 								</div>
 							</div>
@@ -94,7 +96,7 @@ const SingleGroupPage = () => {
 								<div className="ml-4">
 									<p className="text-sm font-medium text-gray-600">Lessons</p>
 									<p className="text-2xl font-bold text-gray-900">
-										{128}/{250}
+										{129}/{250}
 									</p>
 								</div>
 							</div>
@@ -121,7 +123,7 @@ const SingleGroupPage = () => {
 									<div className="flex items-center">
 										<Users className="h-5 w-5 text-gray-400 mr-3" />
 										<div>
-											<p className="text-sm text-gray-600">Teacher</p>
+											<p className="text-sm text-gray-600">Teachers</p>
 											<p className="font-medium">{"Ali Valiyev"}</p>
 										</div>
 									</div>
@@ -187,6 +189,29 @@ const SingleGroupPage = () => {
 						<div className="lg:col-span-2">
 							<div className="bg-white rounded-lg shadow-sm">
 								<div className="overflow-x-auto">
+									<div
+										style={{
+											display: "flex",
+											justifyContent: "center",
+											margin: "10px 0",
+										}}
+									>
+										<h3 className="text-3xl font-bold dark:text-black">
+											Teachers
+										</h3>
+									</div>
+									<Teachers teachers={selectedGroup?.teachers || []} />
+									<div
+										style={{
+											display: "flex",
+											justifyContent: "center",
+											margin: "10px 0",
+										}}
+									>
+										<h3 className="text-3xl font-bold dark:text-black">
+											Students
+										</h3>
+									</div>
 									<Student students={selectedGroup?.students || []} />
 								</div>
 							</div>

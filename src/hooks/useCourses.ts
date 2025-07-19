@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {  courseService } from "@service";
 import type { ParamsType } from '@types'
 
-export const useCourses = (params:ParamsType) => {
+export const useCourses = (params:ParamsType|{}) => {
 	const queryClient = useQueryClient();
 	const { data } = useQuery({
 		queryKey: ["course",params],

@@ -13,9 +13,9 @@ const schema = yup.object().shape({
 		.required("Title is required"),
 	description: yup.string().required("Description is required"),
 	price: yup.number().required("Price is required"),
-	duration: yup.string().required("Duration is required"),
+	duration: yup.number().required("Duration is required"),
 	lessons_in_a_week: yup.number().required("Lesson in a week is required"),
-	lesson_duration: yup.string().required("Lesson duration is required"),
+	lesson_duration: yup.number().required("Lesson duration is required"),
 });
 interface CourseProps extends ModalProps {
 	update: CourseType | null;
@@ -34,23 +34,15 @@ const CourseModal = ({ open, toggle, update }: CourseProps) => {
 		setValue,
 	} = useForm({
 		resolver: yupResolver(schema),
-		defaultValues: {
-			title: "",
-			description: "",
-			price: 0,
-			duration: "",
-			lessons_in_a_week: 0,
-			lesson_duration: "",
-		},
 	});
 	useEffect(() => {
 		if (update?.id) {
 			setValue("title", update.title);
 			setValue("description", update.description);
 			setValue("price", update.price);
-			setValue("duration", update.duration);
+			setValue("duration", +update.duration);
 			setValue("lessons_in_a_week", +update.lesson_in_a_week);
-			setValue("lesson_duration", update.lesson_duration);
+			setValue("lesson_duration", +update.lesson_duration);
 		}
 	}, [update]);
 	const onSubmit = (data: any) => {
@@ -128,11 +120,11 @@ const CourseModal = ({ open, toggle, update }: CourseProps) => {
 								placeholder="Select duration..."
 								options={[
 									{
-										value: "6 months",
+										value: 6,
 										label: "6 months",
 									},
 									{
-										value: "8 months",
+										value: 8,
 										label: "8 months",
 									},
 								]}
@@ -184,11 +176,11 @@ const CourseModal = ({ open, toggle, update }: CourseProps) => {
 								placeholder="Select lesson duration..."
 								options={[
 									{
-										value: "120 minutes",
+										value: 120,
 										label: "2 hours",
 									},
 									{
-										value: "270 minutes",
+										value: 270,
 										label: "4.5 hours",
 									},
 								]}

@@ -1,7 +1,7 @@
 import { EditOutlined } from "@ant-design/icons";
-import { GroupColumns, PopConfirm } from "@components";
-import { useGeneral, useGroups } from "@hooks";
-import type { GroupType } from "@types";
+import { PopConfirm, RoomsColumn } from "@components";
+import { useGeneral, useRoomss } from "@hooks";
+import type { RoomsType } from "@types";
 import {
 	Button,
 	Space,
@@ -10,25 +10,21 @@ import {
 	type TableProps,
 } from "antd";
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import GroupModal from "./modal";
+import { useLocation } from "react-router-dom";
+import RoomModal from "./modal";
 
-;
-
-const Groups: React.FC = () => {
-
-
+const Rooms: React.FC = () => {
 	const [open, setOpen] = useState(false);
-	const [update, setUpdate] = useState<GroupType | null>(null);
+	const [update, setUpdate] = useState<RoomsType | null>(null);
 	const location = useLocation();
 	const { handlePagination } = useGeneral();
 	const [params, setParams] = useState({
 		page: 1,
 		limit: 10,
 	});
-	const navigate = useNavigate();
-	const { data, useGroupDelete } = useGroups(params);
-	const { mutate: deleteGroup, isPending: isDeleting } = useGroupDelete();
+	// const navigate = useNavigate();
+	const { data, useRoomsDelete } = useRoomss(params);
+	const { mutate: deleteRoom, isPending: isDeleting } = useRoomsDelete();
 	useEffect(() => {
 		const searchParams = new URLSearchParams(location.search);
 		const page = searchParams.get("page") || "1";
@@ -41,11 +37,11 @@ const Groups: React.FC = () => {
 		}
 	}, [location.search]);
 	const deleteItem = (id: number) => {
-		deleteGroup(id);
+		deleteRoom(id);
 	};
-	const updateItem = (groupData: GroupType) => {
+	const updateItem = (roomData: RoomsType) => {
 		setOpen(true);
-		setUpdate(groupData);
+		setUpdate(roomData);
 	};
 	const toggle = () => {
 		setOpen(!open);
@@ -56,12 +52,12 @@ const Groups: React.FC = () => {
 	const handleTableChange = (pagination: TablePaginationConfig) => {
 		handlePagination({ pagination, setParams });
 	};
-	const columns: TableProps<GroupType>["columns"] = [
-		...(GroupColumns ?? []),
+	const columns: TableProps<RoomsType>["columns"] = [
+		...(RoomsColumn ?? []),
 		{
 			title: "Action",
 			key: "action",
-			render: (_, record: GroupType) => (
+			render: (_, record: RoomsType) => (
 				<Space size="middle">
 					<Button
 						type={"primary"}
@@ -80,28 +76,18 @@ const Groups: React.FC = () => {
 	];
 	return (
 		<>
-			{open && <GroupModal open={open} toggle={toggle} update={update} />}
+			{open && <RoomModal open={open} toggle={toggle} update={update} />}
 			<div style={{ display: "flex", justifyContent: "space-between" }}>
 				<h1 className="mb-4 text-1xl font-bold tracking-tight text-gray-900 md:text-3xl lg:text-1xl dark:text-dark">
-					Groups
+					Rooms
 				</h1>
-				<Button
-					className="mb-4"
-					type="primary"
-					onClick={() => setOpen(true)}
-				>
-					Add New Group
+				<Button className="mb-4" type="primary" onClick={() => setOpen(true)}>
+					Add New Room
 				</Button>
 			</div>
-				<Table<GroupType>
+			<Table<RoomsType>
 				columns={columns}
-				dataSource={data?.data.data}
-				// onRow={(record) => ({
-				// 	onClick: () => {
-				// 		navigate(`${record.id}`);
-				// 	},
-				// 	style: { cursor: "pointer" },
-				// })}
+				dataSource={data?.data.rooms}
 				rowKey={(record) => record.id}
 				pagination={{
 					current: params.page,
@@ -115,4 +101,4 @@ const Groups: React.FC = () => {
 		</>
 	);
 };
-export default Groups;
+export default Rooms;

@@ -7,6 +7,7 @@ export class ApiUrls {
 	public static LOGOUT: string = "/log-out";
 	public static BRANCHES: string = "/branches";
 	public static TEACHER: string = "/teacher";
+	public static ROOMS: string = "/rooms";
 	public static addStudent = (groupId: number, studentId: number): string =>
 		`${this.GROUPS}/${groupId}/add-student/${studentId}`;
 	public static removeStudent = (groupId: number, studentId: number): string =>

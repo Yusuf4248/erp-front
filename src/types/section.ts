@@ -3,8 +3,9 @@ export interface GroupType {
 	name: string;
 	course: string;
 	start_date: string;
-	end_date: string;
+	start_time: string;
 	status: string;
+	roomId: number;
 }
 
 export interface StudentType {
@@ -52,3 +53,11 @@ export interface AddStudentOrTeacher {
 	teacherId: number;
 	studentId: number;
 }
+
+export interface RoomsType {
+	id: number;
+	branchId: number;
+	name: string;
+	capacity: number;
+}
+

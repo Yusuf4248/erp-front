@@ -77,10 +77,10 @@ const Students = ({ students }: any) => {
 		<>
 			{open && <StudentModal open={open} toggle={toggle} update={update} />}
 			<div style={{ display: "flex", justifyContent: "space-between" }}>
-				<h1 className="mb-4 text-1xl font-bold tracking-tight text-gray-900 md:text-3xl lg:text-1xl dark:text-dark">
+				<h1 style={students?{display:"none"}:{}} className="mb-4 text-1xl font-bold tracking-tight text-gray-900 md:text-3xl lg:text-1xl dark:text-dark">
 					Students
 				</h1>
-				<Button className="mb-4" type="primary" onClick={() => setOpen(true)}>
+				<Button style={students?{display:"none"}:{}} className="mb-4" type="primary" onClick={() => setOpen(true)}>
 					Add New Student
 				</Button>
 			</div>

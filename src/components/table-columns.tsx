@@ -1,4 +1,4 @@
-import type { BranchType, CourseType, GroupType, StudentType, TeacherType } from "@types";
+import type { BranchType, CourseType, GroupType, RoomsType, StudentType, TeacherType } from "@types";
 import type { TableProps } from "antd";
 
 export const GroupColumns: TableProps<GroupType>["columns"] = [
@@ -207,4 +207,26 @@ export const CourseColumns: TableProps<CourseType>["columns"] = [
 		key: "gender",
 		// width: 150,
 	},
+];
+
+export const RoomsColumn: TableProps<RoomsType>["columns"] = [
+	{
+		title: "Name",
+		dataIndex: "name",
+		key: "name",
+		// width: 150,
+	},
+	{
+		title: "Branch",
+		dataIndex: "branchId",
+		key: "brnach",
+		// width: 150,
+	},
+	{
+		title: "Capacity",
+		dataIndex: "capacity",
+		key: "capacity",
+		// width: 150,
+	},
+	
 ];

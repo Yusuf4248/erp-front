@@ -4,3 +4,4 @@ export * from "./groups.service";
 export * from "./students.service";
 export * from "./branch.service";
 export * from "./teacher.service";
+export * from "./rooms.service";

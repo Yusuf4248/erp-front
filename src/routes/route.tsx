@@ -2,6 +2,7 @@ import {
 	Admin,
 	Groups,
 	NotFound,
+	Rooms,
 	SignIn,
 	SignUp,
 	SingleGroup,
@@ -27,24 +28,11 @@ const Router = () => {
 	const router = createBrowserRouter(
 		createRoutesFromElements(
 			<>
-				<Route path="/" element={<App />}>
-					<Route
-						index
-						element={
-							<ProtectLogin>
-								<SignIn />
-							</ProtectLogin>
-						}
+				<Route path="/" element={<App />}><Route index element={<ProtectLogin><SignIn /></ProtectLogin>}
 					/>
 					<Route path="sign-up" element={<SignUp />} />
 					{/* ADMIN */}
-					<Route
-						path="admin"
-						element={
-							<ProtectLayout>
-								<Admin />
-							</ProtectLayout>
-						}
+					<Route path="admin" element={<ProtectLayout><Admin /></ProtectLayout>}
 					>
 						<Route path="dashboard" element={<Dashboard />} />
 						<Route path="groups" element={<Groups />} />
@@ -53,6 +41,7 @@ const Router = () => {
 						<Route path="branches" element={<Branches />} />
 						<Route path="courses" element={<Courses />} />
 						<Route path="teacher" element={<Teacher />} />
+						<Route path="rooms" element={<Rooms />} />
 					</Route>
 					{/* STUDENT */}
 					<Route path="student" element={<Student />}></Route>
