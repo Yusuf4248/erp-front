@@ -1,4 +1,4 @@
-import { EditOutlined } from "@ant-design/icons";
+import { EditOutlined, ExportOutlined } from "@ant-design/icons";
 import { GroupColumns, PopConfirm } from "@components";
 import { useGeneral, useGroups } from "@hooks";
 import type { GroupType } from "@types";
@@ -13,11 +13,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import GroupModal from "./modal";
 
-;
-
 const Groups: React.FC = () => {
-
-
 	const [open, setOpen] = useState(false);
 	const [update, setUpdate] = useState<GroupType | null>(null);
 	const location = useLocation();
@@ -74,6 +70,14 @@ const Groups: React.FC = () => {
 						handleDelete={() => deleteItem(record.id)}
 						loading={isDeleting}
 					/>
+					<Button
+						type="default"
+						style={{ backgroundColor: "rgba(0,0,0,0.1)" }}
+						size="small"
+						onClick={() => navigate(`${record.id}`)}
+					>
+						<ExportOutlined />
+					</Button>
 				</Space>
 			),
 		},
@@ -85,23 +89,13 @@ const Groups: React.FC = () => {
 				<h1 className="mb-4 text-1xl font-bold tracking-tight text-gray-900 md:text-3xl lg:text-1xl dark:text-dark">
 					Groups
 				</h1>
-				<Button
-					className="mb-4"
-					type="primary"
-					onClick={() => setOpen(true)}
-				>
+				<Button className="mb-4" type="primary" onClick={() => setOpen(true)}>
 					Add New Group
 				</Button>
 			</div>
-				<Table<GroupType>
+			<Table<GroupType>
 				columns={columns}
 				dataSource={data?.data.data}
-				// onRow={(record) => ({
-				// 	onClick: () => {
-				// 		navigate(`${record.id}`);
-				// 	},
-				// 	style: { cursor: "pointer" },
-				// })}
 				rowKey={(record) => record.id}
 				pagination={{
 					current: params.page,

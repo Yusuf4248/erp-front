@@ -12,7 +12,7 @@ import {
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import StudentModal from "./modal";
-const Students = ({ students }: any) => {
+const Students = () => {
 	const [open, setOpen] = useState(false);
 	const [update, setUpdate] = useState<StudentType | null>(null);
 	const location = useLocation();
@@ -77,16 +77,16 @@ const Students = ({ students }: any) => {
 		<>
 			{open && <StudentModal open={open} toggle={toggle} update={update} />}
 			<div style={{ display: "flex", justifyContent: "space-between" }}>
-				<h1 style={students?{display:"none"}:{}} className="mb-4 text-1xl font-bold tracking-tight text-gray-900 md:text-3xl lg:text-1xl dark:text-dark">
+				<h1 className="mb-4 text-1xl font-bold tracking-tight text-gray-900 md:text-3xl lg:text-1xl dark:text-dark">
 					Students
 				</h1>
-				<Button style={students?{display:"none"}:{}} className="mb-4" type="primary" onClick={() => setOpen(true)}>
+				<Button className="mb-4" type="primary" onClick={() => setOpen(true)}>
 					Add New Student
 				</Button>
 			</div>
 			<Table<StudentType>
 				columns={columns}
-				dataSource={students || data?.data.students}
+				dataSource={data?.data.students}
 				rowKey={(record) => record.id}
 				scroll={{ x: "max-content" }}
 				pagination={{

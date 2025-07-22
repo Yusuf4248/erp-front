@@ -1,5 +1,13 @@
-import type { BranchType, CourseType, GroupType, RoomsType, StudentType, TeacherType } from "@types";
-import type { TableProps } from "antd";
+import type {
+	BranchType,
+	CourseType,
+	GroupType,
+	LessonType,
+	RoomsType,
+	StudentType,
+	TeacherType,
+} from "@types";
+import { Table, type TableProps } from "antd";
 
 export const GroupColumns: TableProps<GroupType>["columns"] = [
 	{
@@ -228,5 +236,40 @@ export const RoomsColumn: TableProps<RoomsType>["columns"] = [
 		key: "capacity",
 		// width: 150,
 	},
-	
+];
+export const LessonsColumn: TableProps<LessonType>["columns"] = [
+	Table.EXPAND_COLUMN,
+	{
+		title: "Title",
+		dataIndex: "title",
+		key: "title",
+	},
+	{
+		title: "Notes",
+		dataIndex: "notes",
+		key: "notes",
+	},
+	{
+		title: "Date",
+		dataIndex: "date",
+		key: "date",
+		render: (dt) => dt.split("T")[0],
+	},
+	{
+		title: "Status",
+		dataIndex: "status",
+		key: "status",
+	},
+	{
+		title: "Group",
+		dataIndex: "group",
+		key: "groupId",
+		render: (group) => group.name,
+	},
+	{
+		title: "Room",
+		dataIndex: "room",
+		key: "roomId",
+		render:(room)=> room.name
+	},
 ];

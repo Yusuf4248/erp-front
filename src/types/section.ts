@@ -7,6 +7,24 @@ export interface GroupType {
 	status: string;
 	roomId: number;
 }
+export interface GroupStudentType {
+	students: StudentType[];
+}
+export interface GroupTeacherType {
+	teachers: TeacherType[];
+}
+export interface GroupLessonType {
+	lessons: LessonType[];
+}
+export interface LessonType {
+	id: number;
+	title: string;
+	notes: string;
+	date: string;
+	status: string;
+	groupId: number;
+	roomId: number;
+}
 
 export interface StudentType {
 	id: number;
@@ -20,6 +38,7 @@ export interface StudentType {
 	lidId: number;
 	eventsId: number;
 	groupsId: number;
+	is_active?: boolean;
 }
 export interface TeacherType {
 	id: number;
@@ -30,6 +49,7 @@ export interface TeacherType {
 	phone: string;
 	role: string;
 	branchId: [];
+	is_active?: boolean;
 }
 export interface BranchType {
 	id: number;
@@ -60,4 +80,3 @@ export interface RoomsType {
 	name: string;
 	capacity: number;
 }
-

@@ -130,6 +130,8 @@ const AdminLayout: React.FC = () => {
 					minHeight: "100vh",
 					background: darkMode ? "#1a1f24" : "#f5f7fa",
 					marginTop: "-10px",
+				
+					maxWidth:"1520px",
 					marginBottom: "0px",
 				}}
 			>

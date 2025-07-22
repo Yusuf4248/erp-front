@@ -3,7 +3,7 @@ import { useGroups, useStudents, useTeachers } from "@hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import type { ModalProps } from "@types";
 import { Button, Form, Input, Modal } from "antd";
-import { useState } from "react"; // Import useState
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as yup from "yup";
 
@@ -50,30 +50,26 @@ const AddTeacherorStudentModal = ({
 	});
 
 	const onSubmit = (data: any) => {
+		data["status"] = true;
+		data["start_date"] = new Date().toISOString();
+		data["end_date"] = new Date().toISOString();
+		data.groupId = groupId;
 		if (addingTeacher) {
-			addTeacher(
-				{ groupId, teacherId: data.teacherId },
-				{
-					onSuccess: () => {
-						queryClient.invalidateQueries({
-							queryKey: ["groups", "add-teacher"],
-						});
-						setOpen((prev) => !prev);
-					},
-				}
-			);
+			delete data.studentId;
+			addTeacher(data, {
+				onSuccess: () => {
+					queryClient.invalidateQueries(["groups", "add-teacher"]);
+					setOpen((prev) => !prev);
+				},
+			});
 		} else {
-			addStudent(
-				{ groupId, studentId: data.studentId },
-				{
-					onSuccess: () => {
-						queryClient.invalidateQueries({
-							queryKey: ["groups", "add-student"],
-						});
-						setOpen((prev) => !prev);
-					},
-				}
-			);
+			delete data.teacherId;
+			addStudent(data, {
+				onSuccess: () => {
+					queryClient.invalidateQueries(["groups", "add-student"]);
+					setOpen((prev) => !prev);
+				},
+			});
 		}
 	};
 

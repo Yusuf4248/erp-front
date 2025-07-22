@@ -77,18 +77,14 @@ const StudentModal = ({ open, toggle, update }: StudentProps) => {
 		}
 	}, [update]);
 	const onSubmit = (data: any) => {
-		// data["eventsId"] = data.eventsId.split(",").map((i: string) => +i) || null;
-		// data["groupsId"] = data.groupsId.split(",").map((i: string) => +i) || null;
-		data["eventsId"] = null;
-		data["groupsId"] = null;
-		data["lidId"] = null;
 		data["confirm_password"] = data.password_hash;
 		data.phone = data.phone.replace(/[^\d+]/g, "");
+		// delete data.confirm_password;
+		delete data.lidId;
+		delete data.groupsId;
+		delete data.eventsId;
+		console.log(data)
 		if (update?.id) {
-			delete data.confirm_password;
-			delete data.lidId;
-			delete data.groupsId;
-			delete data.eventsId;
 			updateStudent({ id: update!.id, data });
 		} else {
 			createStudent(data);

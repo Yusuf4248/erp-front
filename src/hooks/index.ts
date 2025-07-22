@@ -6,3 +6,4 @@ export * from "./useStudents";
 export * from "./useTeacher";
 export * from "./useGeneral.ts";
 export * from "./useRooms";
+export * from "./useLessons.ts";

@@ -12,7 +12,7 @@ import {
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import TeacherModal from "./modal";
-const Teachers  = ({ teachers }: any) => {
+const Teachers = () => {
 	const [open, setOpen] = useState(false);
 	const [update, setUpdate] = useState<TeacherType | null>(null);
 	const location = useLocation();
@@ -77,24 +77,16 @@ const Teachers  = ({ teachers }: any) => {
 		<>
 			{open && <TeacherModal open={open} toggle={toggle} update={update} />}
 			<div style={{ display: "flex", justifyContent: "space-between" }}>
-				<h1
-					style={teachers ? { display: "none" } : {}}
-					className="mb-4 text-1xl font-bold tracking-tight text-gray-900 md:text-3xl lg:text-1xl dark:text-dark"
-				>
+				<h1 className="mb-4 text-1xl font-bold tracking-tight text-gray-900 md:text-3xl lg:text-1xl dark:text-dark">
 					Teachers
 				</h1>
-				<Button
-					style={teachers ? { display: "none" } : {}}
-					className="mb-4"
-					type="primary"
-					onClick={() => setOpen(true)}
-				>
+				<Button className="mb-4" type="primary" onClick={() => setOpen(true)}>
 					Add New Teacher
 				</Button>
 			</div>
 			<Table<TeacherType>
 				columns={columns}
-				dataSource={teachers || data?.data.teachers}
+				dataSource={data?.data.teachers}
 				rowKey={(record) => record.id}
 				scroll={{ x: "max-content" }}
 				pagination={{

@@ -13,6 +13,22 @@ export const groupsService = {
 		);
 		return res;
 	},
+	async getGroupLessons(id: number) {
+		const res = await apiConfig().getRequest(`${ApiUrls.GROUP_LESSONS}/${id}`);
+		return res;
+	},
+	async getGroupStudents(id: number) {
+		const res = await apiConfig().getRequest(
+			`${ApiUrls.GROUP_STUDENTS_BY_GROUP_ID}/${id}`
+		);
+		return res;
+	},
+	async getGroupTeachers(id: number) {
+		const res = await apiConfig().getRequest(
+			`${ApiUrls.GROUP_TEACHERS_BY_GROUP_ID}/${id}`
+		);
+		return res;
+	},
 	async deleteGroup(id: number) {
 		const res = await apiConfig().deleteRequest(`${ApiUrls.GROUPS}/${id}`);
 		return res;
@@ -29,31 +45,17 @@ export const groupsService = {
 		return res;
 	},
 
-	async addStudentToGroup(groupId: number, studentId: number) {
-		const res = await apiConfig().updateRequest(
-			`${ApiUrls.addStudent(groupId, studentId)}`,
-			{}
+	async addStudentToGroup(data: any) {
+		const res = await apiConfig().postRequest(
+			`${ApiUrls.GROUP_STUDENTS}`,
+			data
 		);
 		return res;
 	},
-	async removeStudentFromGroup(groupId: number, studentId: number) {
-		const res = await apiConfig().updateRequest(
-			`${ApiUrls.removeStudent(groupId, studentId)}`,
-			{}
-		);
-		return res;
-	},
-	async addTeacherToGroup(groupId: number, teacherId: number) {
-		const res = await apiConfig().updateRequest(
-			`${ApiUrls.addTeacher(groupId, teacherId)}`,
-			{}
-		);
-		return res;
-	},
-	async removeTeacherFromGroup(groupId: number, teacherId: number) {
-		const res = await apiConfig().updateRequest(
-			`${ApiUrls.removeTeacher(groupId, teacherId)}`,
-			{}
+	async addTeacherToGroup(data: any) {
+		const res = await apiConfig().postRequest(
+			`${ApiUrls.GROUP_TEACHERS}`,
+			data
 		);
 		return res;
 	},

@@ -12,6 +12,25 @@ export const useGroups = (params: ParamsType | {}, id = 0) => {
 		queryKey: ["groupById"],
 		queryFn: async () => groupsService.getGroupById(id),
 	});
+	const groupStudentsQuery = useQuery({
+		enabled: !!id,
+		queryKey: ["group-students"],
+		queryFn: async () => groupsService.getGroupStudents(id),
+	});
+	const students = groupStudentsQuery.data;
+	const groupLessonsQuery = useQuery({
+		enabled: !!id,
+		queryKey: ["group-lessons"],
+		queryFn: async () => groupsService.getGroupLessons(id),
+	});
+	const lessons = groupLessonsQuery.data;
+	const groupTeachersQuery = useQuery({
+		enabled: !!id,
+		queryKey: ["group-teachers"],
+		queryFn: async () => groupsService.getGroupTeachers(id),
+	});
+	const teachers = groupTeachersQuery.data;
+
 	const useGroupCreate = () => {
 		return useMutation({
 			mutationFn: async (data: any) => groupsService.createGroup(data),
@@ -40,63 +59,18 @@ export const useGroups = (params: ParamsType | {}, id = 0) => {
 
 	const useGroupAddStudent = () => {
 		return useMutation({
-			mutationFn: async ({
-				groupId,
-				studentId,
-			}: {
-				groupId: number;
-				studentId: number;
-			}) => groupsService.addStudentToGroup(groupId, studentId),
+			mutationFn: async (data: any) => groupsService.addStudentToGroup(data),
 			onSuccess: () => {
 				queryClient.invalidateQueries({ queryKey: ["groups", "add-student"] });
 			},
 		});
 	};
 
-	const useGroupRemoveStudent = () => {
-		return useMutation({
-			mutationFn: async ({
-				groupId,
-				studentId,
-			}: {
-				groupId: number;
-				studentId: number;
-			}) => groupsService.removeStudentFromGroup(groupId, studentId),
-			onSuccess: () => {
-				queryClient.invalidateQueries({
-					queryKey: ["groups", "remove-student"],
-				});
-			},
-		});
-	};
-
 	const useGroupAddTeacher = () => {
 		return useMutation({
-			mutationFn: async ({
-				groupId,
-				teacherId,
-			}: {
-				groupId: number;
-				teacherId: number;
-			}) => groupsService.addTeacherToGroup(groupId, teacherId),
+			mutationFn: async (data: any) => groupsService.addTeacherToGroup(data),
 			onSuccess: () => {
 				queryClient.invalidateQueries({ queryKey: ["groups", "add-teacher"] });
-			},
-		});
-	};
-	const useGroupRemoveTeacher = () => {
-		return useMutation({
-			mutationFn: async ({
-				groupId,
-				teacherId,
-			}: {
-				groupId: number;
-				teacherId: number;
-			}) => groupsService.removeTeacherFromGroup(groupId, teacherId),
-			onSuccess: () => {
-				queryClient.invalidateQueries({
-					queryKey: ["groups", "remove-teacher"],
-				});
 			},
 		});
 	};
@@ -108,8 +82,9 @@ export const useGroups = (params: ParamsType | {}, id = 0) => {
 		useGroupDelete,
 		dataById,
 		useGroupAddStudent,
-		useGroupRemoveStudent,
 		useGroupAddTeacher,
-		useGroupRemoveTeacher,
+		students,
+		teachers,
+		lessons,
 	};
 };
