@@ -15,15 +15,15 @@ const SingleGroup = () => {
 				className="min-h-screen bg-gray-50"
 				style={{ margin: "-23px", borderRadius: "8px" }}
 			>
-				<div className="max-w-7xl mx-auto p-6">
+				<div className="max-w-7xl mx-auto p-2 sm:p-4 md:p-6">
 					{/* Group Header */}
-					<div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-						<div className="flex justify-between items-start">
+					<div className="bg-white rounded-lg border border-gray-200 p-2 sm:p-4 md:p-6 mb-6">
+						<div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
 							<div>
-								<h1 className="text-2xl font-semibold text-gray-900 mb-2">
+								<h1 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">
 									{groupData.name}
 								</h1>
-								<div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+								<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-4">
 									<div className="flex items-center gap-2 text-sm">
 										<Calendar className="w-4 h-4 text-gray-400" />
 										<span className="text-gray-600">Start:</span>
@@ -54,14 +54,14 @@ const SingleGroup = () => {
 										</span>
 									</div>
 								</div>
-								<div className="bg-gray-50 rounded-lg p-4">
+								<div className="bg-gray-50 rounded-lg p-3 sm:p-4">
 									<h3 className="font-medium text-gray-900 mb-2">
 										{groupData.course?.title}
 									</h3>
 									<p className="text-gray-600 text-sm">
 										{groupData.course?.description}
 									</p>
-									<div className="flex items-center gap-4 mt-3 text-sm text-gray-500">
+									<div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-500">
 										<span>Duration: {groupData.course?.duration} month</span>
 										<span>
 											Per week: {groupData.course?.lessons_in_a_week} lesson
@@ -70,7 +70,7 @@ const SingleGroup = () => {
 											Lesson time: {groupData.course?.lesson_duration} min
 										</span>
 										<span>
-											Price: {groupData.course?.price.toLocaleString()} sum
+											Price: {groupData.course?.price?.toLocaleString()} sum
 										</span>
 									</div>
 								</div>

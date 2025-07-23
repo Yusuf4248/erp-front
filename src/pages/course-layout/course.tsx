@@ -76,31 +76,33 @@ const Courses: React.FC = () => {
 	return (
 		<>
 			{open && <CourseModal open={open} toggle={toggle} update={update} />}
-			<div style={{ display: "flex", justifyContent: "space-between" }}>
-				<h1 className="mb-4 text-1xl font-bold tracking-tight text-gray-900 md:text-3xl lg:text-1xl dark:text-dark">
+			<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2 sm:gap-0">
+				<h1 className="text-lg sm:text-2xl font-bold tracking-tight text-gray-900">
 					Course
 				</h1>
 				<Button
-					className="mb-4"
+					className="w-full sm:w-auto"
 					type="primary"
 					onClick={() => setOpen(true)}
 				>
 					Add New Course
 				</Button>
 			</div>
-			<Table<CourseType>
-				columns={columns}
-				dataSource={data?.data.courses}
-				rowKey={(record) => record.id}
-				pagination={{
-					current: params.page,
-					pageSize: params.limit,
-					total: data?.data.total,
-					showSizeChanger: true,
-					pageSizeOptions: [2, 6, 10, 14, 18, 20],
-				}}
-				onChange={handleTableChange}
-			/>
+			<div className="overflow-x-auto">
+				<Table<CourseType>
+					columns={columns}
+					dataSource={data?.data.courses}
+					rowKey={(record) => record.id}
+					pagination={{
+						current: params.page,
+						pageSize: params.limit,
+						total: data?.data.total,
+						showSizeChanger: true,
+						pageSizeOptions: [2, 6, 10, 14, 18, 20],
+					}}
+					onChange={handleTableChange}
+				/>
+			</div>
 		</>
 	);
 };

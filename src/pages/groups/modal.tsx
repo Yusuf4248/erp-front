@@ -162,7 +162,11 @@ const GroupModal = ({ open, toggle, update }: GroupProps) => {
 						name="name"
 						control={control}
 						render={({ field }) => (
-							<Input {...field} placeholder="Enter group name" />
+							<Input
+								{...field}
+								placeholder="Enter group name"
+								className="w-full"
+							/>
 						)}
 					/>
 				</Form.Item>
@@ -183,6 +187,7 @@ const GroupModal = ({ open, toggle, update }: GroupProps) => {
 									value: course.id.toString(),
 									label: course.title,
 								}))}
+								className="w-full"
 							/>
 						)}
 					/>
@@ -201,6 +206,7 @@ const GroupModal = ({ open, toggle, update }: GroupProps) => {
 								{...field}
 								{...datePickerProps}
 								value={field.value ? dayjs(field.value) : null}
+								className="w-full"
 							/>
 						)}
 					/>
@@ -219,6 +225,7 @@ const GroupModal = ({ open, toggle, update }: GroupProps) => {
 								{...field}
 								{...timePickerProps}
 								value={field.value ? dayjs(field.value, "HH:mm") : null}
+								className="w-full"
 							/>
 						)}
 					/>
@@ -241,6 +248,7 @@ const GroupModal = ({ open, toggle, update }: GroupProps) => {
 									{ value: "new", label: "New" },
 									{ value: "cancelled", label: "Cancelled" },
 								]}
+								className="w-full"
 							/>
 						)}
 					/>
@@ -262,6 +270,7 @@ const GroupModal = ({ open, toggle, update }: GroupProps) => {
 									value: room.id,
 									label: room.name,
 								}))}
+								className="w-full"
 							/>
 						)}
 					/>

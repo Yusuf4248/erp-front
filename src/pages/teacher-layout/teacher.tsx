@@ -76,28 +76,34 @@ const Teachers = () => {
 	return (
 		<>
 			{open && <TeacherModal open={open} toggle={toggle} update={update} />}
-			<div style={{ display: "flex", justifyContent: "space-between" }}>
-				<h1 className="mb-4 text-1xl font-bold tracking-tight text-gray-900 md:text-3xl lg:text-1xl dark:text-dark">
+			<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2 sm:gap-0">
+				<h1 className="text-lg sm:text-2xl font-bold tracking-tight text-gray-900">
 					Teachers
 				</h1>
-				<Button className="mb-4" type="primary" onClick={() => setOpen(true)}>
+				<Button
+					className="w-full sm:w-auto"
+					type="primary"
+					onClick={() => setOpen(true)}
+				>
 					Add New Teacher
 				</Button>
 			</div>
-			<Table<TeacherType>
-				columns={columns}
-				dataSource={data?.data.teachers}
-				rowKey={(record) => record.id}
-				scroll={{ x: "max-content" }}
-				pagination={{
-					current: params.page,
-					pageSize: params.limit,
-					total: data?.data.total,
-					showSizeChanger: true,
-					pageSizeOptions: [2, 6, 10, 14, 18, 20],
-				}}
-				onChange={handleTableChange}
-			/>
+			<div className="overflow-x-auto">
+				<Table<TeacherType>
+					columns={columns}
+					dataSource={data?.data.teachers}
+					rowKey={(record) => record.id}
+					scroll={{ x: "max-content" }}
+					pagination={{
+						current: params.page,
+						pageSize: params.limit,
+						total: data?.data.total,
+						showSizeChanger: true,
+						pageSizeOptions: [2, 6, 10, 14, 18, 20],
+					}}
+					onChange={handleTableChange}
+				/>
+			</div>
 		</>
 	);
 };

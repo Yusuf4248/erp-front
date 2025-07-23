@@ -4,9 +4,7 @@ import {
 	LogoutOutlined,
 	MenuFoldOutlined,
 	MenuUnfoldOutlined,
-	MoonOutlined,
 	SettingOutlined,
-	SunOutlined,
 	TeamOutlined,
 	UserOutlined,
 } from "@ant-design/icons";
@@ -19,7 +17,6 @@ import {
 	Layout,
 	Menu,
 	Space,
-	Switch,
 } from "antd";
 import React, { useState } from "react";
 import { FaCodeBranch } from "react-icons/fa";
@@ -28,12 +25,11 @@ import { PiChalkboardTeacherFill } from "react-icons/pi";
 import { SiGoogleclassroom } from "react-icons/si";
 import { Outlet, useNavigate } from "react-router-dom";
 import { ApiUrls } from "../../api/api-urls";
-import { removeItem, setItem } from "../../helpers";
+import { removeItem } from "../../helpers";
 const { Header, Sider, Content } = Layout;
 
 const AdminLayout: React.FC = () => {
 	const [collapsed, setCollapsed] = useState(false);
-	const [darkMode, setDarkMode] = useState(false);
 	const navigate = useNavigate();
 	const userMenuItems = [
 		{
@@ -71,7 +67,7 @@ const AdminLayout: React.FC = () => {
 			key: "dashboard",
 			icon: <DashboardOutlined />,
 			label: "Dashboard",
-			default:true,
+			default: true,
 			onClick: () => navigate("/admin/dashboard"),
 		},
 		{
@@ -112,187 +108,151 @@ const AdminLayout: React.FC = () => {
 		},
 	];
 
-	const handleThemeToggle = (checked: boolean) => {
-		setDarkMode(checked);
-		if (checked) {
-			removeItem("dark_mode");
-			setItem("dark_mode", "true");
-		} else {
-			removeItem("dark_mode");
-			setItem("dark_mode", "false");
-		}
-	};
-
 	return (
 		<ConfigProvider>
-			<Layout
-				style={{
-					minHeight: "100vh",
-					background: darkMode ? "#1a1f24" : "#f5f7fa",
-					marginTop: "-10px",
-				
-					maxWidth:"1520px",
-					marginBottom: "0px",
-				}}
-			>
-				<Sider
-					trigger={null}
-					collapsible
-					collapsed={collapsed}
-					style={{
-						position: "fixed",
-						height: "100vh",
-						left: 0,
-						top: 0,
-						bottom: 0,
-						zIndex: 1000,
-						background: darkMode ? "#1a1f24" : "#ffffff",
-						boxShadow: "2px 0 8px rgba(0,0,0,0.08)",
-						borderRight: darkMode ? "none" : "1px solid #e8e8e8",
-						overflow: "auto",
-					}}
-				>
-					<div
+			<div className="admin-layout min-h-screen max-w-[1520px] mx-auto bg-gray-100">
+				<Layout>
+					<Sider
+						trigger={null}
+						collapsible
+						collapsed={collapsed}
+						width={200}
 						style={{
-							height: "64px",
-							display: "flex",
-							alignItems: "center",
-							justifyContent: "center",
-							background: darkMode ? "#2a3a4a" : "#2a3a4a",
-							color: "#fff",
-							fontSize: collapsed ? "18px" : "20px",
-							fontWeight: "600",
-							marginBottom: "8px",
-						}}
-					>
-						{collapsed ? "CRM" : "CRM Admin"}
-					</div>
-
-					<Menu
-						theme={darkMode ? "dark" : "light"}
-						mode="inline"
-						defaultSelectedKeys={["dashboard"]}
-						items={sidebarItems}
-						style={{
-							borderRight: "none",
-							padding: "8px 0",
-							background: darkMode ? "#1a1f24" : "#ffffff",
-						}}
-					/>
-				</Sider>
-
-				<Layout
-					style={{
-						marginLeft: collapsed ? 80 : 200,
-						transition: "margin-left 0.2s",
-						background: darkMode ? "#1a1f24" : "#f5f7fa",
-						marginRight: "-8px",
-						marginTop: "-10px",
-						marginBottom: "-10px",
-					}}
-				>
-					<Header
-						style={{
-							padding: "0 20px",
-							background: darkMode ? "#2a3a4a" : "#ffffff",
-							borderBottom: darkMode ? "none" : "1px solid #e8e8e8",
-							position: "sticky",
+							position: "fixed",
+							height: "100vh",
+							left: 0,
 							top: 0,
-							zIndex: 999,
-							display: "flex",
-							alignItems: "center",
-							justifyContent: "space-between",
-							boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
-							height: "64px",
-							marginLeft: "-8px",
+							bottom: 0,
+							zIndex: 1000,
+							background: "#2a3a4a",
+							color: "#fff",
+							boxShadow: "2px 0 8px rgba(0,0,0,0.08)",
+							borderRight: "none",
+							overflow: "auto",
 						}}
 					>
-						<div style={{ display: "flex", alignItems: "center" }}>
-							<Button
-								type="text"
-								icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-								onClick={() => setCollapsed(!collapsed)}
-								style={{
-									fontSize: "16px",
-									width: 48,
-									height: 48,
-									color: darkMode ? "#fff" : "#5a5a5a",
-								}}
-							/>
+						<div
+							style={{
+								height: "64px",
+								display: "flex",
+								alignItems: "center",
+								justifyContent: "center",
+								background: "#2a3a4a",
+								color: "#fff",
+								fontSize: collapsed ? "18px" : "20px",
+								fontWeight: "600",
+								marginBottom: "8px",
+							}}
+						>
+							{collapsed ? "CRM" : "CRM Admin"}
 						</div>
-
-						<Space size="middle" align="center">
-							<Switch
-								checked={darkMode}
-								onChange={handleThemeToggle}
-								checkedChildren={<MoonOutlined />}
-								unCheckedChildren={<SunOutlined />}
-								style={{
-									backgroundColor: darkMode ? "#394b59" : "#e6e6e6",
-								}}
-							/>
-							<Badge count={5} size="small" dot={false}>
+						<Menu
+							theme="dark"
+							mode="inline"
+							defaultSelectedKeys={["dashboard"]}
+							items={sidebarItems}
+							style={{
+								background: "#2a3a4a",
+								color: "#fff",
+								borderRight: "none",
+								padding: "8px 0",
+							}}
+						/>
+					</Sider>
+					<Layout
+						style={{
+							marginLeft: collapsed ? 80 : 200,
+							transition: "margin-left 0.2s",
+							background: "#f5f7fa",
+							minHeight: "100vh",
+						}}
+					>
+						<Header
+							style={{
+								padding: "0 20px",
+								background: "#ffffff",
+								borderBottom: "1px solid #e8e8e8",
+								position: "sticky",
+								top: 0,
+								zIndex: 999,
+								display: "flex",
+								alignItems: "center",
+								justifyContent: "space-between",
+								boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
+								height: "64px",
+								marginLeft: "-8px",
+							}}
+						>
+							<div style={{ display: "flex", alignItems: "center" }}>
 								<Button
 									type="text"
-									icon={<BellOutlined />}
-									size="middle"
+									icon={
+										collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />
+									}
+									onClick={() => setCollapsed(!collapsed)}
 									style={{
-										color: darkMode ? "#fff" : "#5a5a5a",
-										width: 40,
-										height: 40,
+										fontSize: "16px",
+										width: 48,
+										height: 48,
+										color: "#5a5a5a",
 									}}
 								/>
-							</Badge>
-							<Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
-								<div
-									style={{
-										display: "flex",
-										alignItems: "center",
-										cursor: "pointer",
-										padding: "8px 0 8px 12px",
-										borderRadius: "4px",
-										transition: "background 0.3s",
-									}}
-								>
-									<Avatar
-										icon={<UserOutlined />}
+							</div>
+							<Space size="middle" align="center">
+								<Badge count={5} size="small" dot={false}>
+									<Button
+										type="text"
+										icon={<BellOutlined />}
+										size="middle"
 										style={{
-											backgroundColor: "#4a6da7",
-											marginRight: 8,
+											color: "#5a5a5a",
+											width: 40,
+											height: 40,
 										}}
 									/>
-									{!collapsed && (
-										<span
+								</Badge>
+								<Dropdown
+									menu={{ items: userMenuItems }}
+									placement="bottomRight"
+								>
+									<div
+										style={{
+											display: "flex",
+											alignItems: "center",
+											cursor: "pointer",
+											padding: "8px 0 8px 12px",
+											borderRadius: "4px",
+											transition: "background 0.3s",
+										}}
+									>
+										<Avatar
+											icon={<UserOutlined />}
 											style={{
-												color: darkMode ? "#fff" : "#333",
-												fontWeight: 500,
-												fontSize: "14px",
+												backgroundColor: "#4a6da7",
+												marginRight: 8,
 											}}
-										>
-											Admin
-										</span>
-									)}
-								</div>
-							</Dropdown>
-						</Space>
-					</Header>
-
-					<Content
-						style={{
-							margin: "32px 12px",
-							padding: 24,
-							minHeight: 280,
-							background: darkMode ? "#2a3a4a" : "#ffffff",
-							borderRadius: "8px",
-							boxShadow: darkMode
-								? "0 1px 2px 0 rgba(0, 0, 0, 0.1)"
-								: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
-						}}
-					>
-						<Outlet />
-					</Content>
+										/>
+										{!collapsed && (
+											<span
+												style={{
+													color: "#000",
+													fontWeight: 500,
+													fontSize: "14px",
+												}}
+											>
+												Admin
+											</span>
+										)}
+									</div>
+								</Dropdown>
+							</Space>
+						</Header>
+						<Content className="overflow-x-auto p-2 sm:p-4 md:p-6 min-h-[280px] bg-white rounded-lg shadow">
+							<Outlet />
+						</Content>
+					</Layout>
 				</Layout>
-			</Layout>
+			</div>
 		</ConfigProvider>
 	);
 };
