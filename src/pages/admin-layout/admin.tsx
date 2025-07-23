@@ -110,7 +110,7 @@ const AdminLayout: React.FC = () => {
 
 	return (
 		<ConfigProvider>
-			<div className="admin-layout min-h-screen max-w-[1520px] mx-auto bg-gray-100">
+			<div className="admin-layout min-h-screen bg-gray-100">
 				<Layout>
 					<Sider
 						trigger={null}
@@ -161,10 +161,10 @@ const AdminLayout: React.FC = () => {
 					</Sider>
 					<Layout
 						style={{
-							marginLeft: collapsed ? 80 : 200,
-							transition: "margin-left 0.2s",
-							background: "#f5f7fa",
+							marginLeft: 200,
 							minHeight: "100vh",
+							width: "100%",
+							background: "#f5f7fa",
 						}}
 					>
 						<Header
@@ -247,7 +247,14 @@ const AdminLayout: React.FC = () => {
 								</Dropdown>
 							</Space>
 						</Header>
-						<Content className="overflow-x-auto p-2 sm:p-4 md:p-6 min-h-[280px] bg-white rounded-lg shadow">
+						<Content
+							style={{
+								padding: 0,
+								width: "100%",
+								maxWidth: "100%",
+							}}
+							className="overflow-x-auto p-2 sm:p-4 md:p-6 min-h-[280px] bg-white rounded-lg shadow"
+						>
 							<Outlet />
 						</Content>
 					</Layout>
