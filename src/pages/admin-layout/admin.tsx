@@ -161,10 +161,11 @@ const AdminLayout: React.FC = () => {
 					</Sider>
 					<Layout
 						style={{
-							marginLeft: 200,
+							marginLeft: collapsed ? 80 : 200,
 							minHeight: "100vh",
 							width: "100%",
 							background: "#f5f7fa",
+							transition: "margin-left 0.2s",
 						}}
 					>
 						<Header
@@ -180,7 +181,9 @@ const AdminLayout: React.FC = () => {
 								justifyContent: "space-between",
 								boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
 								height: "64px",
-								marginLeft: "-8px",
+								marginLeft: "-2px",
+								borderBottomLeftRadius: "8px",
+								borderBottomRightRadius: "8px",
 							}}
 						>
 							<div style={{ display: "flex", alignItems: "center" }}>
