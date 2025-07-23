@@ -129,27 +129,16 @@ import {
 	Calendar,
 	ChevronLeft,
 	ChevronRight,
-	Clock,
-	Users,
 } from "lucide-react";
 import { useRef, useState } from "react";
+import type { LessonType } from "../../types/section";
 import LessonInfo from "./lesson-info-modal";
-import LessonModal from "./lesson-modal"
-
-// Mock types for demonstration
-type LessonType = {
-	id: string;
-	date: string;
-	status: string;
-	title?: string;
-	time?: string;
-	attendees?: number;
-};
+import LessonModal from "./lesson-modal";
 
 const LessonsList = ({ lessons }: any) => {
 	const [open, setOpen] = useState(false);
 	const [openInfo, setOpenInfo] = useState(false);
-	const [update, setUpdate] = useState(null);
+	const [update, setUpdate] = useState<LessonType | null>(null);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [scrollPosition, setScrollPosition] = useState(0);
 	const [selectedLesson, setSelectedLesson] = useState<LessonType | null>(null);
@@ -185,7 +174,7 @@ const LessonsList = ({ lessons }: any) => {
 	};
 
 	const toggle = () => {
-		setOpen(!open);
+		setOpen((prev) => !prev);
 		if (update) {
 			setUpdate(null);
 		}
@@ -308,21 +297,8 @@ const LessonsList = ({ lessons }: any) => {
 													</div>
 												)}
 
-												{lesson.time && (
-													<div className="flex items-center gap-2">
-														<Clock className="w-4 h-4 opacity-80" />
-														<span className="text-sm">{lesson.time}</span>
-													</div>
-												)}
 
-												{lesson.attendees !== undefined && (
-													<div className="flex items-center gap-2">
-														<Users className="w-4 h-4 opacity-80" />
-														<span className="text-sm">
-															{lesson.attendees} ishtirokchi
-														</span>
-													</div>
-												)}
+												
 											</div>
 											<div className="absolute top-2 right-2">
 												<div
@@ -368,7 +344,12 @@ const LessonsList = ({ lessons }: any) => {
 
 			{open && <LessonModal open={open} toggle={toggle} update={update} />}
 
-			{openInfo &&  (<LessonInfo open={openInfo} toggle={toggleInfo} lesson={selectedLesson}/>
+			{openInfo && (
+				<LessonInfo
+					open={openInfo}
+					toggle={toggleInfo}
+					lesson={selectedLesson}
+				/>
 			)}
 		</div>
 	);

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
-import { getItem, Notification } from "../../helpers";
+import { getItem } from "../../helpers";
 
 const ProtectLayout = ({ children }: { children: ReactNode }) => {
 	const isAuthorized = getItem("access_token");

@@ -1,11 +1,10 @@
-import type { LessonType, ModalProps } from "@types";
-import { Button, Form, Input, Modal, Select } from "antd";
-import { Controller, useForm } from "react-hook-form";
-// import { useGroups } from '@hooks'
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useLessons } from "@hooks";
 import { useQueryClient } from "@tanstack/react-query";
+import type { LessonType, ModalProps } from "@types";
+import { Button, Form, Input, Modal, Select } from "antd";
 import { useEffect } from "react";
+import { Controller, useForm } from "react-hook-form";
 import * as yup from "yup";
 const schema = yup.object().shape({
 	notes: yup
@@ -44,7 +43,9 @@ const LessonModal = ({ open, toggle, update }: LessonProps) => {
 				{
 					onSuccess: () => {
 						toggle();
-						queryClient.invalidateQueries(["lessons", "status&notes"]);
+						queryClient.invalidateQueries({
+							queryKey: ["lessons", "status&notes"],
+						});
 					},
 				}
 			);

@@ -58,7 +58,9 @@ const AddTeacherorStudentModal = ({
 			delete data.studentId;
 			addTeacher(data, {
 				onSuccess: () => {
-					queryClient.invalidateQueries(["groups", "add-teacher"]);
+					queryClient.invalidateQueries({
+						queryKey: ["groups", "add-teacher"],
+					});
 					setOpen((prev) => !prev);
 				},
 			});
@@ -66,7 +68,9 @@ const AddTeacherorStudentModal = ({
 			delete data.teacherId;
 			addStudent(data, {
 				onSuccess: () => {
-					queryClient.invalidateQueries(["groups", "add-student"]);
+					queryClient.invalidateQueries({
+						queryKey: ["groups", "add-student"],
+					});
 					setOpen((prev) => !prev);
 				},
 			});
@@ -134,13 +138,17 @@ const AddTeacherorStudentModal = ({
 											: { display: "none", marginTop: 10, marginLeft: 10 }
 									}
 								>
-									{selected ? (
+									{selected &&
+									typeof selected === "object" &&
+									"id" in selected &&
+									"first_name" in selected &&
+									"last_name" in selected ? (
 										<p style={{ fontSize: "18px", color: "#1447e6" }}>
-											{`${selected.id} - ${selected.first_name} ${selected.last_name}`}
+											{`${(selected as any).id} - ${
+												(selected as any).first_name
+											} ${(selected as any).last_name}`}
 										</p>
-									) : (
-										<></>
-									)}
+									) : null}
 								</div>
 							</>
 						)}
@@ -182,13 +190,17 @@ const AddTeacherorStudentModal = ({
 											: { display: "none", marginTop: 10, marginLeft: 10 }
 									}
 								>
-									{selected ? (
+									{selected &&
+									typeof selected === "object" &&
+									"id" in selected &&
+									"first_name" in selected &&
+									"last_name" in selected ? (
 										<p style={{ fontSize: "18px", color: "#1447e6" }}>
-											{`${selected.id} - ${selected.first_name} ${selected.last_name}`}
+											{`${(selected as any).id} - ${
+												(selected as any).first_name
+											} ${(selected as any).last_name}`}
 										</p>
-									) : (
-										<></>
-									)}
+									) : null}
 								</div>
 							</>
 						)}

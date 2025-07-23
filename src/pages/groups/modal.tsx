@@ -23,7 +23,7 @@ type GroupFormValues = {
 	start_date: Dayjs | string;
 	start_time: Dayjs | string;
 	status: string;
-	course: string;
+	course?: string;
 	roomId: number;
 };
 
@@ -81,7 +81,7 @@ const GroupModal = ({ open, toggle, update }: GroupProps) => {
 		setValue,
 		reset,
 	} = useForm<GroupFormValues>({
-		resolver: yupResolver(schema),
+		resolver: yupResolver(schema) as any,
 		defaultValues: {
 			name: "",
 			start_date: "",
@@ -106,16 +106,19 @@ const GroupModal = ({ open, toggle, update }: GroupProps) => {
 	}, [open, update]);
 
 	const onSubmit = (data: GroupFormValues) => {
-		const formattedData = {
+		const formattedData: any = {
 			...data,
 			course_id: Number(data.course),
 			start_date: dayjs(data.start_date).format("YYYY-MM-DD"),
 			start_time: dayjs(data.start_time).format("HH:mm"),
+			end_date: "2025-06-06",
+			end_time: "09:00",
 		};
 
-		delete formattedData.course;
-		formattedData["end_date"] = "2025-06-06";
-		formattedData["end_time"] = "09:00";
+		// Remove course from formattedData if present
+		if (formattedData.course) {
+			delete formattedData.course;
+		}
 
 		if (update?.id) {
 			updateGroup({ id: update.id, data: formattedData });
