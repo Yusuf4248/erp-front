@@ -108,7 +108,7 @@ const GroupModal = ({ open, toggle, update }: GroupProps) => {
 	const onSubmit = (data: GroupFormValues) => {
 		const formattedData: any = {
 			...data,
-			course_id: Number(data.course),
+			courseId: Number(data.course),
 			start_date: dayjs(data.start_date).format("YYYY-MM-DD"),
 			start_time: dayjs(data.start_time).format("HH:mm"),
 			end_date: "2025-06-06",
