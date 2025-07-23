@@ -262,7 +262,7 @@ const LessonsList = ({ lessons }: any) => {
 											updateItem(lesson);
 										}}
 										className={`${getStatusColor(lesson.status)} 
-                      flex-shrink-0 w-48 p-4 rounded-xl border-2 cursor-pointer 
+                      flex-shrink-0 w-24 h-24 p-4 rounded-xl border-2 cursor-pointer 
                       transition-all duration-300 hover:shadow-lg hover:scale-105 
                       transform hover:-translate-y-1 relative overflow-hidden`}
 									>
@@ -278,7 +278,7 @@ const LessonsList = ({ lessons }: any) => {
 											}
 										>
 											<div className="text-center mb-3">
-												<div className="text-2xl font-bold">
+												<div className="text-sm font-bold">
 													{dateInfo.split(".")[0]}
 												</div>
 												<div className="text-sm font-medium opacity-90">
@@ -296,9 +296,6 @@ const LessonsList = ({ lessons }: any) => {
 														</span>
 													</div>
 												)}
-
-
-												
 											</div>
 											<div className="absolute top-2 right-2">
 												<div
