@@ -226,8 +226,9 @@ export const RoomsColumn: TableProps<RoomsType>["columns"] = [
 	},
 	{
 		title: "Branch",
-		dataIndex: "branchId",
+		dataIndex: "branch",
 		key: "brnach",
+		render: (branch) => branch.name,
 		// width: 150,
 	},
 	{
