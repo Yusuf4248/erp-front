@@ -79,16 +79,16 @@ const SingleGroup = () => {
 					</div>
 
 					<div className="mb-6">
-						{teachers?.data.length > 0 && (
+						{teachers?.data.length >= 0 && (
 							<GroupTeachers teachers={teachers?.data} />
 						)}
 					</div>
-					{lessons?.data.lessons.length > 0 && (
+					{lessons?.data.lessons.length >= 0 && (
 						<GroupLessons lessons={lessons?.data.lessons} />
 					)}
 
 					<div>
-						{students?.data.length > 0 && (
+						{students?.data.length >= 0 && (
 							<GroupStudents students={students?.data} id={id} />
 						)}
 					</div>
