@@ -124,12 +124,7 @@
 // export default LessonsList;
 
 import { Tooltip } from "antd";
-import {
-	BookOpen,
-	Calendar,
-	ChevronLeft,
-	ChevronRight,
-} from "lucide-react";
+import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { useRef, useState } from "react";
 import type { LessonType } from "../../types/section";
 import LessonInfo from "./lesson-info-modal";
@@ -207,11 +202,11 @@ const LessonsList = ({ lessons }: any) => {
 		const [_, month, day] = newDate.split("-");
 		return `${day}.${month}`;
 	};
-	const getDayName = (dateString: string) => {
-		const date = new Date(dateString);
-		const options: Intl.DateTimeFormatOptions = { weekday: "long" };
-		return date.toLocaleDateString("uz-UZ", options);
-	};
+	// const getDayName = (dateString: string) => {
+	// 	const date = new Date(dateString);
+	// 	const options: Intl.DateTimeFormatOptions = { weekday: "long" };
+	// 	return date.toLocaleDateString("uz-UZ", options);
+	// };
 	return (
 		<div className="w-full bg-white rounded-2xl  border border-gray-100 overflow-hidden mb-5">
 			{/* Header */}
@@ -226,8 +221,62 @@ const LessonsList = ({ lessons }: any) => {
 							<p className="text-sm font-medium text-gray-900">Group lessons</p>
 						</div>
 					</div>
-					<div className="text-gray-900 text-sm font-medium">
-						All lessons: {lessons.length}
+					<div className="bg-white rounded-lg shadow p-4 flex flex-wrap items-center gap-4 text-gray-900 text-sm font-medium w-fit">
+						<span>
+							All: <span className="font-bold">{lessons.length}</span>
+						</span>
+						<span>
+							<span className="inline-block px-2 py-0.5 rounded bg-green-100 text-green-700 font-semibold">
+								Completed
+							</span>
+							:
+							<span className="ml-1">
+								{
+									lessons.filter(
+										(lesson: LessonType) => lesson.status === "completed"
+									).length
+								}
+							</span>
+						</span>
+						<span>
+							<span className="inline-block px-2 py-0.5 rounded bg-red-100 text-red-700 font-semibold">
+								Canceled
+							</span>
+							:
+							<span className="ml-1">
+								{
+									lessons.filter(
+										(lesson: LessonType) => lesson.status === "cancelled"
+									).length
+								}
+							</span>
+						</span>
+						<span>
+							<span className="inline-block px-2 py-0.5 rounded bg-yellow-200 text-black font-semibold">
+								In Progress
+							</span>
+							:
+							<span className="ml-1">
+								{
+									lessons.filter(
+										(lesson: LessonType) => lesson.status === "in_progress"
+									).length
+								}
+							</span>
+						</span>
+						<span>
+							<span className="inline-block px-2 py-0.5 rounded bg-gray-200 text-black font-semibold">
+								New
+							</span>
+							:
+							<span className="ml-1">
+								{
+									lessons.filter(
+										(lesson: LessonType) => lesson.status === "new"
+									).length
+								}
+							</span>
+						</span>
 					</div>
 				</div>
 			</div>
@@ -248,10 +297,10 @@ const LessonsList = ({ lessons }: any) => {
 						className="flex-1 overflow-x-auto scrollbar-hide"
 						style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
 					>
-						<div className="flex gap-4 p-[10px]">
+						<div className="flex gap-2 p-[10px]">
 							{lessons.map((lesson: LessonType, index: number) => {
 								const dateInfo = formatDayAndMonth(lesson.date);
-								const dayName = getDayName(lesson.date).slice(0, 3);
+								// const dayName = getDayName(lesson.date).slice(0, 3);
 
 								return (
 									<div
@@ -262,49 +311,40 @@ const LessonsList = ({ lessons }: any) => {
 											updateItem(lesson);
 										}}
 										className={`${getStatusColor(lesson.status)} 
-                      flex-shrink-0 w-24 h-24 p-4 rounded-xl border-2 cursor-pointer 
+                      flex-shrink-0 w-14 h-14 p-4 rounded-xl border-2 cursor-pointer 
                       transition-all duration-300 hover:shadow-lg hover:scale-105 
                       transform hover:-translate-y-1 relative overflow-hidden`}
 									>
 										<Tooltip
 											title={lesson?.notes}
-											color={
-												lesson.status == "bekor qilingan" ? "#E80A15" : "#ccc"
-											}
+											color={lesson.status == "cancelled" ? "#E80A15" : "#ccc"}
 											overlayInnerStyle={
-												lesson.status == "bekor qilingan"
+												lesson.status == "cancelled"
 													? { color: "#fff" }
 													: { color: "#000" }
 											}
 										>
-											<div className="text-center mb-3">
-												<div className="text-sm font-bold">
+											<div className="text-center">
+												<div className="text-[14px] font-bold">
 													{dateInfo.split(".")[0]}
 												</div>
-												<div className="text-sm font-medium opacity-90">
+												<div className="text-[10px] font-medium opacity-90">
 													{dateInfo.split(".")[1]}
 												</div>
-												<div className="text-xs opacity-75 mt-1">{dayName}</div>
 											</div>
 
-											<div className="space-y-2">
-												{lesson.title && (
-													<div className="flex items-center gap-2">
-														<BookOpen className="w-4 h-4 opacity-80" />
-														<span className="text-sm font-medium truncate">
-															{lesson.title}
-														</span>
-													</div>
-												)}
-											</div>
-											<div className="absolute top-2 right-2">
+											<div className="absolute top-1 right-1 size-3">
 												<div
 													className={`w-3 h-3 rounded-full ${
-														lesson.status === "bekor qilingan"
+														lesson.status === "cancelled"
 															? "bg-red-500"
-															: lesson.status === "yangi"
+															: lesson.status === "new"
 															? "bg-gray-400"
-															: ""
+															: lesson.status === "completed"
+															? "bg-green-500"
+															: lesson.status === "in_progress"
+															? "bg-yellow-500"
+															: "bg-gray-400"
 													} opacity-80`}
 												></div>
 											</div>
@@ -321,21 +361,6 @@ const LessonsList = ({ lessons }: any) => {
 					>
 						<ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-indigo-600 group-disabled:text-gray-400" />
 					</button>
-				</div>
-			</div>
-
-			<div className="border-t border-gray-100 px-6 py-4 bg-gray-50/50">
-				<div className="flex items-center justify-between text-sm text-gray-600">
-					<div className="flex items-center gap-4">
-						<div className="flex items-center gap-2">
-							<div className="w-3 h-3 rounded-full bg-gray-400"></div>
-							<span>Scheduled</span>
-						</div>
-						<div className="flex items-center gap-2">
-							<div className="w-3 h-3 rounded-full bg-red-500"></div>
-							<span>Canceld</span>
-						</div>
-					</div>
 				</div>
 			</div>
 

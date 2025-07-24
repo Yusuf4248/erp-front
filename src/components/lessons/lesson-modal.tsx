@@ -2,16 +2,26 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useLessons } from "@hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import type { LessonType, ModalProps } from "@types";
-import { Button, Form, Input, Modal, Select } from "antd";
+import { Button, DatePicker, Form, Input, Modal, Select } from "antd";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as yup from "yup";
+import dayjs from "dayjs";
 const schema = yup.object().shape({
 	notes: yup
 		.string()
 		.min(3, "Title must be at least 3 characters")
 		.required("Title is required"),
 	status: yup.string().required("Status is required"),
+	date: yup
+	.mixed()
+	.test("is-date", "Start date is required", (value) => {
+		return (
+			value instanceof dayjs ||
+			(typeof value === "string" && dayjs(value).isValid())
+		);
+	})
+	.required("Start date is required"),
 });
 interface LessonProps extends ModalProps {
 	update: LessonType | null;
@@ -33,13 +43,17 @@ const LessonModal = ({ open, toggle, update }: LessonProps) => {
 		if (update?.id) {
 			setValue("notes", update.notes);
 			setValue("status", update.status);
+			setValue("date", dayjs(update.date));
 		}
 	}, [update]);
 	const onSubmit = (data: any) => {
-		const updateItem = { note: data.notes, status: data.status };
+		const updateItem = { note: data.notes, status: data.status, date: dayjs(data.date).format("YYYY-MM-DD") };
 		if (update?.id) {
+			if (data.status === "cancelled" || data.status === "completed") {
+				(updateItem as { date?: string }).date = undefined;
+			}
 			updateLessonStatusAndNote(
-				{ id: update!.id, data: updateItem },
+				{ id: update.id, data: updateItem },
 				{
 					onSuccess: () => {
 						toggle();
@@ -91,11 +105,20 @@ const LessonModal = ({ open, toggle, update }: LessonProps) => {
 							<Select
 								{...field}
 								options={[
-									{ label: "Yangi", value: "yangi" },
-									{ label: "Bekor qilingan", value: "bekor qilingan" },
+									{ label: "New", value: "new" },
+									{ label: "Canceled", value: "cancelled" },
+									{ label: "Completed", value: "completed" },
+									{ label: "In Progress", value: "in_progress" },
 								]}
 							/>
 						)}
+					/>
+				</Form.Item>
+				<Form.Item>
+					<Controller
+						name={"date"}
+						control={control}
+						render={({ field }) => <DatePicker {...field} />}
 					/>
 				</Form.Item>
 

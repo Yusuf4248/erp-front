@@ -8,6 +8,7 @@ const SingleGroup = () => {
 	const groupData: any = dataById
 		? dataById.data.group
 		: { course: { title: "", price: 0 } };
+		console.log("groupData", groupData)
 
 	return (
 		<>
@@ -50,7 +51,7 @@ const SingleGroup = () => {
 													: "bg-green-50 text-green-700"
 											}`}
 										>
-											{groupData.status === "new" ? "Yangi" : "Faol"}
+											{groupData.status === "new" ? "New" : "Active"}
 										</span>
 									</div>
 								</div>

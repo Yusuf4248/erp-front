@@ -123,7 +123,6 @@ const GroupModal = ({ open, toggle, update }: GroupProps) => {
 		if (update?.id) {
 			updateGroup({ id: update.id, data: formattedData });
 		} else {
-			console.log(formattedData);
 			createGroup(formattedData);
 		}
 		toggle();

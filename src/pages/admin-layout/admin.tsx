@@ -180,6 +180,7 @@ import { Button, Layout, Menu, Modal, theme } from "antd";
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import sidebarRoutes from "../../routes/sidebar-routes";
+import { removeItem } from "../../helpers"
 // import { removeAccessToken } from "@utils/token-service";
 // import MainLogo from "../../assets/logo.svg";
 // import LogoTitle from "../../assets/logo_title.svg";
@@ -211,8 +212,9 @@ const Index = () => {
 			icon: <LogoutOutlined />,
 			content: "Your session will be closed.",
 			onOk() {
+				removeItem("access_token");
+				removeItem("role");
 				navigate("/");
-				// removeAccessToken()
 			},
 			okButtonProps: {
 				style: {
@@ -250,10 +252,14 @@ const Index = () => {
 					}}
 				>
 					{collapsed && (
-						<p style={{ fontSize: "24px", fontWeight: "bold", color: "white" }}>CRM</p>
+						<p style={{ fontSize: "24px", fontWeight: "bold", color: "white" }}>
+							CRM
+						</p>
 					)}
 					{!collapsed && (
-						<p style={{ fontSize: "24px", fontWeight: "bold", color: "white" }}>CRM Admin</p>
+						<p style={{ fontSize: "24px", fontWeight: "bold", color: "white" }}>
+							CRM Admin
+						</p>
 					)}
 				</div>
 				<Menu

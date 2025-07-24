@@ -11,6 +11,7 @@ export const groupsService = {
 		const res = await apiConfig().getRequest(
 			`${ApiUrls.GROUPS}/${id ? id : 0}`
 		);
+		console.log("res", res)
 		return res;
 	},
 	async getGroupLessons(id: number) {
