@@ -3,7 +3,7 @@ import "./App.css";
 
 function App() {
 	return (
-		<div className="container mx-auto px-2 sm:px-4 md:px-8">
+		<div className="">
 			<Outlet />
 		</div>
 	);
