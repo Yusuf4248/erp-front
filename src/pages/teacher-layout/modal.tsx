@@ -31,10 +31,7 @@ interface TeacherProps extends ModalProps {
 	update: TeacherType | null;
 }
 const TeacherModal = ({ open, toggle, update }: TeacherProps) => {
-	const { useTeacherCreate, useTeacherUpdate } = useTeachers({
-		page: 1,
-		limit: 10,
-	});
+	const { useTeacherCreate, useTeacherUpdate } = useTeachers({});
 	const { data: brachData } = useBranches({ page: 1, limit: 100 });
 	const fullBranchData = brachData?.data.branch || [];
 	const { mutate: createTeacher, isPending: isCreating } = useTeacherCreate();
@@ -64,7 +61,10 @@ const TeacherModal = ({ open, toggle, update }: TeacherProps) => {
 			setValue("phone", update.phone);
 			setValue("password", update.password);
 			setValue("role", update.role);
-			setValue("branchId", update.branches.map((id:any)=>id.id));
+			setValue(
+				"branchId",
+				update.branches.map((id: any) => id.id)
+			);
 		}
 	}, [update]);
 	const onSubmit = (data: any) => {

@@ -2,9 +2,13 @@ import { teacherService } from "@service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ParamsType } from "@types";
 
-export const useTeachers = (params: ParamsType|{},id:number=0) => {
+const hasPageAndLimit = (p: any): p is { page: any; limit: any } =>
+	p && typeof p.page !== "undefined" && typeof p.limit !== "undefined";
+
+export const useTeachers = (params: ParamsType | {}, id: number = 0) => {
 	const queryClient = useQueryClient();
 	const { data } = useQuery({
+		enabled: hasPageAndLimit(params),
 		queryKey: ["teacher", params],
 		queryFn: async () => teacherService.getTeacher(params),
 	});
@@ -38,5 +42,11 @@ export const useTeachers = (params: ParamsType|{},id:number=0) => {
 			},
 		});
 	};
-	return { useTeacherCreate, data, useTeacherUpdate, useTeacherDelete, teacherDataById };
+	return {
+		useTeacherCreate,
+		data,
+		useTeacherUpdate,
+		useTeacherDelete,
+		teacherDataById,
+	};
 };
