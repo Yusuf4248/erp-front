@@ -96,6 +96,7 @@ const GroupModal = ({ open, toggle, update }: GroupProps) => {
 		if (!open) {
 			reset();
 		} else if (update?.id) {
+			console.log(update)
 			setValue("name", update.name);
 			setValue("status", update.status);
 			setValue("start_date", dayjs(update.start_date));
@@ -114,8 +115,6 @@ const GroupModal = ({ open, toggle, update }: GroupProps) => {
 			end_date: "2025-06-06",
 			end_time: "09:00",
 		};
-
-		// Remove course from formattedData if present
 		if (formattedData.course) {
 			delete formattedData.course;
 		}

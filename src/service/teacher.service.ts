@@ -3,8 +3,12 @@ import { apiConfig } from "@api/config";
 import type { ParamsType } from "@types";
 
 export const teacherService = {
-	async getTeacher(params: ParamsType) {
+	async getTeacher(params: ParamsType|{}) {
 		const res = await apiConfig().getRequest(ApiUrls.TEACHER, params);
+		return res;
+	},
+	async getTeacherById(id: number) {
+		const res = await apiConfig().getRequest(`${ApiUrls.TEACHER}/${id}`);
 		return res;
 	},
 	async deleteTeacher(id: number) {

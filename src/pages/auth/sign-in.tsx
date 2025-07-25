@@ -3,21 +3,13 @@ import { setItem } from "@helpers";
 import { Button, Form, Input, Select } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
+import { jwtDecode } from "jwt-decode";
 const SignIn = () => {
   const { mutate, isPending } = useAuth();
 	const navigate = useNavigate();
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const onFinish = async (values: any) => {
-		// const { email, password, role } = values;
-		// const payload = { email, password };
-		// const res = await authService.signIn(payload, role);
-		// if (res?.status === 201) {
-		//   setItem("access_token", res.data.access_token);
-		//   setItem("role", role);
-		//   navigate(`/${role}`);
-		// }
-
 		const { email, password, role } = values;
 		const payload = { email, password };
 		mutate(
@@ -25,8 +17,10 @@ const SignIn = () => {
 			{
 				onSuccess: (res: any) => {
 					if (res?.status === 201) {
+						const decoded:any = jwtDecode(res.data.access_token);
 						setItem("access_token", res.data.access_token);
 						setItem("role", role);
+						setItem("user_id", decoded.id);
 						navigate(`/${role}/dashboard`);
 					}
 				},

@@ -1,14 +1,16 @@
-
 import {
 	LogoutOutlined,
 	MenuFoldOutlined,
 	MenuUnfoldOutlined,
+	UserOutlined,
 } from "@ant-design/icons";
-import { Button, Layout, Menu, Modal, theme } from "antd";
+import { Button, Dropdown, Layout, Menu, Modal, theme } from "antd";
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import sidebarRoutes, { sidebarRoutesForTeacher } from "../../routes/sidebar-routes";
-import { removeItem } from "../../helpers"
+import { removeItem } from "../../helpers";
+import sidebarRoutes, {
+	sidebarRoutesForTeacher,
+} from "../../routes/sidebar-routes";
 
 const { Header, Sider, Content } = Layout;
 
@@ -16,9 +18,8 @@ const TeacherLayout = () => {
 	const [collapsed, setCollapsed] = useState(false);
 	const location = useLocation();
 	const [selectedKey, setSelectedKey] = useState("");
-console.log("teacher layout")
+	console.log("teacher layout");
 	useEffect(() => {
-		// Find the active route and set the selected key based on the current path
 		const currentRouteIndex = sidebarRoutes.findIndex(
 			(route) => route.path === location.pathname
 		);
@@ -49,6 +50,22 @@ console.log("teacher layout")
 			},
 			okText: "Confirm",
 		});
+	};
+
+	const menu = {
+		items: [
+			{
+				key: "profile",
+				icon: <UserOutlined />,
+				label: <span onClick={() => navigate("/teacher/me")}>Profile</span>,
+			},
+			{
+				key: "logout",
+				icon: <LogoutOutlined />,
+				danger: true,
+				label: <span onClick={handleLogout}>Logout</span>,
+			},
+		],
 	};
 
 	return (
@@ -83,7 +100,7 @@ console.log("teacher layout")
 					)}
 					{!collapsed && (
 						<p style={{ fontSize: "24px", fontWeight: "bold", color: "white" }}>
-							CRM Admin
+							CRM Teacher
 						</p>
 					)}
 				</div>
@@ -118,14 +135,14 @@ console.log("teacher layout")
 							height: 64,
 						}}
 					/>
-					<Button
-						type="text"
-						icon={<LogoutOutlined />}
-						onClick={handleLogout}
-						style={{ marginRight: "16px" }}
-					>
-						Logout
-					</Button>
+					<Dropdown menu={menu} placement="bottom">
+						<Button
+							type="text"
+							size="large"
+							icon={<UserOutlined />}
+							style={{ marginRight: 24 }}
+						/>
+					</Dropdown>
 				</Header>
 				<Content
 					style={{

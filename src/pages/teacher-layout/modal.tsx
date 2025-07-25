@@ -69,7 +69,7 @@ const TeacherModal = ({ open, toggle, update }: TeacherProps) => {
 	}, [update]);
 	const onSubmit = (data: any) => {
 		if (update?.id) {
-			delete data.branchId;
+			// delete data.branchId;
 			delete data.password;
 			updateTeacher({ id: update!.id, data });
 		} else {

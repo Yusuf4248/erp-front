@@ -10,6 +10,8 @@ import {
 	StudentsTbl,
 	Teacher,
 	
+	TeacherProfile,
+	
 	TeachersLayout,
 	
 	Worker,
@@ -71,6 +73,7 @@ const Router = () => {
 						}
 					>
 						<Route path="dashboard" element={<TeacherDashboard />} />
+						<Route path="me" element={<TeacherProfile />} />
 					</Route>
 
 					<Route path="worker" element={<Worker />} />

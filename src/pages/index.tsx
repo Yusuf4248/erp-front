@@ -16,6 +16,7 @@ const SingleGroup = lazy(() => import("./groups/single-group"));
 const Rooms = lazy(() => import("./rooms-layout/rooms"));
 const TeacherDashboard = lazy(() => import("./teachers/dashboard"));
 const TeachersLayout = lazy(() => import("./teachers/teacher"));
+const TeacherProfile = lazy(() => import("./teachers/teacher-profil"));
 
 export {
 	Admin,
@@ -33,5 +34,6 @@ export {
 	Rooms,
 	SingleGroup,
 	TeacherDashboard,
-	TeachersLayout
+	TeachersLayout,
+	TeacherProfile,
 };

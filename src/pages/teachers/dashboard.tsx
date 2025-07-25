@@ -26,6 +26,8 @@ import {
 	Timeline,
 	Tooltip,
 } from "antd";
+import { getItem } from "@helpers"
+import { useTeachers } from "../../hooks"
 
 const TeacherDashboard = () => {
 	const teacherInfo = {
@@ -42,6 +44,9 @@ const TeacherDashboard = () => {
 		completedCourses: 12,
 		totalLessons: 240,
 	};
+	const user_id = getItem("user_id");
+	const { data: teacherDataById } = useTeachers({},Number(user_id));
+	console.log("teacherDataById", teacherDataById);
 
 	const stats = [
 		{
@@ -258,15 +263,7 @@ const TeacherDashboard = () => {
 							</div>
 						</div>
 					</div>
-					<div className="text-right">
-						<Button
-							type="text"
-							icon={<EditOutlined />}
-							className="text-white hover:bg-white hover:bg-opacity-20 border border-white border-opacity-30"
-						>
-							Edit profil
-						</Button>
-					</div>
+					
 				</div>
 
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pt-6 border-t border-white border-opacity-20">
