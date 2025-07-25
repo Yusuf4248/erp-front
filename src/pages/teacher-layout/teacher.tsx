@@ -22,6 +22,7 @@ const Teachers = () => {
 		limit: 10,
 	});
 	const { data, useTeacherDelete } = useTeachers(params);
+	console.log(data)
 	const { mutate: deleteTeacher, isPending: isDeleting } = useTeacherDelete();
 	useEffect(() => {
 		const searchParams = new URLSearchParams(location.search);
@@ -91,7 +92,7 @@ const Teachers = () => {
 			<div className="overflow-x-auto">
 				<Table<TeacherType>
 					columns={columns}
-					dataSource={data?.data.teachers}
+					dataSource={data?.data.data}
 					rowKey={(record) => record.id}
 					scroll={{ x: "max-content" }}
 					pagination={{
