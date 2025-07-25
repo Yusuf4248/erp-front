@@ -9,9 +9,9 @@ export const groupsService = {
 	},
 	async getGroupById(id: Number) {
 		const res = await apiConfig().getRequest(
-			`${ApiUrls.GROUPS}/${id ? id : 0}`
+			`${ApiUrls.GROUPS}/${id}`
 		);
-		console.log("res", res)
+		console.log("res", res, id)
 		return res;
 	},
 	async getGroupLessons(id: number) {

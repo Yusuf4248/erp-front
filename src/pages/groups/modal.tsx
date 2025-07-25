@@ -100,7 +100,7 @@ const GroupModal = ({ open, toggle, update }: GroupProps) => {
 			setValue("status", update.status);
 			setValue("start_date", dayjs(update.start_date));
 			setValue("start_time", dayjs(update.start_time, "HH:mm"));
-			setValue("course", update.course);
+			setValue("course", update.course.title);
 			setValue("roomId", Number(update.roomId));
 		}
 	}, [open, update]);

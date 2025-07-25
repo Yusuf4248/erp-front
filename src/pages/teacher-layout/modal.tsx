@@ -64,13 +64,10 @@ const TeacherModal = ({ open, toggle, update }: TeacherProps) => {
 			setValue("phone", update.phone);
 			setValue("password", update.password);
 			setValue("role", update.role);
-			setValue("branchId", update.branchId);
+			setValue("branchId", update.branches.map((id:any)=>id.id));
 		}
 	}, [update]);
 	const onSubmit = (data: any) => {
-		// data["eventsId"] = data.eventsId.split(",").map((i: string) => +i) || null;
-		// data["groupsId"] = data.groupsId.split(",").map((i: string) => +i) || null;
-		console.log(data);
 		if (update?.id) {
 			delete data.branchId;
 			delete data.password;

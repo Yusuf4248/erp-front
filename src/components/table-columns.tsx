@@ -88,18 +88,6 @@ export const StudentColumn: TableProps<StudentType>["columns"] = [
 		key: "lidid",
 		// width: 80,
 	},
-	{
-		title: "Events Id",
-		dataIndex: "eventsId",
-		key: "eventsid",
-		// width: 100,
-	},
-	{
-		title: "Groups Id",
-		dataIndex: "groupsId",
-		key: "groupsid",
-		// width: 100,
-	},
 ];
 export const TeacherColumn: TableProps<TeacherType>["columns"] = [
 	{

@@ -1,11 +1,12 @@
 export interface GroupType {
 	id: number;
 	name: string;
-	course: string;
+	course: any;
 	start_date: string;
 	start_time: string;
 	status: string;
 	roomId: number;
+	room:any
 }
 export interface GroupStudentType {
 	students: StudentType[];
@@ -50,6 +51,7 @@ export interface TeacherType {
 	role: string;
 	branchId: [];
 	is_active?: boolean;
+	branches:any
 }
 export interface BranchType {
 	id: number;
@@ -79,4 +81,5 @@ export interface RoomsType {
 	branchId: number;
 	name: string;
 	capacity: number;
+	branch?:any
 }

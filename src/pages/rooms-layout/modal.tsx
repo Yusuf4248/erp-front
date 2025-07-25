@@ -20,7 +20,7 @@ interface RoomType extends ModalProps {
 const RoomModal = ({ open, toggle, update }: RoomType) => {
 	const { useRoomsUpdate, useRoomsCreate } = useRoomss({});
 	const { data: branchData } = useBranches({ page: 1, limit: 100 });
-	const branches = branchData?.data.branch || []
+	const branches = branchData?.data.branch || [];
 	// console.log(branchData);
 	const { mutate: createRoom, isPending: isCreating } = useRoomsCreate();
 	const { mutate: updateRoom, isPending: isUpdating } = useRoomsUpdate();
@@ -35,7 +35,7 @@ const RoomModal = ({ open, toggle, update }: RoomType) => {
 	useEffect(() => {
 		if (update?.id) {
 			setValue("name", update.name);
-			setValue("branchId", +update.branchId);
+			setValue("branchId", +update.branch?.id);
 			setValue("capacity", +update.capacity);
 		}
 	}, [update]);

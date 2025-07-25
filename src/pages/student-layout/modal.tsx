@@ -27,10 +27,6 @@ const schema = yup.object().shape({
 	gender: yup.string().required("Gender is required"),
 	date_of_birth: yup.string().required("Date of birth is required"),
 	lidId: yup.number().required("LID ID is required"),
-	eventsId: yup.string().required("Events ID is required"),
-	groupsId: yup.string().required("Groups ID is required"),
-	// eventsId: yup.array().of(yup.number()).required("Events ID is required"),
-	// groupsId: yup.array().of(yup.number()).required("Groups ID is required"),
 });
 interface StudentProps extends ModalProps {
 	update: StudentType | null;
@@ -58,8 +54,6 @@ const StudentModal = ({ open, toggle, update }: StudentProps) => {
 			gender: "",
 			date_of_birth: "",
 			lidId: 0,
-			eventsId: "",
-			groupsId: "",
 		},
 	});
 	useEffect(() => {
@@ -72,8 +66,6 @@ const StudentModal = ({ open, toggle, update }: StudentProps) => {
 			setValue("gender", update.gender);
 			setValue("date_of_birth", update.date_of_birth);
 			setValue("lidId", update.lidId);
-			setValue("eventsId", `${update.eventsId}`);
-			setValue("groupsId", `${update.groupsId}`);
 		}
 	}, [update]);
 	const onSubmit = (data: any) => {
@@ -215,40 +207,6 @@ const StudentModal = ({ open, toggle, update }: StudentProps) => {
 						name="lidId"
 						control={control}
 						render={({ field }) => <Input type="number" {...field} />}
-					/>
-				</Form.Item>
-				<Form.Item
-					label="Events ID"
-					name="eventsId"
-					validateStatus={errors ? "error" : ""}
-					help={errors.eventsId?.message}
-				>
-					<Controller
-						name="eventsId"
-						control={control}
-						render={({ field }) => (
-							<Input
-								{...field}
-								placeholder="Enter event IDs separated by commas"
-							/>
-						)}
-					/>
-				</Form.Item>
-				<Form.Item
-					label="Groups ID"
-					name="groupsId"
-					validateStatus={errors ? "error" : ""}
-					help={errors.groupsId?.message}
-				>
-					<Controller
-						name="groupsId"
-						control={control}
-						render={({ field }) => (
-							<Input
-								{...field}
-								placeholder="Enter group IDs separated by commas"
-							/>
-						)}
 					/>
 				</Form.Item>
 				<Form.Item>

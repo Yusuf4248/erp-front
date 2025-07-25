@@ -9,6 +9,9 @@ import {
 	Student,
 	StudentsTbl,
 	Teacher,
+	
+	TeachersLayout,
+	
 	Worker,
 } from "@pages";
 import { lazy } from "react";
@@ -19,6 +22,7 @@ import {
 	RouterProvider,
 } from "react-router-dom";
 import Dashboard from "../pages/admin-layout/admin-dashboard";
+import TeacherDashboard from "../pages/teachers/dashboard";
 import Branches from "../pages/branche-layout/branch";
 import Courses from "../pages/course-layout/course";
 import ProtectLayout from "../pages/protect-route/protect-layout";
@@ -28,11 +32,24 @@ const Router = () => {
 	const router = createBrowserRouter(
 		createRoutesFromElements(
 			<>
-				<Route path="/" element={<App />}><Route index element={<ProtectLogin><SignIn /></ProtectLogin>}
+				<Route path="/" element={<App />}>
+					<Route
+						index
+						element={
+							<ProtectLogin>
+								<SignIn />
+							</ProtectLogin>
+						}
 					/>
 					<Route path="sign-up" element={<SignUp />} />
 					{/* ADMIN */}
-					<Route path="admin" element={<ProtectLayout><Admin /></ProtectLayout>}
+					<Route
+						path="admin"
+						element={
+							<ProtectLayout>
+								<Admin />
+							</ProtectLayout>
+						}
 					>
 						<Route path="dashboard" element={<Dashboard />} />
 						<Route path="groups" element={<Groups />} />
@@ -46,6 +63,16 @@ const Router = () => {
 					{/* STUDENT */}
 					<Route path="student" element={<Student />}></Route>
 					{/* Teacher */}
+					<Route path="teacher"
+						element={
+							<ProtectLayout>
+								<TeachersLayout />
+							</ProtectLayout>
+						}
+					>
+						<Route path="dashboard" element={<TeacherDashboard />} />
+					</Route>
+
 					<Route path="worker" element={<Worker />} />
 					<Route path="*" element={<NotFound />} />
 				</Route>
