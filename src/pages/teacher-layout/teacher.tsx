@@ -22,7 +22,6 @@ const Teachers = () => {
 		limit: 10,
 	});
 	const { data, useTeacherDelete } = useTeachers(params);
-	console.log(data)
 	const { mutate: deleteTeacher, isPending: isDeleting } = useTeacherDelete();
 	useEffect(() => {
 		const searchParams = new URLSearchParams(location.search);

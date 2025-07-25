@@ -224,7 +224,7 @@ const TeacherDashboard = () => {
 		{
 			title: "Actions",
 			key: "actions",
-			render: (_:any, record:any) => (
+			render: (_:any, ) => (
 				<Space size="small">
 					<Tooltip title="View">
 						<Button type="text" icon={<EyeOutlined />} size="small" />

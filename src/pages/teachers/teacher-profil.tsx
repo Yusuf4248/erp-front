@@ -189,12 +189,6 @@ const TeacherProfile = () => {
 		}
 	};
 
-	const uploadButton = (
-		<div className="flex flex-col items-center justify-center w-full h-full">
-			<CameraOutlined className="text-2xl text-gray-400 mb-2" />
-			<span className="text-sm text-gray-600">Rasm yuklash</span>
-		</div>
-	);
 
 	return (
 		<div className="space-y-6">
