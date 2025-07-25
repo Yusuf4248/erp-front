@@ -28,8 +28,6 @@ import {
 } from "antd";
 
 const TeacherDashboard = () => {
-	// Mock data - bu real API dan keladi
-	console.log("teacher dashboard");
 	const teacherInfo = {
 		name: "Sardor Rahimov",
 		position: "Senior Frontend Developer",
@@ -47,7 +45,7 @@ const TeacherDashboard = () => {
 
 	const stats = [
 		{
-			title: "Jami O'quvchilar",
+			title: "All Students",
 			value: teacherInfo.totalStudents,
 			icon: <UserOutlined className="text-blue-500 text-2xl" />,
 			color: "bg-blue-50 border-blue-200",
@@ -55,7 +53,7 @@ const TeacherDashboard = () => {
 			changeType: "increase",
 		},
 		{
-			title: "Faol Guruhlar",
+			title: "Active Groups",
 			value: teacherInfo.activeGroups,
 			icon: <TeamOutlined className="text-green-500 text-2xl" />,
 			color: "bg-green-50 border-green-200",
@@ -63,7 +61,7 @@ const TeacherDashboard = () => {
 			changeType: "increase",
 		},
 		{
-			title: "Tugallangan Kurslar",
+			title: "Complated Courses",
 			value: teacherInfo.completedCourses,
 			icon: <BookOutlined className="text-purple-500 text-2xl" />,
 			color: "bg-purple-50 border-purple-200",
@@ -71,7 +69,7 @@ const TeacherDashboard = () => {
 			changeType: "increase",
 		},
 		{
-			title: "Jami Darslar",
+			title: "All Lessons",
 			value: teacherInfo.totalLessons,
 			icon: <TrophyOutlined className="text-orange-500 text-2xl" />,
 			color: "bg-orange-50 border-orange-200",
@@ -126,39 +124,39 @@ const TeacherDashboard = () => {
 	const recentActivities = [
 		{
 			time: "10:30",
-			title: "Frontend Bootcamp #12 darsi tugallandi",
-			description: "React Hooks mavzusi o'tildi",
+			title: "Frontend Bootcamp #12 group lesson complated",
+			description: "React Hooks",
 			type: "lesson",
 		},
 		{
 			time: "09:15",
-			title: "Yangi o'quvchi qo'shildi",
-			description: "Alisher Karimov React Advanced #8 ga",
+			title: "New Student added",
+			description: "Alisher Karimov React Advanced #8",
 			type: "student",
 		},
 		{
 			time: "08:45",
-			title: "Vazifa baholandi",
-			description: "15ta vazifa tekshirildi va baholandi",
+			title: "Homework marked",
+			description: "15 homework chacked and marked",
 			type: "homework",
 		},
 		{
-			time: "Kecha",
-			title: "Guruh yakunlandi",
-			description: "JavaScript Basics #23 muvaffaqiyatli yakunlandi",
+			time: "Yesterday",
+			title: "Group Complated",
+			description: "JavaScript Basics #23 complated",
 			type: "completion",
 		},
 	];
 
 	const columns = [
 		{
-			title: "Guruh Nomi",
+			title: "Group Name",
 			dataIndex: "name",
 			key: "name",
 			render: (text:any) => <div className="font-medium text-gray-900">{text}</div>,
 		},
 		{
-			title: "O'quvchilar",
+			title: "Students",
 			dataIndex: "students",
 			key: "students",
 			render: (count:any) => (
@@ -169,7 +167,7 @@ const TeacherDashboard = () => {
 			),
 		},
 		{
-			title: "Daraja",
+			title: "Level",
 			dataIndex: "level",
 			key: "level",
 			render: (level:any) => {
@@ -203,9 +201,9 @@ const TeacherDashboard = () => {
 			key: "status",
 			render: (status:any) => {
 				const config = {
-					active: { color: "success", text: "Faol" },
-					finishing: { color: "warning", text: "Yakunlanmoqda" },
-					completed: { color: "default", text: "Tugallangan" },
+					active: { color: "success", text: "Active" },
+					finishing: { color: "warning", text: "Uploading" },
+					completed: { color: "default", text: "Complated" },
 				};
 				return (
 					<Badge status={config[status as keyof typeof config].color as any	} text={config[status as keyof typeof config].text} />
@@ -213,20 +211,20 @@ const TeacherDashboard = () => {
 			},
 		},
 		{
-			title: "Keyingi Dars",
+			title: "Next Lesson",
 			dataIndex: "nextLesson",
 			key: "nextLesson",
 			render: (date:any) => <div className="text-sm text-gray-600">{date}</div>,
 		},
 		{
-			title: "Amallar",
+			title: "Actions",
 			key: "actions",
 			render: (_:any, record:any) => (
 				<Space size="small">
-					<Tooltip title="Ko'rish">
+					<Tooltip title="View">
 						<Button type="text" icon={<EyeOutlined />} size="small" />
 					</Tooltip>
-					<Tooltip title="Tahrirlash">
+					<Tooltip title="Edit">
 						<Button type="text" icon={<EditOutlined />} size="small" />
 					</Tooltip>
 				</Space>
@@ -251,11 +249,11 @@ const TeacherDashboard = () => {
 							<div className="flex items-center space-x-4 text-sm text-blue-100">
 								<span className="flex items-center">
 									<TrophyOutlined className="mr-1" />
-									{teacherInfo.experience} tajriba
+									{teacherInfo.experience} experience
 								</span>
 								<span className="flex items-center">
 									<span className="text-yellow-300 mr-1">★</span>
-									{teacherInfo.rating} reyting
+									{teacherInfo.rating} rating
 								</span>
 							</div>
 						</div>
@@ -266,7 +264,7 @@ const TeacherDashboard = () => {
 							icon={<EditOutlined />}
 							className="text-white hover:bg-white hover:bg-opacity-20 border border-white border-opacity-30"
 						>
-							Profilni tahrirlash
+							Edit profil
 						</Button>
 					</div>
 				</div>
@@ -330,7 +328,7 @@ const TeacherDashboard = () => {
 						title={
 							<div className="flex items-center justify-between">
 								<span className="font-semibold text-gray-900">
-									Mening Guruhlarim
+									My Groups
 								</span>
 								
 							</div>
@@ -351,7 +349,7 @@ const TeacherDashboard = () => {
 				{/* Recent Activities */}
 				<Col xs={24} xl={8}>
 					<Card
-						title="So'nggi Faoliyat"
+						title="Last Activity"
 						className="shadow-sm border border-gray-200 h-fit"
 					>
 						<Timeline
@@ -397,7 +395,7 @@ const TeacherDashboard = () => {
 							size="large"
 							className="bg-blue-600 hover:bg-blue-700 h-12"
 						>
-							Yangi Dars Yaratish
+							New Lesson
 						</Button>
 					</Col>
 					<Col xs={24} sm={12} md={6}>
@@ -407,7 +405,7 @@ const TeacherDashboard = () => {
 							size="large"
 							className="h-12 border-green-500 text-green-600 hover:bg-green-50"
 						>
-							Vazifalarni Ko'rish
+							View Homeworks
 						</Button>
 					</Col>
 					<Col xs={24} sm={12} md={6}>
@@ -417,7 +415,7 @@ const TeacherDashboard = () => {
 							size="large"
 							className="h-12 border-purple-500 text-purple-600 hover:bg-purple-50"
 						>
-							Jadval Ko'rish
+							View Tables
 						</Button>
 					</Col>
 					<Col xs={24} sm={12} md={6}>
@@ -427,7 +425,7 @@ const TeacherDashboard = () => {
 							size="large"
 							className="h-12 border-orange-500 text-orange-600 hover:bg-orange-50"
 						>
-							Hisobotlar
+							Reports
 						</Button>
 					</Col>
 				</Row>
