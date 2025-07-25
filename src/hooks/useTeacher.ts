@@ -9,6 +9,7 @@ export const useTeachers = (params: ParamsType|{},id:number=0) => {
 		queryFn: async () => teacherService.getTeacher(params),
 	});
 	const { data: teacherDataById } = useQuery({
+		enabled: !!id,
 		queryKey: ["teacher", id],
 		queryFn: async () => teacherService.getTeacherById(id),
 	});

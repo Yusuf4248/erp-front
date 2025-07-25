@@ -188,8 +188,6 @@ const TeacherProfile = () => {
 			message.error("Rasm yuklashda xatolik!");
 		}
 	};
-
-
 	return (
 		<div className="space-y-6">
 			{/* Profile Header */}
