@@ -47,9 +47,20 @@ const CourseModal = ({ open, toggle, update }: CourseProps) => {
 	}, [update]);
 	const onSubmit = (data: any) => {
 		if (update?.id) {
-			updateCourse({ id: update!.id, data });
+			updateCourse(
+				{ id: update!.id, data },
+				{
+					onSuccess: () => {
+						toggle();
+					},
+				}
+			);
 		} else {
-			createCourse(data);
+			createCourse(data, {
+				onSuccess: () => {
+					toggle();
+				},
+			});
 		}
 	};
 	return (

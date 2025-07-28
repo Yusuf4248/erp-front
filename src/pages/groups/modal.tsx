@@ -96,7 +96,7 @@ const GroupModal = ({ open, toggle, update }: GroupProps) => {
 		if (!open) {
 			reset();
 		} else if (update?.id) {
-			console.log(update)
+			console.log(update);
 			setValue("name", update.name);
 			setValue("status", update.status);
 			setValue("start_date", dayjs(update.start_date));
@@ -120,11 +120,21 @@ const GroupModal = ({ open, toggle, update }: GroupProps) => {
 		}
 
 		if (update?.id) {
-			updateGroup({ id: update.id, data: formattedData });
+			updateGroup(
+				{ id: update.id, data: formattedData },
+				{
+					onSuccess: () => {
+						toggle();
+					},
+				}
+			);
 		} else {
-			createGroup(formattedData);
+			createGroup(formattedData, {
+				onSuccess: () => {
+					toggle();
+				},
+			});
 		}
-		toggle();
 	};
 	const datePickerProps: DatePickerProps = {
 		format: "YYYY-MM-DD",

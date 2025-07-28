@@ -71,7 +71,14 @@ const TeacherModal = ({ open, toggle, update }: TeacherProps) => {
 		if (update?.id) {
 			// delete data.branchId;
 			delete data.password;
-			updateTeacher({ id: update!.id, data });
+			updateTeacher(
+				{ id: update!.id, data },
+				{
+					onSuccess: () => {
+						toggle();
+					},
+				}
+			);
 		} else {
 			createTeacher(data, {
 				onSuccess: () => {

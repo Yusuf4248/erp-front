@@ -55,11 +55,21 @@ const BranchModal = ({ open, toggle, update }: BranchProps) => {
 	}, [update]);
 	const onSubmit = (data: any) => {
 		delete data.teachers;
-		console.log("data", data);
 		if (update?.id) {
-			updateBranch({ id: update!.id, data });
+			updateBranch(
+				{ id: update!.id, data },
+				{
+					onSuccess: () => {
+						toggle();
+					},
+				}
+			);
 		} else {
-			createBranch(data);
+			createBranch(data, {
+				onSuccess: () => {
+					toggle();
+				},
+			});
 		}
 	};
 	return (

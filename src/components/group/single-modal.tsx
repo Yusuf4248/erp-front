@@ -58,6 +58,7 @@ const AddTeacherorStudentModal = ({
 			delete data.studentId;
 			addTeacher(data, {
 				onSuccess: () => {
+					toggle();
 					queryClient.invalidateQueries({
 						queryKey: ["groups", "add-teacher"],
 					});
@@ -68,6 +69,7 @@ const AddTeacherorStudentModal = ({
 			delete data.teacherId;
 			addStudent(data, {
 				onSuccess: () => {
+					toggle();
 					queryClient.invalidateQueries({
 						queryKey: ["groups", "add-student"],
 					});

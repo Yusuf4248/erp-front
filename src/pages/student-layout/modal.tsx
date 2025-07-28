@@ -77,9 +77,17 @@ const StudentModal = ({ open, toggle, update }: StudentProps) => {
 		delete data.eventsId;
 		console.log(data)
 		if (update?.id) {
-			updateStudent({ id: update!.id, data });
+			updateStudent({ id: update!.id, data },{
+				onSuccess: () => {
+					toggle();
+				},
+			});
 		} else {
-			createStudent(data);
+			createStudent(data,{
+				onSuccess: () => {
+					toggle();
+				},
+			});
 		}
 	};
 	return (
