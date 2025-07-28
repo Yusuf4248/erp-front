@@ -22,7 +22,7 @@ export default sidebarRoutes;
 
 const sidebarRoutesForTeacher = [
   { path: "/teacher/dashboard", icon: DashboardOutlined, title: "Dashboard" },
-  { path: "/teacher/groups", icon: TeamOutlined, title: "Groups" },
+  { path: "/teacher/my-groups", icon: TeamOutlined, title: "Groups" },
   { path: "/teacher/students", icon: UserOutlined, title: "Students" },
 ];
 export { sidebarRoutes, sidebarRoutesForTeacher };

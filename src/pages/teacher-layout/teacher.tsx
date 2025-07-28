@@ -93,7 +93,7 @@ const Teachers = () => {
 					columns={columns}
 					dataSource={data?.data.data}
 					rowKey={(record) => record.id}
-					scroll={{ x: "max-content" }}
+					scroll={{ x: "max-content", y: 500 }}
 					pagination={{
 						current: params.page,
 						pageSize: params.limit,

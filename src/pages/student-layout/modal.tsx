@@ -108,7 +108,7 @@ const StudentModal = ({ open, toggle, update }: StudentProps) => {
 				<Form.Item
 					label="First Name"
 					name="first_name"
-					validateStatus={errors ? "error" : ""}
+					validateStatus={errors.first_name ? "error" : ""}
 					help={errors.first_name?.message}
 				>
 					<Controller
@@ -120,7 +120,7 @@ const StudentModal = ({ open, toggle, update }: StudentProps) => {
 				<Form.Item
 					label="Last Name"
 					name="last_name"
-					validateStatus={errors ? "error" : ""}
+					validateStatus={errors.last_name ? "error" : ""}
 					help={errors.last_name?.message}
 				>
 					<Controller
@@ -132,7 +132,7 @@ const StudentModal = ({ open, toggle, update }: StudentProps) => {
 				<Form.Item
 					label="Email"
 					name="email"
-					validateStatus={errors ? "error" : ""}
+					validateStatus={errors.email ? "error" : ""}
 					help={errors.email?.message}
 				>
 					<Controller
@@ -162,7 +162,7 @@ const StudentModal = ({ open, toggle, update }: StudentProps) => {
 				<Form.Item
 					label="Password"
 					name="password"
-					validateStatus={errors ? "error" : ""}
+					validateStatus={errors.password_hash ? "error" : ""}
 					help={errors.password_hash?.message}
 				>
 					<Controller
@@ -174,7 +174,7 @@ const StudentModal = ({ open, toggle, update }: StudentProps) => {
 				<Form.Item
 					label="Gender"
 					name="gender"
-					validateStatus={errors ? "error" : ""}
+					validateStatus={errors.gender ? "error" : ""}
 					help={errors.gender?.message}
 				>
 					<Controller
@@ -196,7 +196,7 @@ const StudentModal = ({ open, toggle, update }: StudentProps) => {
 				<Form.Item
 					label="Date of Birth"
 					name="date_of_birth"
-					validateStatus={errors ? "error" : ""}
+					validateStatus={errors.date_of_birth ? "error" : ""}
 					help={errors.date_of_birth?.message}
 				>
 					<Controller
@@ -208,7 +208,7 @@ const StudentModal = ({ open, toggle, update }: StudentProps) => {
 				<Form.Item
 					label="LID ID"
 					name="lidId"
-					validateStatus={errors ? "error" : ""}
+					validateStatus={errors.lidId	 ? "error" : ""}
 					help={errors.lidId?.message}
 				>
 					<Controller

@@ -26,4 +26,11 @@ export const teacherService = {
 		const res = await apiConfig().postRequest(`${ApiUrls.TEACHER}`, body);
 		return res;
 	},
+	async uploadAvatar(id: number, body: FormData) {
+		const res = await apiConfig().postRequest(
+			`${ApiUrls.TEACHER_PROFILE_AVATAR(id)}`,
+			body
+		);
+		return res;
+	},
 };

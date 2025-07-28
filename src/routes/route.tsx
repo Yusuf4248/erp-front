@@ -9,11 +9,10 @@ import {
 	Student,
 	StudentsTbl,
 	Teacher,
-	
+	TeacherGroups,
 	TeacherProfile,
-	
+	TeacherSingleGroupPage,
 	TeachersLayout,
-	
 	Worker,
 } from "@pages";
 import { lazy } from "react";
@@ -24,11 +23,11 @@ import {
 	RouterProvider,
 } from "react-router-dom";
 import Dashboard from "../pages/admin-layout/admin-dashboard";
-import TeacherDashboard from "../pages/teachers/dashboard";
 import Branches from "../pages/branche-layout/branch";
 import Courses from "../pages/course-layout/course";
 import ProtectLayout from "../pages/protect-route/protect-layout";
 import ProtectLogin from "../pages/protect-route/protect-login";
+import TeacherDashboard from "../pages/teachers/dashboard";
 const App = lazy(() => import("../App"));
 const Router = () => {
 	const router = createBrowserRouter(
@@ -65,7 +64,8 @@ const Router = () => {
 					{/* STUDENT */}
 					<Route path="student" element={<Student />}></Route>
 					{/* Teacher */}
-					<Route path="teacher"
+					<Route
+						path="teacher"
 						element={
 							<ProtectLayout>
 								<TeachersLayout />
@@ -74,6 +74,8 @@ const Router = () => {
 					>
 						<Route path="dashboard" element={<TeacherDashboard />} />
 						<Route path="me" element={<TeacherProfile />} />
+						<Route path="my-groups" element={<TeacherGroups />} />
+						<Route path="my-groups/:id" element={<TeacherSingleGroupPage />} />
 					</Route>
 
 					<Route path="worker" element={<Worker />} />

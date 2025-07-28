@@ -43,8 +43,10 @@ const RoomModal = ({ open, toggle, update }: RoomType) => {
 		if (update?.id) {
 			updateRoom({ id: update!.id, data },{
 				onSuccess: () => {
+					// console.log("success")
 					toggle();
 				},
+			
 			});
 		} else {
 			createRoom(data,{

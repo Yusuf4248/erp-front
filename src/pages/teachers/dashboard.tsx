@@ -1,17 +1,15 @@
 import {
 	BookOutlined,
-	CalendarOutlined,
-	ClockCircleOutlined,
 	EditOutlined,
 	EnvironmentOutlined,
 	EyeOutlined,
 	MailOutlined,
 	PhoneOutlined,
-	PlusOutlined,
 	TeamOutlined,
 	TrophyOutlined,
 	UserOutlined,
 } from "@ant-design/icons";
+import { getItem } from "@helpers";
 import {
 	Avatar,
 	Badge,
@@ -26,8 +24,7 @@ import {
 	Timeline,
 	Tooltip,
 } from "antd";
-import { getItem } from "@helpers"
-import { useTeachers } from "../../hooks"
+import { useTeachers } from "../../hooks";
 
 const TeacherDashboard = () => {
 	const teacherInfo = {
@@ -45,7 +42,7 @@ const TeacherDashboard = () => {
 		totalLessons: 240,
 	};
 	const user_id = getItem("user_id");
-	const { data: teacherDataById } = useTeachers({},Number(user_id));
+	const { data: teacherDataById } = useTeachers({}, Number(user_id));
 	console.log("teacherDataById", teacherDataById);
 
 	const stats = [
@@ -158,13 +155,15 @@ const TeacherDashboard = () => {
 			title: "Group Name",
 			dataIndex: "name",
 			key: "name",
-			render: (text:any) => <div className="font-medium text-gray-900">{text}</div>,
+			render: (text: any) => (
+				<div className="font-medium text-gray-900">{text}</div>
+			),
 		},
 		{
 			title: "Students",
 			dataIndex: "students",
 			key: "students",
-			render: (count:any) => (
+			render: (count: any) => (
 				<div className="flex items-center">
 					<UserOutlined className="text-gray-400 mr-1" />
 					<span>{count}</span>
@@ -175,7 +174,7 @@ const TeacherDashboard = () => {
 			title: "Level",
 			dataIndex: "level",
 			key: "level",
-			render: (level:any) => {
+			render: (level: any) => {
 				const colors = {
 					Beginner: "green",
 					Intermediate: "blue",
@@ -188,7 +187,7 @@ const TeacherDashboard = () => {
 			title: "Progress",
 			dataIndex: "progress",
 			key: "progress",
-			render: (progress:any) => (
+			render: (progress: any) => (
 				<div className="w-20">
 					<Progress
 						percent={progress}
@@ -204,14 +203,17 @@ const TeacherDashboard = () => {
 			title: "Status",
 			dataIndex: "status",
 			key: "status",
-			render: (status:any) => {
+			render: (status: any) => {
 				const config = {
 					active: { color: "success", text: "Active" },
 					finishing: { color: "warning", text: "Uploading" },
 					completed: { color: "default", text: "Complated" },
 				};
 				return (
-					<Badge status={config[status as keyof typeof config].color as any	} text={config[status as keyof typeof config].text} />
+					<Badge
+						status={config[status as keyof typeof config].color as any}
+						text={config[status as keyof typeof config].text}
+					/>
 				);
 			},
 		},
@@ -219,12 +221,14 @@ const TeacherDashboard = () => {
 			title: "Next Lesson",
 			dataIndex: "nextLesson",
 			key: "nextLesson",
-			render: (date:any) => <div className="text-sm text-gray-600">{date}</div>,
+			render: (date: any) => (
+				<div className="text-sm text-gray-600">{date}</div>
+			),
 		},
 		{
 			title: "Actions",
 			key: "actions",
-			render: (_:any, ) => (
+			render: (_: any) => (
 				<Space size="small">
 					<Tooltip title="View">
 						<Button type="text" icon={<EyeOutlined />} size="small" />
@@ -263,7 +267,6 @@ const TeacherDashboard = () => {
 							</div>
 						</div>
 					</div>
-					
 				</div>
 
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pt-6 border-t border-white border-opacity-20">
@@ -324,10 +327,7 @@ const TeacherDashboard = () => {
 					<Card
 						title={
 							<div className="flex items-center justify-between">
-								<span className="font-semibold text-gray-900">
-									My Groups
-								</span>
-								
+								<span className="font-semibold text-gray-900">My Groups</span>
 							</div>
 						}
 						className="shadow-sm border border-gray-200"
@@ -380,53 +380,6 @@ const TeacherDashboard = () => {
 					</Card>
 				</Col>
 			</Row>
-
-			{/* Quick Actions */}
-			<Card title="Tezkor Amallar" className="shadow-sm border border-gray-200">
-				<Row gutter={[16, 16]}>
-					<Col xs={24} sm={12} md={6}>
-						<Button
-							type="primary"
-							icon={<PlusOutlined />}
-							block
-							size="large"
-							className="bg-blue-600 hover:bg-blue-700 h-12"
-						>
-							New Lesson
-						</Button>
-					</Col>
-					<Col xs={24} sm={12} md={6}>
-						<Button
-							icon={<BookOutlined />}
-							block
-							size="large"
-							className="h-12 border-green-500 text-green-600 hover:bg-green-50"
-						>
-							View Homeworks
-						</Button>
-					</Col>
-					<Col xs={24} sm={12} md={6}>
-						<Button
-							icon={<CalendarOutlined />}
-							block
-							size="large"
-							className="h-12 border-purple-500 text-purple-600 hover:bg-purple-50"
-						>
-							View Tables
-						</Button>
-					</Col>
-					<Col xs={24} sm={12} md={6}>
-						<Button
-							icon={<ClockCircleOutlined />}
-							block
-							size="large"
-							className="h-12 border-orange-500 text-orange-600 hover:bg-orange-50"
-						>
-							Reports
-						</Button>
-					</Col>
-				</Row>
-			</Card>
 		</div>
 	);
 };

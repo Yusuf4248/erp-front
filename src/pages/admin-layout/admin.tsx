@@ -175,12 +175,13 @@ import {
 	LogoutOutlined,
 	MenuFoldOutlined,
 	MenuUnfoldOutlined,
+	UserOutlined,
 } from "@ant-design/icons";
-import { Button, Layout, Menu, Modal, theme } from "antd";
+import { Button, Dropdown, Layout, Menu, Modal, theme } from "antd";
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { removeItem } from "../../helpers";
 import sidebarRoutes from "../../routes/sidebar-routes";
-import { removeItem } from "../../helpers"
 // import { removeAccessToken } from "@utils/token-service";
 // import MainLogo from "../../assets/logo.svg";
 // import LogoTitle from "../../assets/logo_title.svg";
@@ -224,6 +225,21 @@ const Index = () => {
 			},
 			okText: "Confirm",
 		});
+	};
+	const menu = {
+		items: [
+			{
+				key: "profile",
+				icon: <UserOutlined />,
+				label: <span onClick={() => navigate("/admin/me")}>Profile</span>,
+			},
+			{
+				key: "logout",
+				icon: <LogoutOutlined />,
+				danger: true,
+				label: <span onClick={handleLogout}>Logout</span>,
+			},
+		],
 	};
 
 	return (
@@ -281,7 +297,6 @@ const Index = () => {
 						display: "flex",
 						justifyContent: "space-between",
 						alignItems: "center",
-
 					}}
 				>
 					<Button
@@ -294,14 +309,14 @@ const Index = () => {
 							height: 64,
 						}}
 					/>
-					<Button
-						type="text"
-						icon={<LogoutOutlined />}
-						onClick={handleLogout}
-						style={{ marginRight: "16px" }}
-					>
-						Logout
-					</Button>
+					<Dropdown menu={menu} placement="bottom">
+						<Button
+							type="text"
+							size="large"
+							icon={<UserOutlined />}
+							style={{ marginRight: 24 }}
+						/>
+					</Dropdown>
 				</Header>
 				<Content
 					style={{

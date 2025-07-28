@@ -40,6 +40,7 @@ import {
 } from "antd";
 import dayjs from "dayjs";
 import { useState } from "react";
+import { useTeachers } from "../../hooks"
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -49,8 +50,11 @@ const TeacherProfile = () => {
 	const [isEditing, setIsEditing] = useState(false);
 	const [form] = Form.useForm();
 	const [activeTab, setActiveTab] = useState("1");
+	const { useTeacherUploadAvatar } = useTeachers({});
+	const {mutate:uploadAvatar,}=useTeacherUploadAvatar()
+	const formData = new FormData();
 
-	// Mock teacher data
+
 	const [teacherData, setTeacherData] = useState({
 		id: "12345",
 		firstName: "Sardor",
@@ -182,11 +186,12 @@ const TeacherProfile = () => {
 	};
 
 	const handleAvatarUpload = (info: any) => {
-		if (info.file.status === "done") {
-			message.success("Rasm muvaffaqiyatli yuklandi!");
-		} else if (info.file.status === "error") {
-			message.error("Rasm yuklashda xatolik!");
-		}
+		console.log(info.file);
+		formData.append("image", info.file.originFileObj);
+		uploadAvatar({
+			id: Number(teacherData.id),
+			body: formData,
+		});
 	};
 	return (
 		<div className="space-y-6">
@@ -222,19 +227,17 @@ const TeacherProfile = () => {
 									</Upload>
 								)}
 							</div>
-
-							{/* Basic Info */}
 							<div className="flex-1 text-center md:text-left">
-								<div className="bg-white rounded-lg p-4 shadow-sm">
+								<div className=" from-gray-600 to-gray-400 rounded-lg p-4 shadow-sm">
 									{!isEditing ? (
 										<>
-											<h1 className="text-2xl font-bold text-gray-900 mb-1">
+											<h1 className="text-2xl font-bold text-gray-100 mb-1">
 												{teacherData.firstName} {teacherData.lastName}
 											</h1>
-											<p className="text-blue-600 font-medium mb-2">
+											<p className="text-gray-300 font-medium mb-2">
 												{teacherData.position}
 											</p>
-											<div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm text-gray-600">
+											<div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm text-gray-300">
 												<span className="flex items-center">
 													<CalendarOutlined className="mr-1" />
 													{teacherData.experience} tajriba
@@ -264,12 +267,6 @@ const TeacherProfile = () => {
 													</label>
 													<Input defaultValue={teacherData.lastName} />
 												</div>
-											</div>
-											<div>
-												<label className="block text-sm font-medium mb-1">
-													Lavozim
-												</label>
-												<Input defaultValue={teacherData.position} />
 											</div>
 										</div>
 									)}
@@ -332,11 +329,7 @@ const TeacherProfile = () => {
 					<TabPane tab="Personal Information" key="1">
 						<Row gutter={[24, 24]}>
 							<Col xs={24} lg={12}>
-								<Card
-									title="Main Information"
-									size="small"
-									className="h-full"
-								>
+								<Card title="Main Information" size="small" className="h-full">
 									{!isEditing ? (
 										<div className="space-y-4">
 											<div className="flex items-center">
@@ -365,9 +358,7 @@ const TeacherProfile = () => {
 											<div className="flex items-center">
 												<CalendarOutlined className="text-gray-400 mr-3" />
 												<div>
-													<div className="text-sm text-gray-600">
-														Birthday
-													</div>
+													<div className="text-sm text-gray-600">Birthday</div>
 													<div className="font-medium">
 														{dayjs(teacherData.birthDate).format("DD.MM.YYYY")}
 													</div>
@@ -426,12 +417,14 @@ const TeacherProfile = () => {
 									{!isEditing ? (
 										<div className="space-y-3">
 											<div>
-												<div className="text-sm text-gray-600 mb-1">Department</div>
+												<div className="text-sm text-gray-600 mb-1">
+													Department
+												</div>
 												<div className="font-medium">
 													{teacherData.department}
 												</div>
 											</div>
-											<div>	
+											<div>
 												<div className="text-sm text-gray-600 mb-1">
 													Joined Date
 												</div>
@@ -440,17 +433,13 @@ const TeacherProfile = () => {
 												</div>
 											</div>
 											<div>
-												<div className="text-sm text-gray-600 mb-1">
-													Salary
-												</div>
+												<div className="text-sm text-gray-600 mb-1">Salary</div>
 												<div className="font-medium">
 													{teacherData.salary} UZS
 												</div>
 											</div>
 											<div>
-												<div className="text-sm text-gray-600 mb-1">
-													Rating
-												</div>
+												<div className="text-sm text-gray-600 mb-1">Rating</div>
 												<div className="flex items-center">
 													<Rate
 														disabled
@@ -507,10 +496,7 @@ const TeacherProfile = () => {
 										</p>
 									) : (
 										<Form.Item name="bio" label="About yourself...">
-											<TextArea
-												rows={4}
-													placeholder="About yourself..."
-											/>
+											<TextArea rows={4} placeholder="About yourself..." />
 										</Form.Item>
 									)}
 								</Card>

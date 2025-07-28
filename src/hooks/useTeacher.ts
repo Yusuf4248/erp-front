@@ -42,11 +42,21 @@ export const useTeachers = (params: ParamsType | {}, id: number = 0) => {
 			},
 		});
 	};
+	const useTeacherUploadAvatar = () => {
+		return useMutation({
+			mutationFn: async ({ id, body }: { id: number; body: FormData }) =>
+				teacherService.uploadAvatar(id, body),
+			onSuccess: () => {
+				queryClient.invalidateQueries({ queryKey: ["teacher"] });
+			},
+		});
+	};
 	return {
 		useTeacherCreate,
 		data,
 		useTeacherUpdate,
 		useTeacherDelete,
 		teacherDataById,
+		useTeacherUploadAvatar,
 	};
 };

@@ -7,7 +7,8 @@ import {
 import { Button, Dropdown, Layout, Menu, Modal, theme } from "antd";
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { removeItem } from "../../helpers";
+import { getItem, removeItem } from "@helpers";
+import { useTeachers } from "@hooks";
 import sidebarRoutes, {
 	sidebarRoutesForTeacher,
 } from "../../routes/sidebar-routes";
@@ -15,10 +16,12 @@ import sidebarRoutes, {
 const { Header, Sider, Content } = Layout;
 
 const TeacherLayout = () => {
+	const id = getItem("user_id");
+	const { teacherDataById } = useTeachers({}, +id!);
+	console.log(teacherDataById);
 	const [collapsed, setCollapsed] = useState(false);
 	const location = useLocation();
 	const [selectedKey, setSelectedKey] = useState("");
-	console.log("teacher layout");
 	useEffect(() => {
 		const currentRouteIndex = sidebarRoutes.findIndex(
 			(route) => route.path === location.pathname
@@ -27,6 +30,7 @@ const TeacherLayout = () => {
 			setSelectedKey(currentRouteIndex.toString());
 		}
 	}, [location.pathname]);
+
 	const {
 		token: { colorBgContainer, borderRadiusLG },
 	} = theme.useToken();

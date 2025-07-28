@@ -133,7 +133,7 @@ const BranchModal = ({ open, toggle, update }: BranchProps) => {
 				<Form.Item
 					label="Teachers"
 					name="teachers"
-					validateStatus={errors ? "error" : ""}
+					validateStatus={errors.teachers ? "error" : ""}
 					help={errors.teachers?.message}
 				>
 					<Controller

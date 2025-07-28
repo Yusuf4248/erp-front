@@ -94,6 +94,7 @@ const Rooms: React.FC = () => {
 					columns={columns}
 					dataSource={data?.data.rooms}
 					rowKey={(record) => record.id}
+					scroll={{ x: "max-content", y: 500 }}
 					pagination={{
 						current: params.page,
 						pageSize: params.limit,

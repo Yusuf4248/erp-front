@@ -105,7 +105,7 @@ const TeacherModal = ({ open, toggle, update }: TeacherProps) => {
 				<Form.Item
 					label="First Name"
 					name="first_name"
-					validateStatus={errors ? "error" : ""}
+					validateStatus={errors.first_name ? "error" : ""}
 					help={errors.first_name?.message}
 				>
 					<Controller
@@ -117,7 +117,7 @@ const TeacherModal = ({ open, toggle, update }: TeacherProps) => {
 				<Form.Item
 					label="Last Name"
 					name="last_name"
-					validateStatus={errors ? "error" : ""}
+					validateStatus={errors.last_name ? "error" : ""}
 					help={errors.last_name?.message}
 				>
 					<Controller
@@ -129,7 +129,7 @@ const TeacherModal = ({ open, toggle, update }: TeacherProps) => {
 				<Form.Item
 					label="Email"
 					name="email"
-					validateStatus={errors ? "error" : ""}
+					validateStatus={errors.email ? "error" : ""}
 					help={errors.email?.message}
 				>
 					<Controller
@@ -159,7 +159,7 @@ const TeacherModal = ({ open, toggle, update }: TeacherProps) => {
 				<Form.Item
 					label="Password"
 					name="password"
-					validateStatus={errors ? "error" : ""}
+					validateStatus={errors.password ? "error" : ""}
 					help={errors.password?.message}
 				>
 					<Controller
@@ -171,7 +171,7 @@ const TeacherModal = ({ open, toggle, update }: TeacherProps) => {
 				<Form.Item
 					label="Role"
 					name="role"
-					validateStatus={errors ? "error" : ""}
+					validateStatus={errors.role ? "error" : ""}
 					help={errors.role?.message}
 				>
 					<Controller
@@ -192,7 +192,7 @@ const TeacherModal = ({ open, toggle, update }: TeacherProps) => {
 				<Form.Item
 					label="Branch"
 					name="branch"
-					validateStatus={errors ? "error" : ""}
+					validateStatus={errors.branchId ? "error" : ""}
 					help={errors.branchId?.message}
 				>
 					<Controller
