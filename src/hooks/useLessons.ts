@@ -29,10 +29,8 @@ export const useLessons = (params: ParamsType | {}) => {
 		return useMutation({
 			mutationFn: async ({ id, data }: { id: number; data: any }) =>
 				lessonsService.updateLessonsStatusAndNotes(id, data),
-			onSuccess: () => {
-				queryClient.invalidateQueries({
-					queryKey: ["lessons", "status&notes"],
-				});
+			onSuccess: (_data, variables) => {
+				queryClient.invalidateQueries({ queryKey: ["lessons", variables.id] });
 			},
 		});
 	};

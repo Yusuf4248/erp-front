@@ -3,10 +3,10 @@ import { useLessons } from "@hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import type { LessonType, ModalProps } from "@types";
 import { Button, DatePicker, Form, Input, Modal, Select } from "antd";
+import dayjs from "dayjs";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as yup from "yup";
-import dayjs from "dayjs";
 const schema = yup.object().shape({
 	notes: yup
 		.string()
@@ -14,14 +14,14 @@ const schema = yup.object().shape({
 		.required("Title is required"),
 	status: yup.string().required("Status is required"),
 	date: yup
-	.mixed()
-	.test("is-date", "Start date is required", (value) => {
-		return (
-			value instanceof dayjs ||
-			(typeof value === "string" && dayjs(value).isValid())
-		);
-	})
-	.required("Start date is required"),
+		.mixed()
+		.test("is-date", "Start date is required", (value) => {
+			return (
+				value instanceof dayjs ||
+				(typeof value === "string" && dayjs(value).isValid())
+			);
+		})
+		.required("Start date is required"),
 });
 interface LessonProps extends ModalProps {
 	update: LessonType | null;
@@ -47,7 +47,11 @@ const LessonModal = ({ open, toggle, update }: LessonProps) => {
 		}
 	}, [update]);
 	const onSubmit = (data: any) => {
-		const updateItem = { note: data.notes, status: data.status, date: dayjs(data.date).format("YYYY-MM-DD") };
+		const updateItem = {
+			note: data.notes,
+			status: data.status,
+			date: dayjs(data.date).format("YYYY-MM-DD"),
+		};
 		if (update?.id) {
 			if (data.status === "cancelled" || data.status === "completed") {
 				(updateItem as { date?: string }).date = undefined;
@@ -58,7 +62,7 @@ const LessonModal = ({ open, toggle, update }: LessonProps) => {
 					onSuccess: () => {
 						toggle();
 						queryClient.invalidateQueries({
-							queryKey: ["lessons", "status&notes"],
+							queryKey: ["lessons", update.id],
 						});
 					},
 				}
