@@ -376,7 +376,7 @@ const LessonsList = ({ lessons }: any) => {
 				</div>
 			</div>
 
-			{open && <LessonModal open={open} toggle={toggle} update={update} />}
+			{open &&( <LessonModal open={open} toggle={toggle} update={update} />)}
 
 			{openInfo && (
 				<LessonInfo
