@@ -317,9 +317,21 @@ const LessonsList = ({ lessons }: any) => {
 									>
 										<Tooltip
 											title={lesson?.notes}
-											color={lesson.status == "cancelled" ? "#E80A15" : "#ccc"}
+											color={
+												lesson.status == "cancelled"
+													? "#E80A15"
+													: lesson.status == "in_progress"
+													? "#FFD700"
+													: lesson.status == "completed"
+													? "#008000"
+													: "#ccc"
+											}
 											overlayInnerStyle={
 												lesson.status == "cancelled"
+													? { color: "#fff" }
+													: lesson.status == "in_progress"
+													? { color: "#fff" }
+													: lesson.status == "completed"
 													? { color: "#fff" }
 													: { color: "#000" }
 											}

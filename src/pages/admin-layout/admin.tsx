@@ -273,7 +273,7 @@ const Index = () => {
 					}))}
 				/>
 			</Sider>
-			<Layout style={{ marginLeft: collapsed ? 80 : 200 }}>
+			<Layout style={{ marginLeft: collapsed ? 80 : 200, marginRight: 3 }}>
 				<Header
 					style={{
 						padding: 0,
@@ -281,6 +281,7 @@ const Index = () => {
 						display: "flex",
 						justifyContent: "space-between",
 						alignItems: "center",
+
 					}}
 				>
 					<Button

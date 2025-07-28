@@ -130,9 +130,10 @@ export const TeacherColumn: TableProps<TeacherType>["columns"] = [
 	},
 	{
 		title: "Branch",
-		dataIndex: "BranchId",
+		dataIndex: "branches",
 		key: "branch",
-		width: 120,
+		render: (branches) => branches.map((branch:any) => branch.name).join(" | "),
+		// width: 120,
 	},
 ];
 
@@ -159,7 +160,7 @@ export const BranchColumn: TableProps<BranchType>["columns"] = [
 		render: (teachers) => (
 			<span>
 				{Array.isArray(teachers) && teachers.length > 0
-					? teachers.map((teacher) => teacher.first_name || "N/A").join("\n")
+					? teachers.map((teacher) => teacher.first_name || "N/A").join(" | ")
 					: "No teachers"}
 			</span>
 		),

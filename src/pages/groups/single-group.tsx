@@ -8,7 +8,7 @@ const SingleGroup = () => {
 	const groupData: any = dataById
 		? dataById.data.group
 		: { course: { title: "", price: 0 } };
-		console.log("groupData", groupData)
+	console.log("groupData", groupData);
 
 	return (
 		<>
@@ -20,7 +20,7 @@ const SingleGroup = () => {
 					{/* Group Header */}
 					<div className="bg-white rounded-lg border border-gray-200 p-2 sm:p-4 md:p-6 mb-6">
 						<div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-							<div>
+							<div className="flex flex-col gap-4">
 								<h1 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">
 									{groupData.name}
 								</h1>

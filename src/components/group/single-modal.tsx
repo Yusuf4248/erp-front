@@ -30,10 +30,10 @@ const AddTeacherorStudentModal = ({
 	let originalData: any[] = [];
 	if (addingTeacher) {
 		const { data: teachers } = useTeachers({ page: 1, limit: 100 });
-		originalData = teachers ? teachers.data.teachers : [];
+		originalData = teachers ? teachers.data.data : [];
 	} else {
 		const { data: students } = useStudents({ page: 1, limit: 100 });
-		originalData = students ? students.data.students : [];
+		originalData = students ? students.data.data : [];
 	}
 	const [selected, setSelected] = useState(null);
 	const [isOpen, setOpen] = useState(open);
@@ -118,7 +118,7 @@ const AddTeacherorStudentModal = ({
 									type="number"
 								/>
 								<div className="mt-5 overflow-auto flex flex-wrap w-[300px] justify-center h-[150px]">
-									{filteredData.map((item: any) => (
+									{filteredData?.map((item: any) => (
 										<Button
 											key={item.id}
 											className="mt-0.5 w-[300px]"
@@ -170,7 +170,7 @@ const AddTeacherorStudentModal = ({
 									type="number"
 								/>
 								<div className="mt-5 overflow-auto flex flex-wrap w-[300px] justify-center h-[150px]">
-									{filteredData.map((item: any) => (
+									{filteredData?.map((item: any) => (
 										<Button
 											key={item.id}
 											className="mt-0.5 w-[300px]"

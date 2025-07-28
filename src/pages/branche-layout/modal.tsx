@@ -25,7 +25,7 @@ const BranchModal = ({ open, toggle, update }: BranchProps) => {
 		limit: 10,
 	});
 	const { data: teacherData } = useTeachers({ page: 1, limit: 100 });
-	const teachers = teacherData?.data.teachers || [];
+	const teachers = teacherData?.data.data || [];
 	const { mutate: createBranch, isPending: isCreating } = useBranchCreate();
 	const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdate();
 	const {

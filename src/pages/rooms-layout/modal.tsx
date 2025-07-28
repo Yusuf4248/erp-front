@@ -41,9 +41,17 @@ const RoomModal = ({ open, toggle, update }: RoomType) => {
 	}, [update]);
 	const onSubmit = (data: any) => {
 		if (update?.id) {
-			updateRoom({ id: update!.id, data });
+			updateRoom({ id: update!.id, data },{
+				onSuccess: () => {
+					toggle();
+				},
+			});
 		} else {
-			createRoom(data);
+			createRoom(data,{
+				onSuccess: () => {
+					toggle();
+				},
+			});
 		}
 	};
 	return (

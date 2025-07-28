@@ -53,9 +53,8 @@ const LessonModal = ({ open, toggle, update }: LessonProps) => {
 			date: dayjs(data.date).format("YYYY-MM-DD"),
 		};
 		if (update?.id) {
-			if (data.status === "cancelled" || data.status === "completed") {
+			if (data.status === "cancelled" || data.status === "completed" || data.status === "in_progress") {
 				(updateItem as { date?: string }).date = undefined;
-			}
 			updateLessonStatusAndNote(
 				{ id: update.id, data: updateItem },
 				{
@@ -134,6 +133,7 @@ const LessonModal = ({ open, toggle, update }: LessonProps) => {
 			</Form>
 		</Modal>
 	);
-};
+}
+}
 
 export default LessonModal;

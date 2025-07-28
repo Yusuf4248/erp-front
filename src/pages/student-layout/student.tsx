@@ -91,7 +91,7 @@ const Students = () => {
 			<div className="overflow-x-auto">
 				<Table<StudentType>
 					columns={columns}
-					dataSource={data?.data.students}
+					dataSource={data?.data.data}
 					rowKey={(record) => record.id}
 					scroll={{ x: "max-content" }}
 					pagination={{
