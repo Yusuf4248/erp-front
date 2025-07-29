@@ -27,29 +27,21 @@ const AddTeacherorStudentModal = ({
 		page: 1,
 		limit: 100,
 	});
-
-	// Fetch data conditionally based on addingTeacher prop
 	const { data: teachersData } = useTeachers({ page: 1, limit: 100 });
 	const { data: studentsData } = useStudents({ page: 1, limit: 100 });
-
 	const originalData = addingTeacher
 		? teachersData?.data?.data || []
 		: studentsData?.data?.data || [];
-
 	const { mutate: addStudent, isPending: isCreatingSt } = useGroupAddStudent();
 	const { mutate: addTeacher, isPending: isCreatingTr } = useGroupAddTeacher();
 	const queryClient = useQueryClient();
-
 	const { control, handleSubmit,  reset } = useForm({
-		// Add reset here
 		resolver: yupResolver(schema),
 		defaultValues: {
 			teacherId: [],
 			studentId: [],
 		},
 	});
-
-	// Reset form when modal opens/closes or addingTeacher changes
 	useEffect(() => {
 		if (open) {
 			reset({
@@ -66,9 +58,7 @@ const AddTeacherorStudentModal = ({
 			start_date: new Date().toISOString(),
 			groupId: groupId,
 		};
-
 		if (addingTeacher) {
-			// Ensure teacherId array is passed, remove studentId
 			delete payload.studentId;
 			addTeacher(payload, {
 				onSuccess: () => {
@@ -80,15 +70,11 @@ const AddTeacherorStudentModal = ({
 				},
 			});
 		} else {
-			// Ensure studentId array is passed, remove teacherId
 			delete payload.teacherId;
 			addStudent(payload, {
 				onSuccess: () => {
 					toggle();
-					queryClient.invalidateQueries({
-						queryKey: ["groups", "add-student", groupId], // More specific query key
-					});
-					reset(); // Reset form on success
+					reset(); 
 				},
 			});
 		}

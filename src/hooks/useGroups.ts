@@ -15,7 +15,7 @@ export const useGroups = (params: ParamsType | {}, id = 0) => {
 	});
 	const groupStudentsQuery = useQuery({
 		enabled: !!id,
-		queryKey: ["group-students"],
+		queryKey: ["group-student"],
 		queryFn: async () => groupsService.getGroupStudents(id),
 	});
 	const students = groupStudentsQuery.data;
@@ -62,7 +62,7 @@ export const useGroups = (params: ParamsType | {}, id = 0) => {
 		return useMutation({
 			mutationFn: async (data: any) => groupsService.addStudentToGroup(data),
 			onSuccess: () => {
-				queryClient.invalidateQueries({ queryKey: ["groups", "add-student"] });
+				queryClient.invalidateQueries({ queryKey: ["group-student"] });
 			},
 		});
 	};

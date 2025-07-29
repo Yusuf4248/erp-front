@@ -38,6 +38,27 @@ const GroupTeachers = ({ teachers }: any) => {
 						<div className="text-right">
 							<span
 								className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${
+									teacher.role === "main teacher"
+										? "bg-green-50 text-green-700"
+										: "bg-blue-50 text-blue-700"
+								}`}
+							>
+								{teacher.role === "main teacher" ? (
+									<>
+										<CheckCircle className="w-3 h-3 mr-1" />
+										Main Teacher
+									</>
+								) : (
+									<>
+										<XCircle className="w-3 h-3 mr-1" />
+										Assistant Teacher
+									</>
+								)}
+							</span>
+						</div>
+						<div className="text-right">
+							<span
+								className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${
 									teacher.status
 										? "bg-green-50 text-green-700"
 										: "bg-red-50 text-red-700"
