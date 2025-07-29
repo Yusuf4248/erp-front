@@ -9,6 +9,7 @@ import {
 	PlusOutlined,
 	StarFilled,
 	TeamOutlined,
+	CameraOutlined,
 	UserOutlined,
 } from "@ant-design/icons";
 import {
@@ -30,9 +31,11 @@ import {
 	Table,
 	Tabs,
 	Tag,
+	TimePicker,
+	message,
 } from "antd";
 import dayjs from "dayjs";
-import { useEffect, useRef, useState } from "react";
+import { useState, useRef } from "react";
 
 const { TabPane } = Tabs;
 const { TextArea } = Input;
@@ -44,156 +47,11 @@ const SingleGroupPage = () => {
 		{}
 	);
 	const [form] = Form.useForm();
-
-	const [stream, setStream] = useState<MediaStream | null>(null); // Kamera streamini saqlash uchun
-	const [photoDataUrl, setPhotoDataUrl] = useState<string | null>(null); // Olingan rasmni saqlash uchun
-	const [isCapturing, setIsCapturing] = useState(false); // Kamera yoqilganligini bildirish uchun
-	const [isPhotoTaken, setIsPhotoTaken] = useState(false); // Rasm olinganligini bildirish uchun
-	const [isLoading, setIsLoading] = useState(false); // Backendga yuborish holati uchun
-
-	// Ref'lar
-	const videoRef = useRef<HTMLVideoElement>(null); // <video> elementiga murojaat
-	const canvasRef = useRef<HTMLCanvasElement>(null); // <canvas> elementiga murojaat
-
-	// --- 1. Kamerani ochish funksiyasi ---
-	const startCamera = async () => {
-		try {
-			const mediaStream = await navigator.mediaDevices.getUserMedia({
-				video: true,
-			});
-			if (videoRef.current) {
-				(videoRef.current as HTMLVideoElement).srcObject = mediaStream;
-			}
-			setStream(mediaStream);
-			setIsCapturing(true);
-			setIsPhotoTaken(false); // Kamera ochilganda oldingi rasmni tozalash
-			setPhotoDataUrl(null); // Rasm dataURL ni tozalash
-		} catch (err) {
-			console.error("Kameraga kirishda xato:", err);
-			alert(
-				"Kamerani ochib bo‘lmadi. Ruxsat berilganligini tekshiring yoki boshqa kamera tanlang."
-			);
-		}
-	};
-
-	const stopCamera = () => {
-		if (stream) {
-			stream.getTracks().forEach((track) => track.stop()); // Barcha media treklarini to'xtatish
-			if (videoRef.current) {
-				videoRef.current.srcObject = null; // Video elementni tozalash
-			}
-			setStream(null);
-		}
-		setIsCapturing(false);
-		setIsPhotoTaken(false);
-		setPhotoDataUrl(null);
-		setIsLoading(false);
-	};
-
-	// --- 3. Rasmga olish funksiyasi ---
-	const takePhoto = () => {
-		if (videoRef.current && canvasRef.current) {
-			const video = videoRef.current;
-			const canvas = canvasRef.current;
-			const context = canvas.getContext("2d");
-
-			if (context) {
-				// Canvas o'lchamlarini video o'lchamlariga moslashtirish
-				canvas.width = video.videoWidth;
-				canvas.height = video.videoHeight;
-
-				// Videodagi joriy kadirni canvasga chizish
-				context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-				// Canvasdagi rasmni Data URL formatida olish
-				const imageData = canvas.toDataURL("image/jpeg", 0.9);
-				setPhotoDataUrl(imageData);
-				setIsPhotoTaken(true);
-			}
-		}
-	};
-
-	// --- 4. Backendga rasmni yuborish funksiyasi ---
-	const sendPhotoToBackend = async () => {
-		if (!photoDataUrl) {
-			alert("Avval rasm oling!");
-			return;
-		}
-
-		setIsLoading(true);
-
-		// Data URL ni Blob ga aylantirish
-		const response = await fetch(photoDataUrl);
-		const blob = await response.blob();
-
-		const formData = new FormData();
-		formData.append("image", blob, "webcam_photo.jpg"); // 'image' - backend kutadigan maydon nomi
-
-		try {
-			// Fetch API yordamida rasmni backendga POST qilish
-			const backendUrl = "YOUR_BACKEND_UPLOAD_URL"; // <-- Bu yerga backend manzilingizni qo'ying!
-			const uploadResponse = await fetch(backendUrl, {
-				method: "POST",
-				body: formData,
-			});
-
-			if (uploadResponse.ok) {
-				const result = await uploadResponse.json();
-				console.log("Rasm muvaffaqiyatli yuborildi:", result);
-				alert("Rasm muvaffaqiyatli yuborildi!");
-				stopCamera(); // Muvaffaqiyatli yuborilgandan keyin kamerani o'chirish va holatni tiklash
-			} else {
-				console.error("Rasmni yuborishda xato:", uploadResponse.statusText);
-				alert("Rasmni yuborishda xato yuz berdi.");
-			}
-		} catch (error) {
-			console.error("Tarmoq xatosi:", error);
-			alert("Tarmoqqa ulanishda xato yuz berdi.");
-		} finally {
-			setIsLoading(false);
-		}
-	};
-
-	const videoStyle = {
-		display: "block",
-		marginBottom: "10px",
-		width: "100%",
-		height: "auto",
-		border: "1px solid #ccc",
-		borderRadius: "8px",
-	};
-
-	const canvasStyle = {
-		display: "block",
-		marginTop: "10px",
-		marginBottom: "10px",
-		width: "100%",
-		height: "auto",
-		border: "1px solid #ccc",
-		borderRadius: "8px",
-	};
-
-	const buttonStyle = {
-		padding: "10px 20px",
-		margin: "5px",
-		backgroundColor: "#1890ff",
-		color: "white",
-		border: "none",
-		borderRadius: "4px",
-		cursor: "pointer",
-		fontSize: "14px",
-	};
-	// Komponent render bo'lganda yoki stream o'zgarganda ishlaydi
-	useEffect(() => {
-		// Agar stream mavjud bo'lsa va video elementi yuklangan bo'lsa
-		if (videoRef.current && stream) {
-			videoRef.current.srcObject = stream;
-		}
-		// Komponent unmount bo'lganda streamni tozalash
-		return () => {
-			stopCamera();
-		};
-	}, [stream]);
+	const [isCameraOpen, setIsCameraOpen] = useState(false);
+	const [capturedImage, setCapturedImage] = useState<string | null>(null);
+	const videoRef = useRef<HTMLVideoElement>(null);
+	const canvasRef = useRef<HTMLCanvasElement>(null);
+	const streamRef = useRef<MediaStream | null>(null);
 
 	// Mock group data
 	const groupData = {
@@ -212,7 +70,8 @@ const SingleGroupPage = () => {
 		},
 		startDate: "2024-10-15",
 		endDate: "2025-02-15",
-		description: "Frontend Development Bootcamp",
+		description:
+			"Frontend Development Bootcamp",
 		room: "A-201",
 		price: "1,200,000",
 		totalLessons: 48,
@@ -245,6 +104,7 @@ const SingleGroupPage = () => {
 			isMain: false,
 		},
 	];
+	
 	const studentsData = [
 		{
 			id: 1,
@@ -342,12 +202,19 @@ const SingleGroupPage = () => {
 			const values = await form.validateFields();
 			console.log("Lesson data:", values);
 			console.log("Attendance:", attendanceData);
+			
+			if (capturedImage) {
+				console.log("Captured image:", capturedImage);
+				// Bu yerda backendga rasm yuboriladi
+				// Hozircha faqat consolega chiqaramiz
+			}
 
 			// Here you would send data to API
 			setIsLessonModalVisible(false);
 			form.resetFields();
-
-			// Show success message
+			setCapturedImage(null);
+			
+			message.success("Dars muvaffaqiyatli boshlandi!");
 		} catch (error) {
 			console.error("Form validation failed:", error);
 		}
@@ -358,6 +225,55 @@ const SingleGroupPage = () => {
 			...prev,
 			[studentId]: isPresent,
 		}));
+	};
+
+	const openCamera = async () => {
+		try {
+			const stream = await navigator.mediaDevices.getUserMedia({ 
+				video: { facingMode: 'user' },
+				audio: false 
+			});
+			
+			if (videoRef.current) {
+				videoRef.current.srcObject = stream;
+				streamRef.current = stream;
+				setIsCameraOpen(true);
+			}
+		} catch (error) {
+			console.error("Kamerani ochishda xatolik:", error);
+			message.error("Kamerani ochishda xatolik yuz berdi!");
+		}
+	};
+
+	const closeCamera = () => {
+		if (streamRef.current) {
+			streamRef.current.getTracks().forEach(track => track.stop());
+			streamRef.current = null;
+		}
+		setIsCameraOpen(false);
+		setCapturedImage(null);
+	};
+
+	const capturePhoto = () => {
+		if (videoRef.current && canvasRef.current) {
+			const canvas = canvasRef.current;
+			const video = videoRef.current;
+			
+			canvas.width = video.videoWidth;
+			canvas.height = video.videoHeight;
+			
+			const ctx = canvas.getContext('2d');
+			if (ctx) {
+				ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+				const imageData = canvas.toDataURL('image/jpeg', 0.8);
+				setCapturedImage(imageData);
+				
+				// Bu yerda backendga yuborish kerak
+				console.log("Captured image data:", imageData);
+				
+				message.success("Rasm muvaffaqiyatli olindi!");
+			}
+		}
 	};
 
 	const studentsColumns = [
@@ -729,10 +645,16 @@ const SingleGroupPage = () => {
 					</div>
 				}
 				open={isLessonModalVisible}
-				onCancel={() => setIsLessonModalVisible(false)}
+				onCancel={() => {
+					setIsLessonModalVisible(false);
+					closeCamera();
+				}}
 				width={800}
 				footer={[
-					<Button key="cancel" onClick={() => setIsLessonModalVisible(false)}>
+					<Button key="cancel" onClick={() => {
+						setIsLessonModalVisible(false);
+						closeCamera();
+					}}>
 						Cancel
 					</Button>,
 					<Button
@@ -766,6 +688,26 @@ const SingleGroupPage = () => {
 									format="DD.MM.YYYY"
 								/>
 							</div>
+							<div>
+								<label className="block text-sm font-medium mb-1">
+									Start time *
+								</label>
+								<TimePicker
+									className="w-full"
+									format="HH:mm"
+									defaultValue={dayjs("18:00", "HH:mm")}
+								/>
+							</div>
+							<div>
+								<label className="block text-sm font-medium mb-1">
+									End time *
+								</label>
+								<TimePicker
+									className="w-full"
+									format="HH:mm"
+									defaultValue={dayjs("20:00", "HH:mm")}
+								/>
+							</div>
 						</div>
 						<div className="mt-4">
 							<label className="block text-sm font-medium mb-1">
@@ -778,62 +720,85 @@ const SingleGroupPage = () => {
 						</div>
 					</div>
 
-					{/* Video Upload */}
-					<div
-						style={{
-							padding: "20px",
-							maxWidth: "500px",
-							margin: "auto",
-							textAlign: "center",
-						}}
-					>
-						<h1>Webcam</h1>
-
-						{!isCapturing && !isPhotoTaken && (
-							<button onClick={startCamera} style={buttonStyle}>
-								Open Camera
-							</button>
-						)}
-
-						{isCapturing && !isPhotoTaken && (
-							<>
-								<video
-									ref={videoRef}
-									autoPlay
-									playsInline
-									style={videoStyle}
-								></video>
-								<button onClick={takePhoto} style={buttonStyle}>
-									Rasmga olish
-								</button>
-								<button onClick={stopCamera} style={buttonStyle}>
-									Kamerani yopish
-								</button>
-							</>
-						)}
-
-						{isPhotoTaken && (
-							<>
-								<canvas ref={canvasRef} style={canvasStyle}></canvas>
-								<button
-									onClick={sendPhotoToBackend}
-									disabled={isLoading}
-									style={buttonStyle}
+					{/* Camera Section */}
+					<div>
+						<h3 className="font-medium text-gray-900 mb-4">Take Photo</h3>
+						
+						{!isCameraOpen && !capturedImage && (
+							<div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
+								<CameraOutlined className="text-4xl text-gray-400 mb-4" />
+								<p className="text-gray-600 mb-4">Dars uchun rasm oling</p>
+								<Button 
+									type="primary" 
+									icon={<CameraOutlined />}
+									onClick={openCamera}
+									className="bg-blue-600 hover:bg-blue-700"
 								>
-									{isLoading ? "Yuborilmoqda..." : "Backendga yuborish"}
-								</button>
-								<button onClick={startCamera} style={buttonStyle}>
-									Qayta olish
-								</button>
-								<button onClick={stopCamera} style={buttonStyle}>
-									Kamerani yopish
-								</button>
-							</>
+									Kamerani ochish
+								</Button>
+							</div>
 						)}
-						{/* Canvasni faqat rasm olinganda ko'rsatish */}
-						{!isPhotoTaken && (
-							<canvas ref={canvasRef} style={{ display: "none" }}></canvas>
+
+						{isCameraOpen && (
+							<div className="space-y-4">
+								<div className="relative bg-black rounded-lg overflow-hidden">
+									<video
+										ref={videoRef}
+										autoPlay
+										playsInline
+										muted
+										className="w-full h-64 object-cover"
+									/>
+								</div>
+								<div className="flex justify-center space-x-4">
+									<Button 
+										onClick={closeCamera}
+										className="bg-gray-500 hover:bg-gray-600 text-white"
+									>
+										Bekor qilish
+									</Button>
+									<Button 
+										type="primary"
+										icon={<CameraOutlined />}
+										onClick={capturePhoto}
+										className="bg-green-600 hover:bg-green-700"
+									>
+										Rasmga olish
+									</Button>
+								</div>
+							</div>
 						)}
+
+						{capturedImage && (
+							<div className="space-y-4">
+								<div className="relative">
+									<img 
+										src={capturedImage} 
+										alt="Captured" 
+										className="w-full h-64 object-cover rounded-lg border"
+									/>
+								</div>
+								<div className="flex justify-center space-x-4">
+									<Button 
+										onClick={() => {
+											setCapturedImage(null);
+											openCamera();
+										}}
+										className="bg-orange-500 hover:bg-orange-600 text-white"
+									>
+										Qayta olish
+									</Button>
+									<Button 
+										type="primary"
+										className="bg-green-600 hover:bg-green-700"
+									>
+										Tasdiqlash
+									</Button>
+								</div>
+							</div>
+						)}
+
+						<canvas ref={canvasRef} style={{ display: 'none' }} />
 					</div>
 
 					{/* Attendance */}
@@ -871,8 +836,8 @@ const SingleGroupPage = () => {
 							/>
 						</div>
 						<div className="mt-2 text-sm text-gray-600">
-							Present: {Object.values(attendanceData).filter(Boolean).length} /{" "}
-							{studentsData.length}
+							Present: {Object.values(attendanceData).filter(Boolean).length}{" "}
+							/ {studentsData.length}
 						</div>
 					</div>
 				</div>
