@@ -2,6 +2,7 @@ import {
 	ArrowLeftOutlined,
 	BookOutlined,
 	CalendarOutlined,
+	CameraOutlined,
 	CheckCircleOutlined,
 	MailOutlined,
 	PhoneOutlined,
@@ -9,7 +10,6 @@ import {
 	PlusOutlined,
 	StarFilled,
 	TeamOutlined,
-	CameraOutlined,
 	UserOutlined,
 } from "@ant-design/icons";
 import {
@@ -20,7 +20,7 @@ import {
 	Col,
 	DatePicker,
 	Divider,
-	Form,
+	Form, 
 	Input,
 	List,
 	Modal,
@@ -31,11 +31,10 @@ import {
 	Table,
 	Tabs,
 	Tag,
-	TimePicker,
 	message,
 } from "antd";
 import dayjs from "dayjs";
-import { useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react"; // useEffect import qilindi
 
 const { TabPane } = Tabs;
 const { TextArea } = Input;
@@ -46,12 +45,15 @@ const SingleGroupPage = () => {
 	const [attendanceData, setAttendanceData] = useState<Record<number, boolean>>(
 		{}
 	);
-	const [form] = Form.useForm();
-	const [isCameraOpen, setIsCameraOpen] = useState(false);
-	const [capturedImage, setCapturedImage] = useState<string | null>(null);
-	const videoRef = useRef<HTMLVideoElement>(null);
-	const canvasRef = useRef<HTMLCanvasElement>(null);
-	const streamRef = useRef<MediaStream | null>(null);
+	const [form] = Form.useForm(); // Form instansiyasini olish
+
+	// Kamera holatlari
+	const [isCameraActive, setIsCameraActive] = useState(false); // Kamera yoqilgan, stream ko'rsatilmoqda
+	const [capturedImage, setCapturedImage] = useState<string | null>(null); // Olingan rasmni saqlash uchun
+
+	const videoRef = useRef<HTMLVideoElement>(null); // <video> elementiga murojaat
+	const canvasRef = useRef<HTMLCanvasElement>(null); // <canvas> elementiga murojaat
+	const streamRef = useRef<MediaStream | null>(null); // MediaStream obyektini saqlash uchun
 
 	// Mock group data
 	const groupData = {
@@ -70,8 +72,7 @@ const SingleGroupPage = () => {
 		},
 		startDate: "2024-10-15",
 		endDate: "2025-02-15",
-		description:
-			"Frontend Development Bootcamp",
+		description: "Frontend Development Bootcamp",
 		room: "A-201",
 		price: "1,200,000",
 		totalLessons: 48,
@@ -104,7 +105,7 @@ const SingleGroupPage = () => {
 			isMain: false,
 		},
 	];
-	
+
 	const studentsData = [
 		{
 			id: 1,
@@ -195,28 +196,32 @@ const SingleGroupPage = () => {
 			initialAttendance[student.id] = true; // Default to present
 		});
 		setAttendanceData(initialAttendance);
+		// Modal ochilganda kamerani avtomatik ochmaslik uchun, tugma bosilishini kutish
 	};
 
 	const handleLessonSubmit = async () => {
 		try {
-			const values = await form.validateFields();
+			const values = await form.validateFields(); // Formani validatsiya qilish
 			console.log("Lesson data:", values);
 			console.log("Attendance:", attendanceData);
-			
+
 			if (capturedImage) {
-				console.log("Captured image:", capturedImage);
-				// Bu yerda backendga rasm yuboriladi
-				// Hozircha faqat consolega chiqaramiz
+				await sendPhotoToBackend(); 
+			} else {
+				message.warning("Take photo for lesson!");
+				return; 
 			}
 
-			// Here you would send data to API
 			setIsLessonModalVisible(false);
-			form.resetFields();
-			setCapturedImage(null);
-			
-			message.success("Dars muvaffaqiyatli boshlandi!");
+			form.resetFields(); 
+			closeCamera(); 
+
+			message.success("Lesson started successfully!");
 		} catch (error) {
-			console.error("Form validation failed:", error);
+			console.error("Form validation failed or submission error:", error);
+			message.error(
+				"Error starting lesson. Please check that all form fields are filled correctly."
+			);
 		}
 	};
 
@@ -228,53 +233,131 @@ const SingleGroupPage = () => {
 	};
 
 	const openCamera = async () => {
+		setCapturedImage(null); 
 		try {
-			const stream = await navigator.mediaDevices.getUserMedia({ 
-				video: { facingMode: 'user' },
-				audio: false 
+			const stream = await navigator.mediaDevices.getUserMedia({
+				video: {
+					facingMode: "user", 
+				},
+				audio: false, 
 			});
-			
+
+			streamRef.current = stream; 
+
 			if (videoRef.current) {
 				videoRef.current.srcObject = stream;
-				streamRef.current = stream;
-				setIsCameraOpen(true);
+				videoRef.current.onloadedmetadata = () => {
+					videoRef.current
+						?.play()
+						.then(() => {
+							setIsCameraActive(true); 
+						})
+						.catch((error) => {
+							console.error("Error playing video:", error);
+							message.error(
+								"Error playing video. Please try again."
+							);
+							closeCamera(); 
+						});
+				};
 			}
 		} catch (error) {
-			console.error("Kamerani ochishda xatolik:", error);
-			message.error("Kamerani ochishda xatolik yuz berdi!");
+			console.error("Error opening camera:", error);
+			message.error(
+				"Error opening camera! Please check that you have permission to use the camera."
+			);
+			closeCamera(); 
 		}
 	};
 
 	const closeCamera = () => {
 		if (streamRef.current) {
-			streamRef.current.getTracks().forEach(track => track.stop());
+			streamRef.current.getTracks().forEach((track) => track.stop()); 
 			streamRef.current = null;
 		}
-		setIsCameraOpen(false);
-		setCapturedImage(null);
+		setIsCameraActive(false); 
+		setCapturedImage(null); 
+		if (videoRef.current) {
+			videoRef.current.srcObject = null; 
+		}
 	};
 
 	const capturePhoto = () => {
 		if (videoRef.current && canvasRef.current) {
 			const canvas = canvasRef.current;
 			const video = videoRef.current;
-			
+
 			canvas.width = video.videoWidth;
 			canvas.height = video.videoHeight;
-			
-			const ctx = canvas.getContext('2d');
+
+			const ctx = canvas.getContext("2d");
 			if (ctx) {
-				ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-				const imageData = canvas.toDataURL('image/jpeg', 0.8);
-				setCapturedImage(imageData);
-				
-				// Bu yerda backendga yuborish kerak
-				console.log("Captured image data:", imageData);
-				
-				message.success("Rasm muvaffaqiyatli olindi!");
+				ctx.drawImage(video, 0, 0, canvas.width, canvas.height); 
+				const imageData = canvas.toDataURL("image/jpeg", 0.9); 
+				setCapturedImage(imageData); 
+				setIsCameraActive(false); 
+				closeCamera(); 
+				message.success("Photo taken successfully!");
 			}
 		}
 	};
+
+	// Backendga rasmni yuborish funksiyasi
+	const sendPhotoToBackend = async () => {
+		if (!capturedImage) {
+			message.error("Take photo for lesson!");
+			return;
+		}
+
+		try {
+			const response = await fetch(capturedImage);
+			const blob = await response.blob();
+
+			const formData = new FormData();
+			formData.append("image", blob, "lesson_photo.jpeg"); 
+
+			const backendUploadUrl = "YOUR_BACKEND_UPLOAD_URL"; 
+
+			const uploadResponse = await fetch(backendUploadUrl, {
+				method: "POST",
+				body: formData,
+			});
+
+			if (uploadResponse.ok) {
+				const result = await uploadResponse.json();
+				console.log("Backend response:", result);
+				message.success("Photo uploaded successfully!");
+				return result; 
+			} else {
+				const errorText = await uploadResponse.text();
+				console.error(
+					"Error uploading photo:",
+					uploadResponse.status,
+					errorText
+				);
+				message.error(
+					`Error uploading photo: ${uploadResponse.status}`
+				);
+				throw new Error("Photo not uploaded"); 
+			}
+		} catch (error) {
+			console.error("Unexpected error uploading photo:", error);
+			message.error("Unexpected error uploading photo!");
+			throw error; 
+		}
+	};
+
+	useEffect(() => {
+		if (!isLessonModalVisible) {
+			closeCamera(); 
+		}
+	}, [isLessonModalVisible]); 
+
+	useEffect(() => {
+		return () => {
+			closeCamera();
+		};
+	}, []); 
 
 	const studentsColumns = [
 		{
@@ -647,14 +730,15 @@ const SingleGroupPage = () => {
 				open={isLessonModalVisible}
 				onCancel={() => {
 					setIsLessonModalVisible(false);
-					closeCamera();
 				}}
 				width={800}
 				footer={[
-					<Button key="cancel" onClick={() => {
-						setIsLessonModalVisible(false);
-						closeCamera();
-					}}>
+					<Button
+						key="cancel"
+						onClick={() => {
+							setIsLessonModalVisible(false);
+						}}
+					>
 						Cancel
 					</Button>,
 					<Button
@@ -673,132 +757,112 @@ const SingleGroupPage = () => {
 						<h3 className="font-medium text-gray-900 mb-4">
 							Lesson Information
 						</h3>
-						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-							<div>
-								<label className="block text-sm font-medium mb-1">
-									Lesson name *
-								</label>
-								<Input placeholder="Masalan: React Components" />
+						<Form form={form} layout="vertical">
+							{" "}
+							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+								<Form.Item
+									label="Lesson name"
+									name="lessonName"
+									rules={[{ required: true, message: "Lesson name is required!" }]}
+								>
+									<Input placeholder="Masalan: React Components" />
+								</Form.Item>
+								<Form.Item
+									label="Date"
+									name="lessonDate"
+									rules={[{ required: true, message: "Date is required!" }]}
+									initialValue={dayjs()} 
+								>
+									<DatePicker className="w-full" format="DD.MM.YYYY" />
+								</Form.Item>
 							</div>
-							<div>
-								<label className="block text-sm font-medium mb-1">Date *</label>
-								<DatePicker
-									className="w-full"
-									defaultValue={dayjs()}
-									format="DD.MM.YYYY"
-								/>
-							</div>
-							<div>
-								<label className="block text-sm font-medium mb-1">
-									Start time *
-								</label>
-								<TimePicker
-									className="w-full"
-									format="HH:mm"
-									defaultValue={dayjs("18:00", "HH:mm")}
-								/>
-							</div>
-							<div>
-								<label className="block text-sm font-medium mb-1">
-									End time *
-								</label>
-								<TimePicker
-									className="w-full"
-									format="HH:mm"
-									defaultValue={dayjs("20:00", "HH:mm")}
-								/>
-							</div>
-						</div>
-						<div className="mt-4">
-							<label className="block text-sm font-medium mb-1">
-								Lesson description
-							</label>
-							<TextArea
-								rows={3}
-								placeholder="Dars haqida qisqacha ma'lumot..."
-							/>
-						</div>
+							<Form.Item label="Lesson description" name="lessonDescription">
+								<TextArea rows={3} placeholder="Lesson description..." />
+							</Form.Item>
+						</Form>
 					</div>
 
 					{/* Camera Section */}
 					<div>
 						<h3 className="font-medium text-gray-900 mb-4">Take Photo</h3>
-						
-						{!isCameraOpen && !capturedImage && (
+
+						{!isCameraActive && !capturedImage && (
 							<div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
 								<CameraOutlined className="text-4xl text-gray-400 mb-4" />
-								<p className="text-gray-600 mb-4">Dars uchun rasm oling</p>
-								<Button 
-									type="primary" 
+								<p className="text-gray-600 mb-4">Take photo for lesson</p>
+								<Button
+									type="primary"
 									icon={<CameraOutlined />}
 									onClick={openCamera}
 									className="bg-blue-600 hover:bg-blue-700"
 								>
-									Kamerani ochish
+									Open camera
 								</Button>
 							</div>
 						)}
 
-						{isCameraOpen && (
+						{isCameraActive && !capturedImage && (
 							<div className="space-y-4">
 								<div className="relative bg-black rounded-lg overflow-hidden">
 									<video
 										ref={videoRef}
 										autoPlay
 										playsInline
-										muted
-										className="w-full h-64 object-cover"
-									/>
+										muted 
+										className="w-full h-64 object-cover" 
+									></video>
 								</div>
 								<div className="flex justify-center space-x-4">
-									<Button 
-										onClick={closeCamera}
+									<Button
+										onClick={closeCamera} 
 										className="bg-gray-500 hover:bg-gray-600 text-white"
 									>
-										Bekor qilish
+										Cancel
 									</Button>
-									<Button 
+									<Button
 										type="primary"
 										icon={<CameraOutlined />}
-										onClick={capturePhoto}
+										onClick={capturePhoto} 
 										className="bg-green-600 hover:bg-green-700"
 									>
-										Rasmga olish
+										Take photo
 									</Button>
 								</div>
 							</div>
 						)}
-
+				
 						{capturedImage && (
 							<div className="space-y-4">
 								<div className="relative">
-									<img 
-										src={capturedImage} 
-										alt="Captured" 
+									<img
+										src={capturedImage}
+										alt="Olingan rasm"
 										className="w-full h-64 object-cover rounded-lg border"
 									/>
 								</div>
 								<div className="flex justify-center space-x-4">
-									<Button 
+									<Button
 										onClick={() => {
-											setCapturedImage(null);
-											openCamera();
+											setCapturedImage(null); // Olingan rasmni tozalash
+											openCamera(); // Kamerani qayta ochish
 										}}
 										className="bg-orange-500 hover:bg-orange-600 text-white"
 									>
 										Qayta olish
 									</Button>
-									<Button 
+									<Button
 										type="primary"
+										onClick={sendPhotoToBackend} // Rasmni backendga yuborish
 										className="bg-green-600 hover:bg-green-700"
 									>
-										Tasdiqlash
+										Tasdiqlash va yuklash
 									</Button>
 								</div>
 							</div>
 						)}
 
-						<canvas ref={canvasRef} style={{ display: 'none' }} />
+						{/* Canvas elementi har doim mavjud bo'lishi kerak, lekin yashiringan holda */}
+						<canvas ref={canvasRef} style={{ display: "none" }} />
 					</div>
 
 					{/* Attendance */}
@@ -836,8 +900,8 @@ const SingleGroupPage = () => {
 							/>
 						</div>
 						<div className="mt-2 text-sm text-gray-600">
-							Present: {Object.values(attendanceData).filter(Boolean).length}{" "}
-							/ {studentsData.length}
+							Present: {Object.values(attendanceData).filter(Boolean).length} /{" "}
+							{studentsData.length}
 						</div>
 					</div>
 				</div>
