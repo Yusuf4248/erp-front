@@ -11,6 +11,11 @@ export const teacherService = {
 		const res = await apiConfig().getRequest(`${ApiUrls.TEACHER}/${id}`);
 		return res;
 	},
+	async getAllTeacherGroups(id: number) {
+		const res = await apiConfig().getRequest(ApiUrls.GET_ALL_TEACHER_GROUPS(id));
+		return res;
+	},
+
 	async deleteTeacher(id: number) {
 		const res = await apiConfig().deleteRequest(`${ApiUrls.TEACHER}/${id}`);
 		return res;
@@ -22,6 +27,8 @@ export const teacherService = {
 		);
 		return res;
 	},
+
+	
 	async createTeacher(body: object) {
 		const res = await apiConfig().postRequest(`${ApiUrls.TEACHER}`, body);
 		return res;

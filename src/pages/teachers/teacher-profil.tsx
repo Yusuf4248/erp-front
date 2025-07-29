@@ -40,7 +40,8 @@ import {
 } from "antd";
 import dayjs from "dayjs";
 import { useState } from "react";
-import { useTeachers } from "../../hooks"
+import { useTeachers } from "@hooks"
+import { getItem } from "@helpers"
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -53,8 +54,10 @@ const TeacherProfile = () => {
 	const { useTeacherUploadAvatar } = useTeachers({});
 	const {mutate:uploadAvatar,}=useTeacherUploadAvatar()
 	const formData = new FormData();
-
-
+	const user_id = getItem("user_id");
+	const { teacherDataById } = useTeachers({}, +user_id!);
+	const teacherDatas = teacherDataById?.data?.teacher;
+	console.log("teacherDatas", teacherDatas);
 	const [teacherData, setTeacherData] = useState({
 		id: "12345",
 		firstName: "Sardor",
@@ -125,7 +128,7 @@ const TeacherProfile = () => {
 		},
 		{
 			title: "Average Rating",
-			value: teacherData.rating,
+			value: 4.8,
 			icon: <StarFilled />,
 			color: "text-yellow-500",
 		},
@@ -158,9 +161,8 @@ const TeacherProfile = () => {
 	const handleEdit = () => {
 		setIsEditing(true);
 		form.setFieldsValue({
-			...teacherData,
-			birthDate: dayjs(teacherData.birthDate),
-			joinDate: dayjs(teacherData.joinDate),
+			...teacherDatas,
+			joinDate: dayjs(teacherDatas?.created_at),
 		});
 	};
 
@@ -168,15 +170,14 @@ const TeacherProfile = () => {
 		try {
 			const values = await form.validateFields();
 			setTeacherData({
-				...teacherData,
+				...teacherDatas,
 				...values,
-				birthDate: values.birthDate.format("YYYY-MM-DD"),
-				joinDate: values.joinDate.format("YYYY-MM-DD"),
+				joinDate: values.created_at.format("YYYY-MM-DD"),
 			});
 			setIsEditing(false);
-			message.success("Profil muvaffaqiyatli yangilandi!");
+			message.success("Profil successfuly updated!");
 		} catch (error) {
-			message.error("Iltimos, barcha maydonlarni to'ldiring!");
+			message.error("Please fill all fields!");
 		}
 	};
 
@@ -189,26 +190,22 @@ const TeacherProfile = () => {
 		console.log(info.file);
 		formData.append("image", info.file.originFileObj);
 		uploadAvatar({
-			id: Number(teacherData.id),
+			id: Number(teacherDatas.id),
 			body: formData,
 		});
 	};
 	return (
 		<div className="space-y-6">
-			{/* Profile Header */}
 			<Card className="shadow-sm border border-gray-200">
 				<div className="relative">
-					{/* Background Pattern */}
 					<div className="absolute inset-0 bg-gradient-to-r from-gray-600 to-gray-400 rounded-lg h-44"></div>
-
 					<div className="relative pt-8 pb-4">
 						<div className="flex flex-col md:flex-row items-center md:items-end space-y-4 md:space-y-0 md:space-x-6">
-							{/* Avatar */}
 							<div className="relative">
 								<Avatar
 									size={120}
 									icon={<UserOutlined />}
-									src={teacherData.avatar}
+									src={teacherDatas?.avatar_url|| <UserOutlined />}
 									className="border-4 border-white shadow-lg bg-white"
 								/>
 								{isEditing && (
@@ -232,23 +229,27 @@ const TeacherProfile = () => {
 									{!isEditing ? (
 										<>
 											<h1 className="text-2xl font-bold text-gray-100 mb-1">
-												{teacherData.firstName} {teacherData.lastName}
+												{teacherDatas?.first_name} {teacherDatas?.last_name}
 											</h1>
 											<p className="text-gray-300 font-medium mb-2">
-												{teacherData.position}
+												{teacherDatas?.role.toUpperCase()}
 											</p>
 											<div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm text-gray-300">
 												<span className="flex items-center">
 													<CalendarOutlined className="mr-1" />
-													{teacherData.experience} tajriba
+													{new Date().getFullYear() -
+														new Date(teacherDatas?.created_at).getFullYear()}{" "}
+													years experience
 												</span>
 												<span className="flex items-center">
 													<StarFilled className="mr-1 text-yellow-500" />
-													{teacherData.rating} reyting
+													4.8 rating
 												</span>
 												<span className="flex items-center">
 													<TeamOutlined className="mr-1" />
-													{teacherData.department}
+													{teacherDatas?.branches
+														.map((branch: any) => branch.name)
+														.join(" | ")}
 												</span>
 											</div>
 										</>
@@ -259,21 +260,19 @@ const TeacherProfile = () => {
 													<label className="block text-sm font-medium mb-1">
 														Ism
 													</label>
-													<Input defaultValue={teacherData.firstName} />
+													<Input defaultValue={teacherDatas?.first_name} />
 												</div>
 												<div>
 													<label className="block text-sm font-medium mb-1">
 														Familiya
 													</label>
-													<Input defaultValue={teacherData.lastName} />
+													<Input defaultValue={teacherDatas?.last_name} />
 												</div>
 											</div>
 										</div>
 									)}
 								</div>
 							</div>
-
-							{/* Action Buttons */}
 							<div className="flex space-x-2">
 								{!isEditing ? (
 									<Button
@@ -304,8 +303,6 @@ const TeacherProfile = () => {
 					</div>
 				</div>
 			</Card>
-
-			{/* Statistics */}
 			<Row gutter={[16, 16]}>
 				{statistics.map((stat, index) => (
 					<Col xs={24} sm={12} lg={6} key={index}>
@@ -314,18 +311,16 @@ const TeacherProfile = () => {
 							<Statistic
 								title={stat.title}
 								value={stat.value}
-								precision={stat.title.includes("Reyting") ? 1 : 0}
+								precision={stat.title.includes("Rating") ? 1 : 0}
 								className="mb-0"
 							/>
 						</Card>
 					</Col>
 				))}
 			</Row>
-
-			{/* Tabs Content */}
+				
 			<Card className="shadow-sm border border-gray-200">
 				<Tabs activeKey={activeTab} onChange={setActiveTab} type="card">
-					{/* Personal Information */}
 					<TabPane tab="Personal Information" key="1">
 						<Row gutter={[24, 24]}>
 							<Col xs={24} lg={12}>
@@ -336,34 +331,28 @@ const TeacherProfile = () => {
 												<MailOutlined className="text-gray-400 mr-3" />
 												<div>
 													<div className="text-sm text-gray-600">Email</div>
-													<div className="font-medium">{teacherData.email}</div>
+													<div className="font-medium">{teacherDatas?.email}</div>
 												</div>
 											</div>
 											<div className="flex items-center">
 												<PhoneOutlined className="text-gray-400 mr-3" />
 												<div>
 													<div className="text-sm text-gray-600">Phone</div>
-													<div className="font-medium">{teacherData.phone}</div>
+													<div className="font-medium">{teacherDatas?.phone}</div>
 												</div>
 											</div>
 											<div className="flex items-center">
 												<EnvironmentOutlined className="text-gray-400 mr-3" />
 												<div>
-													<div className="text-sm text-gray-600">Address</div>
+													<div className="text-sm text-gray-600">Branches</div>
 													<div className="font-medium">
-														{teacherData.address}
+														{teacherDatas?.branches
+														.map((branch: any) => branch.name)
+														.join(" | ")}
 													</div>
 												</div>
 											</div>
-											<div className="flex items-center">
-												<CalendarOutlined className="text-gray-400 mr-3" />
-												<div>
-													<div className="text-sm text-gray-600">Birthday</div>
-													<div className="font-medium">
-														{dayjs(teacherData.birthDate).format("DD.MM.YYYY")}
-													</div>
-												</div>
-											</div>
+											
 										</div>
 									) : (
 										<div className="space-y-4">
@@ -373,7 +362,7 @@ const TeacherProfile = () => {
 												</label>
 												<Input
 													prefix={<MailOutlined />}
-													defaultValue={teacherData.email}
+													defaultValue={teacherDatas?.email}
 												/>
 											</div>
 											<div>
@@ -382,7 +371,7 @@ const TeacherProfile = () => {
 												</label>
 												<Input
 													prefix={<PhoneOutlined />}
-													defaultValue={teacherData.phone}
+													defaultValue={teacherDatas?.phone}
 												/>
 											</div>
 											<div>
@@ -391,16 +380,9 @@ const TeacherProfile = () => {
 												</label>
 												<Input
 													prefix={<EnvironmentOutlined />}
-													defaultValue={teacherData.address}
-												/>
-											</div>
-											<div>
-												<label className="block text-sm font-medium mb-1">
-													Birthday
-												</label>
-												<DatePicker
-													className="w-full"
-													defaultValue={dayjs(teacherData.birthDate)}
+													defaultValue={teacherDatas?.branches
+														.map((branch: any) => branch.name)
+														.join(" | ")}
 												/>
 											</div>
 										</div>
@@ -421,7 +403,9 @@ const TeacherProfile = () => {
 													Department
 												</div>
 												<div className="font-medium">
-													{teacherData.department}
+													{teacherDatas?.branches
+														.map((branch: any) => branch.name)
+														.join(" | ")}
 												</div>
 											</div>
 											<div>
@@ -429,13 +413,13 @@ const TeacherProfile = () => {
 													Joined Date
 												</div>
 												<div className="font-medium">
-													{dayjs(teacherData.joinDate).format("DD.MM.YYYY")}
+													{dayjs(teacherDatas?.created_at).format("DD.MM.YYYY")}
 												</div>
 											</div>
 											<div>
 												<div className="text-sm text-gray-600 mb-1">Salary</div>
 												<div className="font-medium">
-													{teacherData.salary} UZS
+													5000000 UZS
 												</div>
 											</div>
 											<div>
@@ -443,12 +427,12 @@ const TeacherProfile = () => {
 												<div className="flex items-center">
 													<Rate
 														disabled
-														value={teacherData.rating}
+														value={4.8}
 														allowHalf
 														className="text-sm mr-2"
 													/>
 													<span className="font-medium">
-														({teacherData.rating})
+														(4.8)
 													</span>
 												</div>
 											</div>
@@ -460,7 +444,9 @@ const TeacherProfile = () => {
 													Department
 												</label>
 												<Select
-													defaultValue={teacherData.department}
+													defaultValue={teacherDatas?.branches
+														.map((branch: any) => branch.name)
+														.join(" | ")}
 													className="w-full"
 												>
 													<Option value="IT Education">IT Education</Option>
@@ -474,14 +460,14 @@ const TeacherProfile = () => {
 												</label>
 												<DatePicker
 													className="w-full"
-													defaultValue={dayjs(teacherData.joinDate)}
+													defaultValue={dayjs(teacherDatas?.created_at)}
 												/>
 											</div>
 											<div>
 												<label className="block text-sm font-medium mb-1">
 													Salary
 												</label>
-												<Input suffix="UZS" defaultValue={teacherData.salary} />
+												<Input suffix="UZS" defaultValue={5000000} />
 											</div>
 										</div>
 									)}
@@ -492,7 +478,7 @@ const TeacherProfile = () => {
 								<Card title="About" size="small">
 									{!isEditing ? (
 										<p className="text-gray-700 leading-relaxed">
-											{teacherData.bio}
+											{teacherData?.bio}
 										</p>
 									) : (
 										<Form.Item name="bio" label="About yourself...">
@@ -503,8 +489,6 @@ const TeacherProfile = () => {
 							</Col>
 						</Row>
 					</TabPane>
-
-					{/* Skills & Education */}
 					<TabPane tab="Skills & Education" key="2">
 						<Row gutter={[24, 24]}>
 							<Col xs={24} lg={12}>

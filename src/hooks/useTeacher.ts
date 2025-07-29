@@ -17,6 +17,13 @@ export const useTeachers = (params: ParamsType | {}, id: number = 0) => {
 		queryKey: ["teacher", id],
 		queryFn: async () => teacherService.getTeacherById(id),
 	});
+
+	// const { data: teacherGroups } = useQuery({
+	// 	enabled: !!id,
+	// 	queryKey: ["teacherGroups", id],
+	// 	queryFn: async () => teacherService.getAllTeacherGroups(id),
+	// });
+
 	const useTeacherCreate = () => {
 		return useMutation({
 			mutationFn: async (data: any) => teacherService.createTeacher(data),
@@ -54,6 +61,7 @@ export const useTeachers = (params: ParamsType | {}, id: number = 0) => {
 	return {
 		useTeacherCreate,
 		data,
+		// teacherGroups,
 		useTeacherUpdate,
 		useTeacherDelete,
 		teacherDataById,

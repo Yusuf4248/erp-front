@@ -27,28 +27,15 @@ import {
 import { useTeachers } from "../../hooks";
 
 const TeacherDashboard = () => {
-	const teacherInfo = {
-		name: "Sardor Rahimov",
-		position: "Senior Frontend Developer",
-		experience: "3 yil",
-		rating: 4.8,
-		email: "sardor.rahimov@crm.uz",
-		phone: "+998 90 123 45 67",
-		address: "Toshkent, Uzbekistan",
-		avatar: null,
-		totalStudents: 156,
-		activeGroups: 8,
-		completedCourses: 12,
-		totalLessons: 240,
-	};
 	const user_id = getItem("user_id");
-	const { data: teacherDataById } = useTeachers({}, Number(user_id));
-	console.log("teacherDataById", teacherDataById);
+	const { teacherDataById } = useTeachers({}, +user_id!);
+	const teacherData = teacherDataById?.data?.teacher;
+	// console.log("teacherGroupsData", teacherGroups);
 
 	const stats = [
 		{
 			title: "All Students",
-			value: teacherInfo.totalStudents,
+			value: 156,
 			icon: <UserOutlined className="text-blue-500 text-2xl" />,
 			color: "bg-blue-50 border-blue-200",
 			change: "+12%",
@@ -56,7 +43,7 @@ const TeacherDashboard = () => {
 		},
 		{
 			title: "Active Groups",
-			value: teacherInfo.activeGroups,
+			value: 15,
 			icon: <TeamOutlined className="text-green-500 text-2xl" />,
 			color: "bg-green-50 border-green-200",
 			change: "+2",
@@ -64,7 +51,7 @@ const TeacherDashboard = () => {
 		},
 		{
 			title: "Complated Courses",
-			value: teacherInfo.completedCourses,
+			value: 15,
 			icon: <BookOutlined className="text-purple-500 text-2xl" />,
 			color: "bg-purple-50 border-purple-200",
 			change: "+3",
@@ -72,7 +59,7 @@ const TeacherDashboard = () => {
 		},
 		{
 			title: "All Lessons",
-			value: teacherInfo.totalLessons,
+			value: 15,
 			icon: <TrophyOutlined className="text-orange-500 text-2xl" />,
 			color: "bg-orange-50 border-orange-200",
 			change: "+15",
@@ -240,10 +227,9 @@ const TeacherDashboard = () => {
 			),
 		},
 	];
-
+	// =======================================================================================
 	return (
 		<div className="space-y-6">
-			{/* Teacher Profile Section */}
 			<div className="bg-gradient-to-r from-gray-600  to-gray-400 rounded-xl p-6 text-white">
 				<div className="flex flex-col md:flex-row items-start md:items-center justify-between">
 					<div className="flex items-center space-x-4 mb-4 md:mb-0">
@@ -252,17 +238,24 @@ const TeacherDashboard = () => {
 							icon={<UserOutlined />}
 							className="bg-white bg-opacity-20 border-2 border-white border-opacity-30"
 						/>
-						<div>
-							<h1 className="text-2xl font-bold mb-1">{teacherInfo.name}</h1>
-							<p className="text-blue-100 mb-2">{teacherInfo.position}</p>
+						<div className="ml-4">
+							<h1 className="text-2xl font-bold mb-1">
+								{teacherData?.first_name} {teacherData?.last_name}
+							</h1>
+							<p className="text-blue-100 mb-2">
+								{" "}
+								{teacherData?.role.toUpperCase()}
+							</p>
 							<div className="flex items-center space-x-4 text-sm text-blue-100">
 								<span className="flex items-center">
 									<TrophyOutlined className="mr-1" />
-									{teacherInfo.experience} experience
+									{new Date().getFullYear() -
+										new Date(teacherData?.created_at).getFullYear()}{" "}
+									years experience
 								</span>
 								<span className="flex items-center">
 									<span className="text-yellow-300 mr-1">★</span>
-									{teacherInfo.rating} rating
+									4.8 rating
 								</span>
 							</div>
 						</div>
@@ -272,20 +265,22 @@ const TeacherDashboard = () => {
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pt-6 border-t border-white border-opacity-20">
 					<div className="flex items-center text-blue-100">
 						<MailOutlined className="mr-2" />
-						<span className="text-sm">{teacherInfo.email}</span>
+						<span className="text-sm">{teacherData?.email}</span>
 					</div>
 					<div className="flex items-center text-blue-100">
 						<PhoneOutlined className="mr-2" />
-						<span className="text-sm">{teacherInfo.phone}</span>
+						<span className="text-sm">{teacherData?.phone}</span>
 					</div>
 					<div className="flex items-center text-blue-100">
 						<EnvironmentOutlined className="mr-2" />
-						<span className="text-sm">{teacherInfo.address}</span>
+						<span className="text-sm">
+							{teacherData?.branches
+								.map((branch: any) => branch.name)
+								.join(" | ")}
+						</span>
 					</div>
 				</div>
 			</div>
-
-			{/* Statistics Cards */}
 			<Row gutter={[16, 16]}>
 				{stats.map((stat, index) => (
 					<Col xs={24} sm={12} lg={6} key={index}>

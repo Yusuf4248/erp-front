@@ -9,6 +9,8 @@ export class ApiUrls {
 	public static TEACHER: string = "/teacher";
 	public static TEACHER_PROFILE_AVATAR = (id: number) =>
 		`${this.TEACHER}/${id}/avatar`;
+	public static GET_ALL_TEACHER_GROUPS = (id: number) =>
+		`${this.GROUP_TEACHERS}/by-teacher/${id}`;
 	public static ROOMS: string = "/rooms";
 	public static LESSONS: string = "/lessons";
 	public static GROUP_LESSONS: string = this.LESSONS + "/group";

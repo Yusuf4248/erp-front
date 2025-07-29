@@ -4,11 +4,10 @@ import {
 	MenuUnfoldOutlined,
 	UserOutlined,
 } from "@ant-design/icons";
+import { removeItem } from "@helpers";
 import { Button, Dropdown, Layout, Menu, Modal, theme } from "antd";
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { getItem, removeItem } from "@helpers";
-import { useTeachers } from "@hooks";
 import sidebarRoutes, {
 	sidebarRoutesForTeacher,
 } from "../../routes/sidebar-routes";
@@ -16,9 +15,6 @@ import sidebarRoutes, {
 const { Header, Sider, Content } = Layout;
 
 const TeacherLayout = () => {
-	const id = getItem("user_id");
-	const { teacherDataById } = useTeachers({}, +id!);
-	console.log(teacherDataById);
 	const [collapsed, setCollapsed] = useState(false);
 	const location = useLocation();
 	const [selectedKey, setSelectedKey] = useState("");
