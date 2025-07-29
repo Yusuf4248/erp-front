@@ -1,135 +1,9 @@
-// import { LeftCircleOutlined, RightCircleOutlined } from "@ant-design/icons";
-// import { Button, Tooltip } from "antd";
-// import { useRef, useState } from "react";
-// import type { GroupLessonType, LessonType } from "../../types";
-// import LessonInfo from "./lesson-info-modal";
-// import LessonModal from "./lesson-modal";
-// const LessonsList = ({ lessons }: GroupLessonType) => {
-// 	const [open, setOpen] = useState(false);
-// 	const [openInfo, setOpenInfo] = useState(false);
-// 	const [update, setUpdate] = useState<LessonType | null>(null);
-// 	const containerRef = useRef<HTMLDivElement>(null);
-// 	const [scrollPosition, setScrollPosition] = useState(0);
-// 	const [selectedLesson, setSelectedLesson] = useState<LessonType | null>(null);
-// 	const handleScroll = () => {
-// 		if (containerRef.current) {
-// 			setScrollPosition(containerRef.current.scrollLeft);
-// 		}
-// 	};
-// 	const go = (val: number) => {
-// 		if (containerRef.current) {
-// 			containerRef.current.scrollBy({ left: val * 50, behavior: "smooth" });
-// 		}
-// 	};
-// 	const isStartDisabled = () => {
-// 		if (!containerRef.current) return true;
-// 		return scrollPosition <= 5;
-// 	};
-// 	const isEndDisabled = () => {
-// 		if (!containerRef.current) return true;
-// 		return (
-// 			scrollPosition + containerRef.current.clientWidth >=
-// 			containerRef.current.scrollWidth - 3
-// 		);
-// 	};
-// 	const formatDayAndMonth = (date: string) => {
-// 		const newDate = date.split("T")[0];
-// 		const [_, month, day] = newDate.split("-");
-// 		return `${day}.${month}`;
-// 	};
-// 	const updateItem = (lessonData: LessonType) => {
-// 		setOpen(true);
-// 		setUpdate(lessonData);
-// 	};
-// 	const toggle = () => {
-// 		setOpen(!open);
-// 		if (update) {
-// 			setUpdate(null);
-// 		}
-// 	};
-// 	const handleClickInfo = (lesson: LessonType) => {
-// 		setSelectedLesson(lesson);
-// 		setOpenInfo(true);
-// 	};
-// 	const toggleInfo = () => {
-// 		setOpenInfo(!openInfo);
-// 		setSelectedLesson(null);
-// 	};
-// 	return (
-// 		<>
-// 			{open && <LessonModal open={open} toggle={toggle} update={update} />}
-// 			{openInfo && (
-// 				<LessonInfo
-// 					open={openInfo}
-// 					toggle={toggleInfo}
-// 					lesson={selectedLesson}
-// 				/>
-// 			)}
-// 			<div className="flex gap-2 items-center">
-// 				<Button
-// 					type="primary"
-// 					onClick={() => go(-1)}
-// 					disabled={isStartDisabled()}
-// 				>
-// 					<LeftCircleOutlined />
-// 				</Button>
-// 				<div
-// 					className="overflow-scroll flex gap-1 [&::-webkit-scrollbar]:hidden"
-// 					ref={containerRef}
-// 					onScroll={handleScroll}
-// 				>
-// 					{lessons.map((lesson: LessonType) => {
-// 						return (
-// 							<div
-// 								key={lesson.id}
-// 								onClick={() => handleClickInfo(lesson)}
-// 								onContextMenu={(e) => {
-// 									e.preventDefault();
-// 									updateItem(lesson);
-// 								}}
-// 								className={`${
-// 									lesson.status == "bekor qilingan"
-// 										? "bg-red-700 text-amber-50"
-// 										: "text-black"
-// 								} flex justify-center p-3 bg-[#ccc] rounded-lg hover:cursor-pointer min-w-[50px]`}
-// 							>
-// 								<span>
-// 									<Tooltip
-// 										title={lesson.notes}
-// 										// title={`${lesson.notes}(${lesson.date.split("T")[0]})`}
-// 										color={
-// 											lesson.status == "bekor qilingan" ? "#B91C1C" : "#ccc"
-// 										}
-// 										overlayInnerStyle={
-// 											lesson.status == "bekor qilingan"
-// 												? { color: "#fff" }
-// 												: { color: "#000" }
-// 										}
-// 									>
-// 										{formatDayAndMonth(lesson.date)}
-// 									</Tooltip>
-// 								</span>
-// 							</div>
-// 						);
-// 					})}
-// 				</div>
-// 				<Button type="primary" onClick={() => go(1)} disabled={isEndDisabled()}>
-// 					<RightCircleOutlined />
-// 				</Button>
-// 			</div>
-// 		</>
-// 	);
-// };
-
-// export default LessonsList;
-
 import { Tooltip } from "antd";
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { LessonType } from "../../types/section";
 import LessonInfo from "./lesson-info-modal";
 import LessonModal from "./lesson-modal";
-
 const LessonsList = ({ lessons }: any) => {
 	const [open, setOpen] = useState(false);
 	const [openInfo, setOpenInfo] = useState(false);
@@ -137,24 +11,20 @@ const LessonsList = ({ lessons }: any) => {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [scrollPosition, setScrollPosition] = useState(0);
 	const [selectedLesson, setSelectedLesson] = useState<LessonType | null>(null);
-
 	const handleScroll = () => {
 		if (containerRef.current) {
 			setScrollPosition(containerRef.current.scrollLeft);
 		}
 	};
-
 	const go = (val: number) => {
 		if (containerRef.current) {
 			containerRef.current.scrollBy({ left: val * 200, behavior: "smooth" });
 		}
 	};
-
 	const isStartDisabled = () => {
 		if (!containerRef.current) return true;
 		return scrollPosition <= 5;
 	};
-
 	const isEndDisabled = () => {
 		if (!containerRef.current) return true;
 		return (
@@ -202,11 +72,27 @@ const LessonsList = ({ lessons }: any) => {
 		const [_, month, day] = newDate.split("-");
 		return `${day}.${month}`;
 	};
-	// const getDayName = (dateString: string) => {
-	// 	const date = new Date(dateString);
-	// 	const options: Intl.DateTimeFormatOptions = { weekday: "long" };
-	// 	return date.toLocaleDateString("uz-UZ", options);
-	// };
+	useEffect(() => {
+    if (containerRef.current && lessons.length > 0) {
+      const inProgressIndex = lessons.findIndex(
+        (lesson: LessonType) => lesson.status === "in_progress"
+      );
+
+      if (inProgressIndex !== -1) {
+        const lessonElements = Array.from(containerRef.current.children[0].children) as HTMLElement[];
+        const targetLessonElement = lessonElements[inProgressIndex];
+        if (targetLessonElement) {
+          targetLessonElement.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+            inline: "center", 
+          });
+        }
+      } else {
+        containerRef.current.scrollTo({ left: 0, behavior: "smooth" });
+      }
+    }
+  }, [lessons]);
 	return (
 		<div className="w-full bg-white rounded-2xl  border border-gray-100 overflow-hidden mb-5">
 			{/* Header */}
@@ -300,8 +186,6 @@ const LessonsList = ({ lessons }: any) => {
 						<div className="flex gap-2 p-[10px]">
 							{lessons.map((lesson: LessonType, index: number) => {
 								const dateInfo = formatDayAndMonth(lesson.date);
-								// const dayName = getDayName(lesson.date).slice(0, 3);
-
 								return (
 									<div
 										key={lesson.id || index}
