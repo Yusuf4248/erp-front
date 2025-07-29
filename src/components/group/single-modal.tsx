@@ -40,7 +40,7 @@ const AddTeacherorStudentModal = ({
 	const { mutate: addTeacher, isPending: isCreatingTr } = useGroupAddTeacher();
 	const queryClient = useQueryClient();
 
-	const { control, handleSubmit, setValue, reset } = useForm({
+	const { control, handleSubmit,  reset } = useForm({
 		// Add reset here
 		resolver: yupResolver(schema),
 		defaultValues: {
