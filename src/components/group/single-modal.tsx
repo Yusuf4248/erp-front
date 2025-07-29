@@ -2,224 +2,166 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useGroups, useStudents, useTeachers } from "@hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import type { ModalProps } from "@types";
-import { Button, Form, Input, Modal } from "antd";
-import { useState } from "react";
+import { Button, Form, Modal, Select } from "antd";
+import { useEffect, useState } from "react"; // Import useEffect
 import { Controller, useForm } from "react-hook-form";
 import * as yup from "yup";
 
 const schema = yup.object().shape({
-	studentId: yup.number().required("Student must be selected"),
-	teacherId: yup.number().required("Teacher must be selected"),
+  studentId: yup.array().of(yup.number()).optional(), // Make optional and specify type
+  teacherId: yup.array().of(yup.number()).optional(), // Make optional and specify type
 });
 
 interface ThisProps extends ModalProps {
-	addingTeacher: boolean;
-	groupId: number;
+  addingTeacher: boolean;
+  groupId: number;
 }
 
 const AddTeacherorStudentModal = ({
-	addingTeacher,
-	open,
-	toggle,
-	groupId,
+  addingTeacher,
+  open,
+  toggle,
+  groupId,
 }: ThisProps) => {
-	const { useGroupAddStudent, useGroupAddTeacher } = useGroups({
-		page: 1,
-		limit: 100,
-	});
-	let originalData: any[] = [];
-	if (addingTeacher) {
-		const { data: teachers } = useTeachers({ page: 1, limit: 100 });
-		originalData = teachers ? teachers.data.data : [];
-	} else {
-		const { data: students } = useStudents({ page: 1, limit: 100 });
-		originalData = students ? students.data.data : [];
-	}
-	const [selected, setSelected] = useState(null);
-	const [isOpen, setOpen] = useState(open);
-	const [filteredData, setFilteredData] = useState(originalData);
-	const { mutate: addStudent, isPending: isCreatingSt } = useGroupAddStudent();
-	const { mutate: addTeacher, isPending: isCreatingTr } = useGroupAddTeacher();
-	const queryClient = useQueryClient();
-	const { control, handleSubmit, setValue } = useForm({
-		resolver: yupResolver(schema),
-		defaultValues: {
-			teacherId: 0,
-			studentId: 0,
-		},
-	});
+  const { useGroupAddStudent, useGroupAddTeacher } = useGroups({
+    page: 1,
+    limit: 100,
+  });
 
-	const onSubmit = (data: any) => {
-		data["status"] = true;
-		data["start_date"] = new Date().toISOString();
-		data["end_date"] = new Date().toISOString();
-		data.groupId = groupId;
-		if (addingTeacher) {
-			delete data.studentId;
-			addTeacher(data, {
-				onSuccess: () => {
-					toggle();
-					queryClient.invalidateQueries({
-						queryKey: ["groups", "add-teacher"],
-					});
-					setOpen((prev) => !prev);
-				},
-			});
-		} else {
-			delete data.teacherId;
-			addStudent(data, {
-				onSuccess: () => {
-					toggle();
-					queryClient.invalidateQueries({
-						queryKey: ["groups", "add-student"],
-					});
-					setOpen((prev) => !prev);
-				},
-			});
-		}
-	};
+  // Fetch data conditionally based on addingTeacher prop
+  const { data: teachersData } = useTeachers({ page: 1, limit: 100 }, { enabled: addingTeacher });
+  const { data: studentsData } = useStudents({ page: 1, limit: 100 }, { enabled: !addingTeacher });
 
-	const handleChange = (e: any) => {
-		const id = +e.target.value;
-		if (!id) {
-			setFilteredData(originalData);
-		} else {
-			const filtered = originalData.filter((item: any) => item.id === id);
-			setFilteredData(filtered);
-		}
-	};
+  const originalData = addingTeacher
+    ? teachersData?.data?.data || []
+    : studentsData?.data?.data || [];
 
-	return (
-		<Modal
-			title={`Add ${addingTeacher ? "Teacher" : "Student"}`}
-			centered
-			open={isOpen}
-			closeIcon
-			footer={null}
-			width={340}
-			onCancel={toggle}
-		>
-			<Form
-				layout="vertical"
-				autoComplete="on"
-				onFinish={handleSubmit(onSubmit)}
-			>
-				<Form.Item
-					label="Teacher"
-					name="teacherId"
-					style={addingTeacher ? {} : { display: "none" }}
-				>
-					<Controller
-						name="teacherId"
-						control={control}
-						render={() => (
-							<>
-								<Input
-									onChange={handleChange}
-									placeholder="Search by id..."
-									type="number"
-								/>
-								<div className="mt-5 overflow-auto flex flex-wrap w-[300px] justify-center h-[150px]">
-									{filteredData?.map((item: any) => (
-										<Button
-											key={item.id}
-											className="mt-0.5 w-[300px]"
-											onClick={() => {
-												setSelected(item);
-												setValue("teacherId", item.id);
-											}}
-										>
-											{`${item.id} - ${item.first_name} ${item.last_name}`}
-										</Button>
-									))}
-								</div>
-								<div
-									style={
-										selected
-											? { marginTop: 10, marginLeft: 10 }
-											: { display: "none", marginTop: 10, marginLeft: 10 }
-									}
-								>
-									{selected &&
-									typeof selected === "object" &&
-									"id" in selected &&
-									"first_name" in selected &&
-									"last_name" in selected ? (
-										<p style={{ fontSize: "18px", color: "#1447e6" }}>
-											{`${(selected as any).id} - ${
-												(selected as any).first_name
-											} ${(selected as any).last_name}`}
-										</p>
-									) : null}
-								</div>
-							</>
-						)}
-					/>
-				</Form.Item>
-				<Form.Item
-					label="Student"
-					name="studentId"
-					style={addingTeacher ? { display: "none" } : {}}
-				>
-					<Controller
-						name="studentId"
-						control={control}
-						render={() => (
-							<>
-								<Input
-									onChange={handleChange}
-									placeholder="Search by id..."
-									type="number"
-								/>
-								<div className="mt-5 overflow-auto flex flex-wrap w-[300px] justify-center h-[150px]">
-									{filteredData?.map((item: any) => (
-										<Button
-											key={item.id}
-											className="mt-0.5 w-[300px]"
-											onClick={() => {
-												setSelected(item);
-												setValue("studentId", item.id);
-											}}
-										>
-											{`${item.id} - ${item.first_name} ${item.last_name}`}
-										</Button>
-									))}
-								</div>
-								<div
-									style={
-										selected
-											? { marginTop: 10, marginLeft: 10 }
-											: { display: "none", marginTop: 10, marginLeft: 10 }
-									}
-								>
-									{selected &&
-									typeof selected === "object" &&
-									"id" in selected &&
-									"first_name" in selected &&
-									"last_name" in selected ? (
-										<p style={{ fontSize: "18px", color: "#1447e6" }}>
-											{`${(selected as any).id} - ${
-												(selected as any).first_name
-											} ${(selected as any).last_name}`}
-										</p>
-									) : null}
-								</div>
-							</>
-						)}
-					/>
-				</Form.Item>
-				<Form.Item>
-					<Button
-						type="primary"
-						htmlType="submit"
-						loading={addingTeacher ? isCreatingTr : isCreatingSt}
-					>
-						Submit
-					</Button>
-				</Form.Item>
-			</Form>
-		</Modal>
-	);
+  const { mutate: addStudent, isPending: isCreatingSt } = useGroupAddStudent();
+  const { mutate: addTeacher, isPending: isCreatingTr } = useGroupAddTeacher();
+  const queryClient = useQueryClient();
+
+  const { control, handleSubmit, setValue, reset } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      teacherId: [],
+      studentId: [],
+    },
+  });
+
+  useEffect(() => {
+    if (open) {
+      reset({
+        teacherId: [],
+        studentId: [],
+      });
+    }
+  }, [open, addingTeacher, reset]);
+
+
+  const onSubmit = (data: any) => {
+    const payload = {
+      ...data,
+      status: true,
+      start_date: new Date().toISOString(),
+      groupId: groupId,
+    };
+
+    if (addingTeacher) {
+      delete payload.studentId;
+      addTeacher(payload, {
+        onSuccess: () => {
+          toggle();
+          queryClient.invalidateQueries({
+            queryKey: ["groups", "add-teacher", groupId],
+          });
+          reset(); 
+        },
+      });
+    } else {
+      delete payload.teacherId;
+      addStudent(payload, {
+        onSuccess: () => {
+          toggle();
+          queryClient.invalidateQueries({
+            queryKey: ["groups", "add-student", groupId], \
+          });
+          reset();
+        },
+      });
+    }
+  };
+
+  return (
+    <Modal
+      title={`Add ${addingTeacher ? "Teacher" : "Student"}`}
+      centered
+      open={open} 
+      closeIcon
+      footer={null}
+      width={340}
+      onCancel={toggle}
+    >
+      <Form
+        layout="vertical"
+        autoComplete="on"
+        onFinish={handleSubmit(onSubmit)}
+      >
+        {addingTeacher && ( 
+          <Form.Item label="Teacher" name="teacherId">
+            <Controller
+              name="teacherId"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  mode="multiple"
+                  style={{ width: "100%" }}
+                  placeholder="Select teachers"
+                  options={originalData?.map((item: any) => ({
+                    label: `${item.id} - ${item.first_name} ${item.last_name}`,
+                    value: item.id,
+                  }))}
+                  onChange={field.onChange} 
+                  value={field.value} 
+                />
+              )}
+            />
+          </Form.Item>
+        )}
+
+        {!addingTeacher && ( 
+          <Form.Item label="Student" name="studentId">
+            <Controller
+              name="studentId"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  mode="multiple"
+                  style={{ width: "100%" }}
+                  placeholder="Select students"
+                  options={originalData?.map((item: any) => ({
+                    label: `${item.id} - ${item.first_name} ${item.last_name}`,
+                    value: item.id,
+                  }))}
+                  onChange={field.onChange}
+                  value={field.value} 
+                />
+              )}
+            />
+          </Form.Item>
+        )}
+
+        <Form.Item>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={addingTeacher ? isCreatingTr : isCreatingSt}
+          >
+            Submit
+          </Button>
+        </Form.Item>
+      </Form>
+    </Modal>
+  );
 };
 
 export default AddTeacherorStudentModal;
