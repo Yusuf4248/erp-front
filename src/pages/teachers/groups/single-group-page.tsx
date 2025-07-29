@@ -9,7 +9,6 @@ import {
 	PlusOutlined,
 	StarFilled,
 	TeamOutlined,
-	UploadOutlined,
 	UserOutlined,
 } from "@ant-design/icons";
 import {
@@ -31,11 +30,9 @@ import {
 	Table,
 	Tabs,
 	Tag,
-	TimePicker,
-	Upload,
 } from "antd";
 import dayjs from "dayjs";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const { TabPane } = Tabs;
 const { TextArea } = Input;
@@ -47,6 +44,156 @@ const SingleGroupPage = () => {
 		{}
 	);
 	const [form] = Form.useForm();
+
+	const [stream, setStream] = useState<MediaStream | null>(null); // Kamera streamini saqlash uchun
+	const [photoDataUrl, setPhotoDataUrl] = useState<string | null>(null); // Olingan rasmni saqlash uchun
+	const [isCapturing, setIsCapturing] = useState(false); // Kamera yoqilganligini bildirish uchun
+	const [isPhotoTaken, setIsPhotoTaken] = useState(false); // Rasm olinganligini bildirish uchun
+	const [isLoading, setIsLoading] = useState(false); // Backendga yuborish holati uchun
+
+	// Ref'lar
+	const videoRef = useRef<HTMLVideoElement>(null); // <video> elementiga murojaat
+	const canvasRef = useRef<HTMLCanvasElement>(null); // <canvas> elementiga murojaat
+
+	// --- 1. Kamerani ochish funksiyasi ---
+	const startCamera = async () => {
+		try {
+			const mediaStream = await navigator.mediaDevices.getUserMedia({
+				video: true,
+			});
+			if (videoRef.current) {
+				(videoRef.current as HTMLVideoElement).srcObject = mediaStream;
+			}
+			setStream(mediaStream);
+			setIsCapturing(true);
+			setIsPhotoTaken(false); // Kamera ochilganda oldingi rasmni tozalash
+			setPhotoDataUrl(null); // Rasm dataURL ni tozalash
+		} catch (err) {
+			console.error("Kameraga kirishda xato:", err);
+			alert(
+				"Kamerani ochib bo‘lmadi. Ruxsat berilganligini tekshiring yoki boshqa kamera tanlang."
+			);
+		}
+	};
+
+	const stopCamera = () => {
+		if (stream) {
+			stream.getTracks().forEach((track) => track.stop()); // Barcha media treklarini to'xtatish
+			if (videoRef.current) {
+				videoRef.current.srcObject = null; // Video elementni tozalash
+			}
+			setStream(null);
+		}
+		setIsCapturing(false);
+		setIsPhotoTaken(false);
+		setPhotoDataUrl(null);
+		setIsLoading(false);
+	};
+
+	// --- 3. Rasmga olish funksiyasi ---
+	const takePhoto = () => {
+		if (videoRef.current && canvasRef.current) {
+			const video = videoRef.current;
+			const canvas = canvasRef.current;
+			const context = canvas.getContext("2d");
+
+			if (context) {
+				// Canvas o'lchamlarini video o'lchamlariga moslashtirish
+				canvas.width = video.videoWidth;
+				canvas.height = video.videoHeight;
+
+				// Videodagi joriy kadirni canvasga chizish
+				context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+				// Canvasdagi rasmni Data URL formatida olish
+				const imageData = canvas.toDataURL("image/jpeg", 0.9);
+				setPhotoDataUrl(imageData);
+				setIsPhotoTaken(true);
+			}
+		}
+	};
+
+	// --- 4. Backendga rasmni yuborish funksiyasi ---
+	const sendPhotoToBackend = async () => {
+		if (!photoDataUrl) {
+			alert("Avval rasm oling!");
+			return;
+		}
+
+		setIsLoading(true);
+
+		// Data URL ni Blob ga aylantirish
+		const response = await fetch(photoDataUrl);
+		const blob = await response.blob();
+
+		const formData = new FormData();
+		formData.append("image", blob, "webcam_photo.jpg"); // 'image' - backend kutadigan maydon nomi
+
+		try {
+			// Fetch API yordamida rasmni backendga POST qilish
+			const backendUrl = "YOUR_BACKEND_UPLOAD_URL"; // <-- Bu yerga backend manzilingizni qo'ying!
+			const uploadResponse = await fetch(backendUrl, {
+				method: "POST",
+				body: formData,
+			});
+
+			if (uploadResponse.ok) {
+				const result = await uploadResponse.json();
+				console.log("Rasm muvaffaqiyatli yuborildi:", result);
+				alert("Rasm muvaffaqiyatli yuborildi!");
+				stopCamera(); // Muvaffaqiyatli yuborilgandan keyin kamerani o'chirish va holatni tiklash
+			} else {
+				console.error("Rasmni yuborishda xato:", uploadResponse.statusText);
+				alert("Rasmni yuborishda xato yuz berdi.");
+			}
+		} catch (error) {
+			console.error("Tarmoq xatosi:", error);
+			alert("Tarmoqqa ulanishda xato yuz berdi.");
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	const videoStyle = {
+		display: "block",
+		marginBottom: "10px",
+		width: "100%",
+		height: "auto",
+		border: "1px solid #ccc",
+		borderRadius: "8px",
+	};
+
+	const canvasStyle = {
+		display: "block",
+		marginTop: "10px",
+		marginBottom: "10px",
+		width: "100%",
+		height: "auto",
+		border: "1px solid #ccc",
+		borderRadius: "8px",
+	};
+
+	const buttonStyle = {
+		padding: "10px 20px",
+		margin: "5px",
+		backgroundColor: "#1890ff",
+		color: "white",
+		border: "none",
+		borderRadius: "4px",
+		cursor: "pointer",
+		fontSize: "14px",
+	};
+	// Komponent render bo'lganda yoki stream o'zgarganda ishlaydi
+	useEffect(() => {
+		// Agar stream mavjud bo'lsa va video elementi yuklangan bo'lsa
+		if (videoRef.current && stream) {
+			videoRef.current.srcObject = stream;
+		}
+		// Komponent unmount bo'lganda streamni tozalash
+		return () => {
+			stopCamera();
+		};
+	}, [stream]);
 
 	// Mock group data
 	const groupData = {
@@ -65,8 +212,7 @@ const SingleGroupPage = () => {
 		},
 		startDate: "2024-10-15",
 		endDate: "2025-02-15",
-		description:
-			"Frontend Development Bootcamp",
+		description: "Frontend Development Bootcamp",
 		room: "A-201",
 		price: "1,200,000",
 		totalLessons: 48,
@@ -620,26 +766,6 @@ const SingleGroupPage = () => {
 									format="DD.MM.YYYY"
 								/>
 							</div>
-							<div>
-								<label className="block text-sm font-medium mb-1">
-									Start time *
-								</label>
-								<TimePicker
-									className="w-full"
-									format="HH:mm"
-									defaultValue={dayjs("18:00", "HH:mm")}
-								/>
-							</div>
-							<div>
-								<label className="block text-sm font-medium mb-1">
-									End time *
-								</label>
-								<TimePicker
-									className="w-full"
-									format="HH:mm"
-									defaultValue={dayjs("20:00", "HH:mm")}
-								/>
-							</div>
 						</div>
 						<div className="mt-4">
 							<label className="block text-sm font-medium mb-1">
@@ -653,24 +779,61 @@ const SingleGroupPage = () => {
 					</div>
 
 					{/* Video Upload */}
-					<div>
-						<h3 className="font-medium text-gray-900 mb-4">Video Upload</h3>
-						<Upload.Dragger
-							name="video"
-							accept="video/*"
-							maxCount={1}
-							className="mb-4"
-						>
-							<p className="ant-upload-drag-icon">
-								<UploadOutlined className="text-4xl text-blue-500" />
-							</p>
-							<p className="ant-upload-text">
-								Upload video file by clicking or dragging
-							</p>
-							<p className="ant-upload-hint">
-								MP4, AVI, MOV formats are supported (max 500MB)
-							</p>
-						</Upload.Dragger>
+					<div
+						style={{
+							padding: "20px",
+							maxWidth: "500px",
+							margin: "auto",
+							textAlign: "center",
+						}}
+					>
+						<h1>Webcam</h1>
+
+						{!isCapturing && !isPhotoTaken && (
+							<button onClick={startCamera} style={buttonStyle}>
+								Open Camera
+							</button>
+						)}
+
+						{isCapturing && !isPhotoTaken && (
+							<>
+								<video
+									ref={videoRef}
+									autoPlay
+									playsInline
+									style={videoStyle}
+								></video>
+								<button onClick={takePhoto} style={buttonStyle}>
+									Rasmga olish
+								</button>
+								<button onClick={stopCamera} style={buttonStyle}>
+									Kamerani yopish
+								</button>
+							</>
+						)}
+
+						{isPhotoTaken && (
+							<>
+								<canvas ref={canvasRef} style={canvasStyle}></canvas>
+								<button
+									onClick={sendPhotoToBackend}
+									disabled={isLoading}
+									style={buttonStyle}
+								>
+									{isLoading ? "Yuborilmoqda..." : "Backendga yuborish"}
+								</button>
+								<button onClick={startCamera} style={buttonStyle}>
+									Qayta olish
+								</button>
+								<button onClick={stopCamera} style={buttonStyle}>
+									Kamerani yopish
+								</button>
+							</>
+						)}
+						{/* Canvasni faqat rasm olinganda ko'rsatish */}
+						{!isPhotoTaken && (
+							<canvas ref={canvasRef} style={{ display: "none" }}></canvas>
+						)}
 					</div>
 
 					{/* Attendance */}
@@ -689,8 +852,6 @@ const SingleGroupPage = () => {
 												onChange={(checked) =>
 													handleAttendanceChange(student.id, checked)
 												}
-												checkedChildren="Present"
-												unCheckedChildren="Absent"
 											/>,
 										]}
 									>
@@ -710,8 +871,8 @@ const SingleGroupPage = () => {
 							/>
 						</div>
 						<div className="mt-2 text-sm text-gray-600">
-							Present: {Object.values(attendanceData).filter(Boolean).length}{" "}
-							/ {studentsData.length}
+							Present: {Object.values(attendanceData).filter(Boolean).length} /{" "}
+							{studentsData.length}
 						</div>
 					</div>
 				</div>

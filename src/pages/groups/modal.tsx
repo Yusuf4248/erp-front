@@ -112,8 +112,6 @@ const GroupModal = ({ open, toggle, update }: GroupProps) => {
 			courseId: Number(data.course),
 			start_date: dayjs(data.start_date).format("YYYY-MM-DD"),
 			start_time: dayjs(data.start_time).format("HH:mm"),
-			end_date: "2025-06-06",
-			end_time: "09:00",
 		};
 		if (formattedData.course) {
 			delete formattedData.course;
