@@ -57,7 +57,6 @@ const TeacherProfile = () => {
 	const user_id = getItem("user_id");
 	const { teacherDataById } = useTeachers({}, +user_id!);
 	const teacherDatas = teacherDataById?.data?.teacher;
-	console.log("teacherDatas", teacherDatas);
 	const [teacherData, setTeacherData] = useState({
 		id: "12345",
 		firstName: "Sardor",
@@ -133,7 +132,6 @@ const TeacherProfile = () => {
 			color: "text-yellow-500",
 		},
 	];
-
 	const recentActivities = [
 		{
 			date: "2025-01-25",
@@ -157,7 +155,6 @@ const TeacherProfile = () => {
 			status: "completed",
 		},
 	];
-
 	const handleEdit = () => {
 		setIsEditing(true);
 		form.setFieldsValue({
@@ -165,7 +162,6 @@ const TeacherProfile = () => {
 			joinDate: dayjs(teacherDatas?.created_at),
 		});
 	};
-
 	const handleSave = async () => {
 		try {
 			const values = await form.validateFields();
@@ -180,15 +176,13 @@ const TeacherProfile = () => {
 			message.error("Please fill all fields!");
 		}
 	};
-
 	const handleCancel = () => {
 		setIsEditing(false);
 		form.resetFields();
 	};
-
 	const handleAvatarUpload = (info: any) => {
 		console.log(info.file);
-		formData.append("image", info.file.originFileObj);
+		formData.append("avatar_url", info.file.originFileObj);
 		uploadAvatar({
 			id: Number(teacherDatas.id),
 			body: formData,
@@ -200,7 +194,7 @@ const TeacherProfile = () => {
 				<div className="relative">
 					<div className="absolute inset-0 bg-gradient-to-r from-gray-600 to-gray-400 rounded-lg h-44"></div>
 					<div className="relative pt-8 pb-4">
-						<div className="flex flex-col md:flex-row items-center md:items-end space-y-4 md:space-y-0 md:space-x-6">
+						<div className="flex flex-col md:flex-row items-center md:items-end space-y-4 md:space-y-0 md:space-x-6 ml-10">
 							<div className="relative">
 								<Avatar
 									size={120}
@@ -273,7 +267,7 @@ const TeacherProfile = () => {
 									)}
 								</div>
 							</div>
-							<div className="flex space-x-2">
+							<div className="flex space-x-2 mr-5">
 								{!isEditing ? (
 									<Button
 										type="primary"
@@ -318,7 +312,6 @@ const TeacherProfile = () => {
 					</Col>
 				))}
 			</Row>
-				
 			<Card className="shadow-sm border border-gray-200">
 				<Tabs activeKey={activeTab} onChange={setActiveTab} type="card">
 					<TabPane tab="Personal Information" key="1">
@@ -352,7 +345,6 @@ const TeacherProfile = () => {
 													</div>
 												</div>
 											</div>
-											
 										</div>
 									) : (
 										<div className="space-y-4">
@@ -389,7 +381,6 @@ const TeacherProfile = () => {
 									)}
 								</Card>
 							</Col>
-
 							<Col xs={24} lg={12}>
 								<Card
 									title="Professional Information"
@@ -473,7 +464,6 @@ const TeacherProfile = () => {
 									)}
 								</Card>
 							</Col>
-
 							<Col xs={24}>
 								<Card title="About" size="small">
 									{!isEditing ? (
@@ -510,7 +500,6 @@ const TeacherProfile = () => {
 										</Button>
 									)}
 								</Card>
-
 								<Card title="Languages" size="small">
 									<div className="space-y-3">
 										{teacherData.languages.map((lang, index) => (
@@ -544,7 +533,6 @@ const TeacherProfile = () => {
 									)}
 								</Card>
 							</Col>
-
 							<Col xs={24} lg={12}>
 								<Card title="Education" size="small" className="mb-6">
 									{teacherData.education.map((edu, index) => (
@@ -571,7 +559,6 @@ const TeacherProfile = () => {
 										</Button>
 									)}
 								</Card>
-
 								<Card title="Certificates" size="small">
 									<div className="space-y-3">
 										{teacherData.certifications.map((cert, index) => (
@@ -599,8 +586,6 @@ const TeacherProfile = () => {
 							</Col>
 						</Row>
 					</TabPane>
-
-					{/* Recent Activity */}
 					<TabPane tab="Recent Activity" key="3">
 						<Row gutter={[24, 24]}>
 							<Col xs={24} lg={16}>
@@ -644,7 +629,6 @@ const TeacherProfile = () => {
 									/>
 								</Card>
 							</Col>
-
 							<Col xs={24} lg={8}>
 								<Card title="Social Media" size="small">
 									<div className="space-y-4">
@@ -705,5 +689,4 @@ const TeacherProfile = () => {
 		</div>
 	);
 };
-
 export default TeacherProfile;

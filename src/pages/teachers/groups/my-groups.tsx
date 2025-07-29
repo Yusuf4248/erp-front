@@ -7,7 +7,6 @@ import {
 import {
 	Avatar,
 	Badge,
-	Button,
 	Card,
 	Col,
 	Empty,
@@ -227,7 +226,6 @@ const TeacherGroups = () => {
 	const handleGroupClick = (groupId: any) => {
 		console.log("----------------------------");
 		navigate(`${groupId}`);
-
 	};
 
 	return (
@@ -458,14 +456,6 @@ const TeacherGroups = () => {
 						}
 					></Empty>
 				</Card>
-			)}
-
-			{filteredGroups.length > 0 && filteredGroups.length >= 6 && (
-				<div className="text-center">
-					<Button size="large" className="px-8">
-						Load more
-					</Button>
-				</div>
 			)}
 		</div>
 	);
