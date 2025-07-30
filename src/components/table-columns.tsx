@@ -7,8 +7,9 @@ import type {
 	StudentType,
 	TeacherType,
 } from "@types";
-import { Table, Tooltip, type TableProps } from "antd";
-
+import { Button, Modal, Table, Tooltip, type TableProps } from "antd";
+import { useState } from "react";
+import { ExportOutlined } from "@ant-design/icons";
 export const GroupColumns: TableProps<GroupType>["columns"] = [
 	{
 		title: "Group",
@@ -106,7 +107,7 @@ export const TeacherColumn: TableProps<TeacherType>["columns"] = [
 		title: "Phone",
 		dataIndex: "phone",
 		key: "phone",
-		// width: 150,
+		width: 180,
 	},
 	{
 		title: "Role",
@@ -118,10 +119,82 @@ export const TeacherColumn: TableProps<TeacherType>["columns"] = [
 		title: "Branch",
 		dataIndex: "branches",
 		key: "branch",
-		render: (branches) => branches.map((branch:any) => branch.name).join(" | "),
-		// width: 120,
+		render: (branches) => {
+			if (!branches || !Array.isArray(branches) || branches.length === 0) {
+				return "No branches";
+			}
+			const branchNames = branches
+				.map((branch: any) => branch.name)
+				.join(" | ");
+			return (
+				<Tooltip title={branchNames}>
+					{branchNames.slice(0, 100) + (branchNames.length > 100 ? "..." : "")}
+				</Tooltip>
+			);
+		},
+		width: 200,
 	},
 ];
+export const TeacherColumnForModal: TableProps<TeacherType>["columns"] = [
+	{
+		title: "First Name",
+		dataIndex: "first_name",
+		key: "first_name",
+		// width: 150,
+		// fixed: 'left',
+	},
+	{
+		title: "Last Name",
+		dataIndex: "last_name",
+		key: "lastname",
+		// 		width: 150,
+	},
+	{
+		title: "Email",
+		dataIndex: "email",
+		key: "email",
+		// width: 200,
+	},
+	{
+		title: "Phone",
+		dataIndex: "phone",
+		key: "phone",
+		width: 180,
+	},
+	{
+		title: "Role",
+		dataIndex: "role",
+		key: "role",
+		// width: 100,
+	},
+];
+
+const TeachersModal = ({ teachers }: { teachers: TeacherType[] }) => {
+	const [isModalOpen, setIsModalOpen] = useState(false);
+
+	const showModal = () => {
+		setIsModalOpen(true);
+	};
+	const handleCancel = () => {
+		setIsModalOpen(false);
+	};
+	return (
+		<>
+			<Button type="link" onClick={showModal}>
+			<ExportOutlined />
+			</Button>
+			<Modal
+				title="Branch Teachers"
+				open={isModalOpen}
+				onCancel={handleCancel}
+				footer={null}
+				width={800}
+			>
+				<Table dataSource={teachers} columns={TeacherColumnForModal} />
+			</Modal>
+		</>
+	);
+};
 
 export const BranchColumn: TableProps<BranchType>["columns"] = [
 	{
@@ -145,9 +218,11 @@ export const BranchColumn: TableProps<BranchType>["columns"] = [
 		key: "Teachers",
 		render: (teachers) => (
 			<span>
-				{Array.isArray(teachers) && teachers.length > 0
-					? teachers.map((teacher) => teacher.first_name || "N/A").join(" | ")
-					: "No teachers"}
+				{Array.isArray(teachers) && teachers.length > 0 ? (
+					<TeachersModal teachers={teachers} />
+				) : (
+					"No teachers"
+				)}
 			</span>
 		),
 	},
@@ -158,14 +233,16 @@ export const CourseColumns: TableProps<CourseType>["columns"] = [
 		title: "Title",
 		dataIndex: "title",
 		key: "title",
-		// width: 150,
+		width: 150,
 	},
 	{
 		title: "Description",
 		dataIndex: "description",
 		key: "description",
-		width: 200,
-		render: (text) => <Tooltip title={text}>{text.slice(0, 20)+"..."}</Tooltip>,
+		width: 250,
+		render: (text) => (
+			<Tooltip title={text}>{text.slice(0, 40) + "..."}</Tooltip>
+		),
 	},
 	{
 		title: "Price",
@@ -183,7 +260,7 @@ export const CourseColumns: TableProps<CourseType>["columns"] = [
 		title: "Lesson in week",
 		dataIndex: "lessons_in_a_week",
 		key: "lessons_in_a_week",
-		// width: 150,
+		width: 150,
 	},
 	{
 		title: "Lesson Duration",
@@ -247,6 +324,6 @@ export const LessonsColumn: TableProps<LessonType>["columns"] = [
 		title: "Room",
 		dataIndex: "room",
 		key: "roomId",
-		render:(room)=> room.name
+		render: (room) => room.name,
 	},
 ];
