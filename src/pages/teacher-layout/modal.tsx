@@ -161,6 +161,7 @@ const TeacherModal = ({ open, toggle, update }: TeacherProps) => {
 					name="password"
 					validateStatus={errors.password ? "error" : ""}
 					help={errors.password?.message}
+					hidden={!!update?.id}
 				>
 					<Controller
 						name={"password"}

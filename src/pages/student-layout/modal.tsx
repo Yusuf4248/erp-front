@@ -164,6 +164,7 @@ const StudentModal = ({ open, toggle, update }: StudentProps) => {
 					name="password"
 					validateStatus={errors.password_hash ? "error" : ""}
 					help={errors.password_hash?.message}
+					hidden={!!update?.id}
 				>
 					<Controller
 						name={"password_hash"}

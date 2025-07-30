@@ -7,7 +7,7 @@ import type {
 	StudentType,
 	TeacherType,
 } from "@types";
-import { Table, type TableProps } from "antd";
+import { Table, Tooltip, type TableProps } from "antd";
 
 export const GroupColumns: TableProps<GroupType>["columns"] = [
 	{
@@ -64,13 +64,6 @@ export const StudentColumn: TableProps<StudentType>["columns"] = [
 		// width: 150,
 	},
 	{
-		title: "Password",
-		dataIndex: "password_hash",
-		key: "passwordhash",
-		// width: 150,
-		render: (text) => (text ? `******` : "N/A"),
-	},
-	{
 		title: "Gender",
 		dataIndex: "gender",
 		key: "gender",
@@ -114,13 +107,6 @@ export const TeacherColumn: TableProps<TeacherType>["columns"] = [
 		dataIndex: "phone",
 		key: "phone",
 		// width: 150,
-	},
-	{
-		title: "Password",
-		dataIndex: "password",
-		key: "passwordhash",
-		// width: 150,
-		render: (text) => (text ? `${text.slice(1, 10)}...` : "N/A"),
 	},
 	{
 		title: "Role",
@@ -178,7 +164,8 @@ export const CourseColumns: TableProps<CourseType>["columns"] = [
 		title: "Description",
 		dataIndex: "description",
 		key: "description",
-		// width: 150,
+		width: 200,
+		render: (text) => <Tooltip title={text}>{text.slice(0, 20)+"..."}</Tooltip>,
 	},
 	{
 		title: "Price",

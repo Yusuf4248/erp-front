@@ -91,19 +91,6 @@ const CourseModal = ({ open, toggle, update }: CourseProps) => {
 					/>
 				</Form.Item>
 				<Form.Item
-					label="Description"
-					name={"description"}
-					validateStatus={errors.description ? "error" : ""}
-					help={errors.description?.message}
-				>
-					<Controller
-						name={"description"}
-						control={control}
-						render={({ field }) => <Input {...field} />}
-					/>
-				</Form.Item>
-
-				<Form.Item
 					label="Price"
 					name={"price"}
 					validateStatus={errors.price ? "error" : ""}
@@ -197,6 +184,19 @@ const CourseModal = ({ open, toggle, update }: CourseProps) => {
 								]}
 							/>
 						)}
+					/>
+				</Form.Item>
+
+				<Form.Item
+					label="Description"
+					name={"description"}
+					validateStatus={errors.description ? "error" : ""}
+					help={errors.description?.message}
+				>
+					<Controller
+						name={"description"}
+						control={control}
+						render={({ field }) => <Input.TextArea {...field} />}
 					/>
 				</Form.Item>
 
