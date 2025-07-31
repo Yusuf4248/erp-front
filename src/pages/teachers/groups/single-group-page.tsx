@@ -9,7 +9,6 @@ import {
 	PlayCircleOutlined,
 	PlusOutlined,
 	StarFilled,
-	TeamOutlined,
 	UserOutlined,
 } from "@ant-design/icons";
 import {
@@ -20,7 +19,7 @@ import {
 	Col,
 	DatePicker,
 	Divider,
-	Form, 
+	Form,
 	Input,
 	List,
 	Modal,
@@ -34,28 +33,24 @@ import {
 	message,
 } from "antd";
 import dayjs from "dayjs";
-import { useEffect, useRef, useState } from "react"; // useEffect import qilindi
-
+import { useEffect, useRef, useState } from "react";
 const { TabPane } = Tabs;
 const { TextArea } = Input;
-
 const SingleGroupPage = () => {
 	const [activeTab, setActiveTab] = useState("1");
 	const [isLessonModalVisible, setIsLessonModalVisible] = useState(false);
-	const [attendanceData, setAttendanceData] = useState<Record<number, boolean>>(
-		{}
-	);
-	const [form] = Form.useForm(); // Form instansiyasini olish
-
-	// Kamera holatlari
-	const [isCameraActive, setIsCameraActive] = useState(false); // Kamera yoqilgan, stream ko'rsatilmoqda
-	const [capturedImage, setCapturedImage] = useState<string | null>(null); // Olingan rasmni saqlash uchun
-
-	const videoRef = useRef<HTMLVideoElement>(null); // <video> elementiga murojaat
-	const canvasRef = useRef<HTMLCanvasElement>(null); // <canvas> elementiga murojaat
-	const streamRef = useRef<MediaStream | null>(null); // MediaStream obyektini saqlash uchun
-
-	// Mock group data
+	const [attendanceData, setAttendanceData] = useState<
+		{
+			studentId: number;
+			isPresent: boolean;
+		}[]
+	>([]);
+	const [form] = Form.useForm();
+	const [isCameraActive, setIsCameraActive] = useState(false);
+	const [capturedImage, setCapturedImage] = useState<string | null>(null);
+	const videoRef = useRef<HTMLVideoElement>(null);
+	const canvasRef = useRef<HTMLCanvasElement>(null);
+	const streamRef = useRef<MediaStream | null>(null);
 	const groupData = {
 		id: 1,
 		name: "Frontend Bootcamp #12",
@@ -79,8 +74,6 @@ const SingleGroupPage = () => {
 		completedLessons: 36,
 		avatar: null,
 	};
-
-	// Mock teachers data
 	const teachersData = [
 		{
 			id: 1,
@@ -105,7 +98,6 @@ const SingleGroupPage = () => {
 			isMain: false,
 		},
 	];
-
 	const studentsData = [
 		{
 			id: 1,
@@ -156,8 +148,6 @@ const SingleGroupPage = () => {
 			rating: 3.9,
 		},
 	];
-
-	// Mock lessons data
 	const lessonsData = [
 		{
 			id: 1,
@@ -187,35 +177,28 @@ const SingleGroupPage = () => {
 			attendance: 0,
 		},
 	];
-
 	const handleStartLesson = () => {
 		setIsLessonModalVisible(true);
-		// Initialize attendance data
-		const initialAttendance: Record<number, boolean> = {};
+		const initialAttendance: { studentId: number; isPresent: boolean }[] = [];
 		studentsData.forEach((student: { id: number }) => {
-			initialAttendance[student.id] = true; // Default to present
+			initialAttendance.push({ studentId: student.id, isPresent: true });
 		});
 		setAttendanceData(initialAttendance);
-		// Modal ochilganda kamerani avtomatik ochmaslik uchun, tugma bosilishini kutish
 	};
-
 	const handleLessonSubmit = async () => {
 		try {
-			const values = await form.validateFields(); // Formani validatsiya qilish
+			const values = await form.validateFields();
 			console.log("Lesson data:", values);
 			console.log("Attendance:", attendanceData);
-
-			if (capturedImage) {
-				await sendPhotoToBackend(); 
-			} else {
-				message.warning("Take photo for lesson!");
-				return; 
-			}
-
+			// if (capturedImage) {
+			// 	await sendPhotoToBackend();
+			// } else {
+			// 	message.warning("Take photo for lesson!");
+			// 	return;
+			// }
 			setIsLessonModalVisible(false);
-			form.resetFields(); 
-			closeCamera(); 
-
+			form.resetFields();
+			closeCamera();
 			message.success("Lesson started successfully!");
 		} catch (error) {
 			console.error("Form validation failed or submission error:", error);
@@ -224,40 +207,42 @@ const SingleGroupPage = () => {
 			);
 		}
 	};
-
 	const handleAttendanceChange = (studentId: number, isPresent: boolean) => {
-		setAttendanceData((prev) => ({
-			...prev,
-			[studentId]: isPresent,
-		}));
+		setAttendanceData((prev) => {
+			const existingIndex = prev.findIndex(
+				(attendance) => attendance.studentId === studentId
+			);
+			if (existingIndex !== -1) {
+				const updated = [...prev];
+				updated[existingIndex] = { studentId, isPresent };
+				return updated;
+			} else {
+				return [...prev, { studentId, isPresent }];
+			}
+		});
 	};
-
 	const openCamera = async () => {
-		setCapturedImage(null); 
+		setCapturedImage(null);
 		try {
 			const stream = await navigator.mediaDevices.getUserMedia({
 				video: {
-					facingMode: "user", 
+					facingMode: "user",
 				},
-				audio: false, 
+				audio: false,
 			});
-
-			streamRef.current = stream; 
-
+			streamRef.current = stream;
 			if (videoRef.current) {
 				videoRef.current.srcObject = stream;
 				videoRef.current.onloadedmetadata = () => {
 					videoRef.current
 						?.play()
 						.then(() => {
-							setIsCameraActive(true); 
+							setIsCameraActive(true);
 						})
 						.catch((error) => {
 							console.error("Error playing video:", error);
-							message.error(
-								"Error playing video. Please try again."
-							);
-							closeCamera(); 
+							message.error("Error playing video. Please try again.");
+							closeCamera();
 						});
 				};
 			}
@@ -266,22 +251,20 @@ const SingleGroupPage = () => {
 			message.error(
 				"Error opening camera! Please check that you have permission to use the camera."
 			);
-			closeCamera(); 
+			closeCamera();
 		}
 	};
-
 	const closeCamera = () => {
 		if (streamRef.current) {
-			streamRef.current.getTracks().forEach((track) => track.stop()); 
+			streamRef.current.getTracks().forEach((track) => track.stop());
 			streamRef.current = null;
 		}
-		setIsCameraActive(false); 
-		setCapturedImage(null); 
+		setIsCameraActive(false);
+		setCapturedImage(null);
 		if (videoRef.current) {
-			videoRef.current.srcObject = null; 
+			videoRef.current.srcObject = null;
 		}
 	};
-
 	const capturePhoto = () => {
 		if (videoRef.current && canvasRef.current) {
 			const canvas = canvasRef.current;
@@ -292,42 +275,38 @@ const SingleGroupPage = () => {
 
 			const ctx = canvas.getContext("2d");
 			if (ctx) {
-				ctx.drawImage(video, 0, 0, canvas.width, canvas.height); 
-				const imageData = canvas.toDataURL("image/jpeg", 0.9); 
-				setCapturedImage(imageData); 
-				setIsCameraActive(false); 
-				closeCamera(); 
+				ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+				const imageData = canvas.toDataURL("image/jpeg", 0.9);
+				setCapturedImage(imageData);
+				setIsCameraActive(false);
+				closeCamera();
 				message.success("Photo taken successfully!");
 			}
 		}
 	};
-
-	// Backendga rasmni yuborish funksiyasi
 	const sendPhotoToBackend = async () => {
 		if (!capturedImage) {
 			message.error("Take photo for lesson!");
 			return;
 		}
-
 		try {
 			const response = await fetch(capturedImage);
 			const blob = await response.blob();
 
 			const formData = new FormData();
-			formData.append("image", blob, "lesson_photo.jpeg"); 
+			formData.append("image", blob, "lesson_photo.jpeg");
 
-			const backendUploadUrl = "YOUR_BACKEND_UPLOAD_URL"; 
+			const backendUploadUrl = "YOUR_BACKEND_UPLOAD_URL";
 
 			const uploadResponse = await fetch(backendUploadUrl, {
 				method: "POST",
 				body: formData,
 			});
-
 			if (uploadResponse.ok) {
 				const result = await uploadResponse.json();
 				console.log("Backend response:", result);
 				message.success("Photo uploaded successfully!");
-				return result; 
+				return result;
 			} else {
 				const errorText = await uploadResponse.text();
 				console.error(
@@ -335,30 +314,25 @@ const SingleGroupPage = () => {
 					uploadResponse.status,
 					errorText
 				);
-				message.error(
-					`Error uploading photo: ${uploadResponse.status}`
-				);
-				throw new Error("Photo not uploaded"); 
+				message.error(`Error uploading photo: ${uploadResponse.status}`);
+				throw new Error("Photo not uploaded");
 			}
 		} catch (error) {
 			console.error("Unexpected error uploading photo:", error);
 			message.error("Unexpected error uploading photo!");
-			throw error; 
+			throw error;
 		}
 	};
-
 	useEffect(() => {
 		if (!isLessonModalVisible) {
-			closeCamera(); 
+			closeCamera();
 		}
-	}, [isLessonModalVisible]); 
-
+	}, [isLessonModalVisible]);
 	useEffect(() => {
 		return () => {
 			closeCamera();
 		};
-	}, []); 
-
+	}, []);
 	const studentsColumns = [
 		{
 			title: "Student",
@@ -448,7 +422,6 @@ const SingleGroupPage = () => {
 			},
 		},
 	];
-
 	const lessonsColumns = [
 		{
 			title: "Lesson name",
@@ -509,7 +482,6 @@ const SingleGroupPage = () => {
 			),
 		},
 	];
-
 	return (
 		<div className="space-y-6">
 			{/* Header */}
@@ -539,17 +511,10 @@ const SingleGroupPage = () => {
 					Start Lesson
 				</Button>
 			</div>
-
-			{/* Group Overview */}
 			<Card className="shadow-sm border border-gray-200">
 				<Row gutter={[24, 24]}>
 					<Col xs={24} lg={8}>
 						<div className="flex items-center space-x-4">
-							<Avatar
-								size={80}
-								icon={<TeamOutlined />}
-								className="bg-gradient-to-r from-blue-500 to-purple-500"
-							/>
 							<div>
 								<h2 className="text-xl font-semibold text-gray-900 mb-1">
 									{groupData.name}
@@ -564,7 +529,6 @@ const SingleGroupPage = () => {
 							</div>
 						</div>
 					</Col>
-
 					<Col xs={24} lg={16}>
 						<Row gutter={[16, 16]}>
 							<Col xs={12} sm={6}>
@@ -600,7 +564,6 @@ const SingleGroupPage = () => {
 								/>
 							</Col>
 						</Row>
-
 						<div className="mt-4">
 							<div className="text-sm text-gray-600 mb-2">Total Progress:</div>
 							<Progress
@@ -618,9 +581,7 @@ const SingleGroupPage = () => {
 						</div>
 					</Col>
 				</Row>
-
 				<Divider />
-
 				<div>
 					<h3 className="font-medium text-gray-900 mb-2">Description:</h3>
 					<p className="text-gray-600 leading-relaxed">
@@ -628,11 +589,8 @@ const SingleGroupPage = () => {
 					</p>
 				</div>
 			</Card>
-
-			{/* Tabs Content */}
 			<Card className="shadow-sm border border-gray-200">
 				<Tabs activeKey={activeTab} onChange={setActiveTab} type="card">
-					{/* Students Tab */}
 					<TabPane tab={`Students (${studentsData.length})`} key="1">
 						<Table
 							columns={studentsColumns}
@@ -642,8 +600,6 @@ const SingleGroupPage = () => {
 							scroll={{ x: 800 }}
 						/>
 					</TabPane>
-
-					{/* Teachers Tab */}
 					<TabPane tab={`Teachers (${teachersData.length})`} key="2">
 						<Row gutter={[16, 16]}>
 							{teachersData.map((teacher) => (
@@ -696,8 +652,6 @@ const SingleGroupPage = () => {
 							))}
 						</Row>
 					</TabPane>
-
-					{/* Lessons Tab */}
 					<TabPane tab={`Lessons (${lessonsData.length})`} key="3">
 						<div className="mb-4 flex justify-between items-center">
 							<Button
@@ -718,8 +672,6 @@ const SingleGroupPage = () => {
 					</TabPane>
 				</Tabs>
 			</Card>
-
-			{/* Start Lesson Modal */}
 			<Modal
 				title={
 					<div className="flex items-center space-x-2">
@@ -752,7 +704,6 @@ const SingleGroupPage = () => {
 				]}
 			>
 				<div className="space-y-6">
-					{/* Lesson Info */}
 					<div>
 						<h3 className="font-medium text-gray-900 mb-4">
 							Lesson Information
@@ -763,7 +714,9 @@ const SingleGroupPage = () => {
 								<Form.Item
 									label="Lesson name"
 									name="lessonName"
-									rules={[{ required: true, message: "Lesson name is required!" }]}
+									rules={[
+										{ required: true, message: "Lesson name is required!" },
+									]}
 								>
 									<Input placeholder="Masalan: React Components" />
 								</Form.Item>
@@ -771,7 +724,7 @@ const SingleGroupPage = () => {
 									label="Date"
 									name="lessonDate"
 									rules={[{ required: true, message: "Date is required!" }]}
-									initialValue={dayjs()} 
+									initialValue={dayjs()}
 								>
 									<DatePicker className="w-full" format="DD.MM.YYYY" />
 								</Form.Item>
@@ -781,11 +734,8 @@ const SingleGroupPage = () => {
 							</Form.Item>
 						</Form>
 					</div>
-
-					{/* Camera Section */}
 					<div>
 						<h3 className="font-medium text-gray-900 mb-4">Take Photo</h3>
-
 						{!isCameraActive && !capturedImage && (
 							<div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
 								<CameraOutlined className="text-4xl text-gray-400 mb-4" />
@@ -800,7 +750,6 @@ const SingleGroupPage = () => {
 								</Button>
 							</div>
 						)}
-
 						{isCameraActive && !capturedImage && (
 							<div className="space-y-4">
 								<div className="relative bg-black rounded-lg overflow-hidden">
@@ -808,13 +757,13 @@ const SingleGroupPage = () => {
 										ref={videoRef}
 										autoPlay
 										playsInline
-										muted 
-										className="w-full h-64 object-cover" 
+										muted
+										className="w-full h-64 object-cover"
 									></video>
 								</div>
 								<div className="flex justify-center space-x-4">
 									<Button
-										onClick={closeCamera} 
+										onClick={closeCamera}
 										className="bg-gray-500 hover:bg-gray-600 text-white"
 									>
 										Cancel
@@ -822,7 +771,7 @@ const SingleGroupPage = () => {
 									<Button
 										type="primary"
 										icon={<CameraOutlined />}
-										onClick={capturePhoto} 
+										onClick={capturePhoto}
 										className="bg-green-600 hover:bg-green-700"
 									>
 										Take photo
@@ -830,7 +779,6 @@ const SingleGroupPage = () => {
 								</div>
 							</div>
 						)}
-				
 						{capturedImage && (
 							<div className="space-y-4">
 								<div className="relative">
@@ -860,24 +808,25 @@ const SingleGroupPage = () => {
 								</div>
 							</div>
 						)}
-
-						{/* Canvas elementi har doim mavjud bo'lishi kerak, lekin yashiringan holda */}
 						<canvas ref={canvasRef} style={{ display: "none" }} />
 					</div>
-
-					{/* Attendance */}
 					<div>
 						<h3 className="font-medium text-gray-900 mb-4">Attendance</h3>
-						<div className="max-h-60 overflow-y-auto border rounded-lg">
+						<div className="max-h-60 overflow-y-auto border border-gray-300 rounded-lg [&::-webkit-scrollbar]:hidden">
 							<List
 								dataSource={studentsData}
+								className="!p-[10px]"
 								renderItem={(student) => (
 									<List.Item
 										key={student.id}
 										className="px-4 hover:bg-gray-50"
 										actions={[
 											<Switch
-												checked={attendanceData?.[student.id] !== false}
+												checked={attendanceData.some(
+													(attendance) =>
+														attendance.studentId === student.id &&
+														attendance.isPresent
+												)}
 												onChange={(checked) =>
 													handleAttendanceChange(student.id, checked)
 												}
@@ -900,8 +849,12 @@ const SingleGroupPage = () => {
 							/>
 						</div>
 						<div className="mt-2 text-sm text-gray-600">
-							Present: {Object.values(attendanceData).filter(Boolean).length} /{" "}
-							{studentsData.length}
+							Present:{" "}
+							{
+								attendanceData.filter((attendance) => attendance.isPresent)
+									.length
+							}{" "}
+							/ {studentsData.length}
 						</div>
 					</div>
 				</div>
@@ -909,5 +862,4 @@ const SingleGroupPage = () => {
 		</div>
 	);
 };
-
 export default SingleGroupPage;

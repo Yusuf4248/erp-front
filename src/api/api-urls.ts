@@ -7,10 +7,13 @@ export class ApiUrls {
 	public static LOGOUT: string = "/log-out";
 	public static BRANCHES: string = "/branches";
 	public static TEACHER: string = "/teacher";
+	public static TEACHER_GROUPS='/group-teachers/my-groups'
 	public static TEACHER_PROFILE_AVATAR = (id: number) =>
 		`${this.TEACHER}/${id}/avatar`;
 	public static GET_ALL_TEACHER_GROUPS = (id: number) =>
 		`${this.GROUP_TEACHERS}/by-teacher/${id}`;
+	public static GET_GROUP_DETAILS_FOR_TEACHER = (id: number) =>
+		`${this.GROUPS}/${id}/teacher`;
 	public static ROOMS: string = "/rooms";
 	public static LESSONS: string = "/lessons";
 	public static GROUP_LESSONS: string = this.LESSONS + "/group";
@@ -22,4 +25,5 @@ export class ApiUrls {
 		this.GROUP_STUDENTS + "/by-group";
 	public static UPDATE_LESSONS_STATUS_AND_NOTES = (id: number): string =>
 		`${this.LESSONS}/${id}/status`;
+
 }

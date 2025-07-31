@@ -18,11 +18,23 @@ export const useTeachers = (params: ParamsType | {}, id: number = 0) => {
 		queryFn: async () => teacherService.getTeacherById(id),
 	});
 
-	// const { data: teacherGroups } = useQuery({
-	// 	enabled: !!id,
-	// 	queryKey: ["teacherGroups", id],
-	// 	queryFn: async () => teacherService.getAllTeacherGroups(id),
-	// });
+	const { data: teacherGroups } = useQuery({
+		enabled: !!id,
+		queryKey: ["teacherGroups", id],
+		queryFn: async () => teacherService.getAllTeacherGroups(id),
+	});
+
+	const { data: teacherGroup } = useQuery({
+		enabled: !id,
+		queryKey: ["teacherGroups", id],
+		queryFn: async () => teacherService.getTeacherGroups(),
+	});
+
+	const { data: groupDetailsForTeacher } = useQuery({
+		enabled: !!id,
+		queryKey: ["groupDetailsForTeacher", id],
+		queryFn: async () => teacherService.getGroupDetailsForTeacher(id),
+	});
 
 	const useTeacherCreate = () => {
 		return useMutation({
@@ -61,10 +73,12 @@ export const useTeachers = (params: ParamsType | {}, id: number = 0) => {
 	return {
 		useTeacherCreate,
 		data,
-		// teacherGroups,
+		teacherGroups,
+		groupDetailsForTeacher,
 		useTeacherUpdate,
 		useTeacherDelete,
 		teacherDataById,
 		useTeacherUploadAvatar,
+		teacherGroup
 	};
 };

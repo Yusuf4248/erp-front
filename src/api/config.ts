@@ -8,6 +8,7 @@ export function apiConfig() {
 			return res;
 		} catch (error) {
 			console.log(error);
+			throw error; // Re-throw the error so React Query can handle it properly
 		}
 	}
 	async function postRequest(url: string, body: object = {}) {
@@ -19,6 +20,7 @@ export function apiConfig() {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
 			Notification("error", error?.message);
+			throw error; // Re-throw the error so React Query can handle it properly
 		}
 	}
 	async function deleteRequest(url: string, params: object = {}) {
@@ -29,6 +31,7 @@ export function apiConfig() {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
 			Notification("error", error?.message);
+			throw error; // Re-throw the error so React Query can handle it properly
 		}
 	}
 	async function updateRequest(url: string, body: object) {
@@ -39,6 +42,7 @@ export function apiConfig() {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {
 			Notification("error", error?.response?.data?.message?.message);
+			throw error; // Re-throw the error so React Query can handle it properly
 		}
 	}
 	return {

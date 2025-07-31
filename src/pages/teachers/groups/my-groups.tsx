@@ -5,7 +5,6 @@ import {
 	UserOutlined,
 } from "@ant-design/icons";
 import {
-	Avatar,
 	Badge,
 	Card,
 	Col,
@@ -15,11 +14,14 @@ import {
 	Row,
 	Select,
 	Statistic,
+	Table,
 	Tag,
 } from "antd";
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { getItem } from "@helpers";
+import { useGroups, useTeachers } from "@hooks";
 const { Option } = Select;
 const { Search } = Input;
 const TeacherGroups = () => {
@@ -27,8 +29,13 @@ const TeacherGroups = () => {
 	const [searchTerm, setSearchTerm] = useState("");
 	const [statusFilter, setStatusFilter] = useState("all");
 	const [levelFilter, setLevelFilter] = useState("all");
+	const user_id = getItem("user_id");
+	const {data} = useGroups({})
+	const { teacherDataById, teacherGroup } = useTeachers({}, +user_id!);
+	const teacherData = teacherDataById?.data?.teacher;
+	console.log("teacherData", teacherData);
+	console.log("teacherGroup", data);
 
-	// Mock groups data
 	const groupsData = [
 		{
 			id: 1,
@@ -157,8 +164,6 @@ const TeacherGroups = () => {
 			avatar: null,
 		},
 	];
-
-	// Filter groups based on search and filters
 	const filteredGroups = groupsData.filter((group) => {
 		const matchesSearch =
 			group.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -224,9 +229,118 @@ const TeacherGroups = () => {
 	};
 
 	const handleGroupClick = (groupId: any) => {
-		console.log("----------------------------");
+		console.log("Group clicked:", groupId);
+		// navigate(`/teacher/my-groups/${groupId}`);
 		navigate(`${groupId}`);
 	};
+
+	// Table columns
+	const columns = [
+		{
+			title: "Group",
+			dataIndex: "name",
+			key: "name",
+			render: (text: string, record: any) => (
+				<div className="flex items-center space-x-3">
+					<div className="font-semibold text-gray-900 hover:text-blue-600 cursor-pointer">
+						{text}
+					</div>
+					<div className="text-sm text-gray-600">{record.course}</div>
+					<div className="text-xs text-gray-500">Room: {record.room}</div>
+				</div>
+			),
+		},
+		{
+			title: "Level",
+			dataIndex: "level",
+			key: "level",
+			render: (level: string) => (
+				<Tag color={getLevelColor(level)} className="border-0">
+					{level}
+				</Tag>
+			),
+		},
+		{
+			title: "Students",
+			dataIndex: "students",
+			key: "students",
+			render: (students: number, record: any) => (
+				<div className="flex items-center space-x-2">
+					<UserOutlined className="text-gray-400 text-sm" />
+					<span className="font-medium">
+						{students}/{record.maxStudents}
+					</span>
+				</div>
+			),
+		},
+		{
+			title: "Progress",
+			dataIndex: "progress",
+			key: "progress",
+			render: (progress: number) => (
+				<div className="flex items-center space-x-2">
+					<Progress
+						percent={progress}
+						size="small"
+						className="w-20"
+						strokeColor={
+							progress > 80 ? "#52c41a" : progress > 50 ? "#1890ff" : "#faad14"
+						}
+					/>
+					{/* <span className="text-sm text-gray-600">{progress}%</span> */}
+				</div>
+			),
+		},
+		{
+			title: "Schedule",
+			dataIndex: "schedule",
+			key: "schedule",
+			render: (schedule: any, record: any) => (
+				<div className="space-y-1">
+					<div className="flex items-center space-x-1">
+						<CalendarOutlined className="text-blue-500 text-sm" />
+						<span className="text-sm">{formatSchedule(schedule)}</span>
+					</div>
+					<div className="flex items-center space-x-1">
+						<ClockCircleOutlined className="text-gray-400 text-sm" />
+						<span className="text-xs text-gray-500">
+							Next: {record.nextLesson}
+						</span>
+					</div>
+				</div>
+			),
+		},
+		{
+			title: "Status",
+			dataIndex: "status",
+			key: "status",
+			render: (status: string) => {
+				const statusConfig = getStatusConfig(status);
+				return (
+					<div
+						className={`inline-block px-3 py-1 rounded-full ${statusConfig.bgColor}`}
+					>
+						<span className={`text-sm font-medium ${statusConfig.textColor}`}>
+							{statusConfig.text}
+						</span>
+					</div>
+				);
+			},
+		},
+		{
+			title: "Duration",
+			dataIndex: "startDate",
+			key: "duration",
+			render: (startDate: string, record: any) => (
+				<div className="text-sm text-gray-600">
+					<div>{new Date(startDate).toLocaleDateString()}</div>
+					<div className="text-xs text-gray-500">
+						to {new Date(record.endDate).toLocaleDateString()}
+					</div>
+				</div>
+			),
+		},
+	];
 
 	return (
 		<div className="space-y-6">
@@ -322,141 +436,45 @@ const TeacherGroups = () => {
 				</div>
 			</Card>
 
-			{/* Groups Grid */}
-			{filteredGroups.length > 0 ? (
-				<Row gutter={[16, 16]}>
-					{filteredGroups.map((group: any) => {
-						const statusConfig = getStatusConfig(group.status);
-
-						return (
-							<Col xs={24} lg={12} xl={8} key={group.id}>
-								<Card
-									className="hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-200 group"
-									onClick={() => handleGroupClick(group.id)}
-								>
-									{/* Card Header */}
-									<div className="flex items-start justify-between mb-4">
-										<div className="flex items-center space-x-3">
-											<Avatar
-												size={48}
-												icon={<TeamOutlined />}
-												className="bg-gradient-to-r from-blue-500 to-purple-500"
-											/>
-											<div>
-												<h3 className="font-semibold text-lg text-gray-900 group-hover:text-blue-600 transition-colors">
-													{group.name}
-												</h3>
-												<p className="text-sm text-gray-600">{group.course}</p>
-											</div>
-										</div>
-										<div
-											className={`px-2 py-1 rounded-full ${statusConfig.bgColor}`}
-										>
-											<span
-												className={`text-xs font-medium ${statusConfig.textColor}`}
-											>
-												{statusConfig.text}
-											</span>
-										</div>
-									</div>
-
-									{/* Course Info */}
-									<div className="space-y-3 mb-4">
-										<div className="flex items-center justify-between">
-											<span className="text-sm text-gray-600">Level:</span>
-											<Tag
-												color={getLevelColor(group.level)}
-												className="border-0"
-											>
-												{group.level}
-											</Tag>
-										</div>
-
-										<div className="flex items-center justify-between">
-											<span className="text-sm text-gray-600">Students:</span>
-											<div className="flex items-center space-x-1">
-												<UserOutlined className="text-gray-400 text-xs" />
-												<span className="text-sm font-medium">
-													{group.students}/{group.maxStudents}
-												</span>
-											</div>
-										</div>
-
-										<div className="flex items-center justify-between">
-											<span className="text-sm text-gray-600">Progress:</span>
-											<div className="flex items-center space-x-2">
-												<Progress
-													percent={group.progress}
-													size="small"
-													className="w-16"
-													strokeColor={
-														group.progress > 80
-															? "#52c41a"
-															: group.progress > 50
-															? "#1890ff"
-															: "#faad14"
-													}
-												/>
-												{/* <span className="text-xs text-gray-600">
-													{group.progress}%
-												</span> */}
-											</div>
-										</div>
-									</div>
-
-									{/* Schedule */}
-									<div className="bg-gray-50 rounded-lg p-3 mb-4">
-										<div className="flex items-center space-x-2 mb-2">
-											<CalendarOutlined className="text-blue-500" />
-											<span className="text-sm font-medium text-gray-900">
-												Schedule
-											</span>
-										</div>
-										<p className="text-sm text-gray-600 mb-1">
-											{formatSchedule(group.schedule)}
-										</p>
-										<div className="flex items-center space-x-2 text-xs text-gray-500">
-											<ClockCircleOutlined />
-											<span>Next lesson: {group.nextLesson}</span>
-										</div>
-									</div>
-
-									{/* Description */}
-									<p className="text-sm text-gray-600 line-clamp-2">
-										{group.description}
+			<Card className="shadow-sm border border-gray-200">
+				{filteredGroups.length > 0 ? (
+					<Table
+						columns={columns}
+						dataSource={filteredGroups}
+						rowKey="id"
+						pagination={{
+							pageSize: 10,
+							showSizeChanger: true,
+							showQuickJumper: true,
+							showTotal: (total, range) =>
+								`${range[0]}-${range[1]} of ${total} groups`,
+						}}
+						onRow={(record) => ({
+							onClick: () => handleGroupClick(record.id),
+							className: "cursor-pointer hover:bg-gray-50",
+						})}
+						scroll={{ x: 1200 }}
+						className="custom-table"
+					/>
+				) : (
+					<div className="text-center py-12">
+						<Empty
+							description={
+								<div>
+									<p className="text-gray-500 mb-2">No groups found</p>
+									<p className="text-sm text-gray-400">
+										{searchTerm ||
+										statusFilter !== "all" ||
+										levelFilter !== "all"
+											? "Change search criteria"
+											: "You don't have any groups yet"}
 									</p>
-
-									{/* Room Info */}
-									<div className="mt-3 pt-3 border-t border-gray-200">
-										<div className="flex items-center justify-between text-xs text-gray-500">
-											<span>Room: {group.room}</span>
-											<span>
-												{new Date(group.startDate).toLocaleDateString()} -{" "}
-												{new Date(group.endDate).toLocaleDateString()}
-											</span>
-										</div>
-									</div>
-								</Card>
-							</Col>
-						);
-					})}
-				</Row>
-			) : (
-				<Card className="text-center py-12">
-					<Empty
-						description={
-							<div>
-								<p className="text-gray-500 mb-2">No groups found</p>
-								<p className="text-sm text-gray-400">
-									{searchTerm || statusFilter !== "all" || levelFilter !== "all"
-										? "Change search criteria or"
-										: ""}
-								</p>
-							</div>
-						}
-					></Empty>
-				</Card>
-			)}
+								</div>
+							}
+						/>
+					</div>
+				)}
+			</Card>
 		</div>
 	);
 };

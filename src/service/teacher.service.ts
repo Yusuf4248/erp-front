@@ -15,18 +15,28 @@ export const teacherService = {
 		const res = await apiConfig().getRequest(ApiUrls.GET_ALL_TEACHER_GROUPS(id));
 		return res;
 	},
+	async getTeacherGroups() {
+		const res = await apiConfig().getRequest(ApiUrls.TEACHER_GROUPS);
+		return res;
+	},
+
+	async getGroupDetailsForTeacher(id: number) {
+		const res = await apiConfig().getRequest(ApiUrls.GET_GROUP_DETAILS_FOR_TEACHER(id));
+		return res;
+	},
 
 	async deleteTeacher(id: number) {
 		const res = await apiConfig().deleteRequest(`${ApiUrls.TEACHER}/${id}`);
 		return res;
 	},
+
 	async updateTeacher(id: number, body: object) {
 		const res = await apiConfig().updateRequest(
 			`${ApiUrls.TEACHER}/${id}`,
 			body
 		);
 		return res;
-	},
+	},	
 
 	
 	async createTeacher(body: object) {

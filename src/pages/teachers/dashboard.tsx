@@ -1,8 +1,6 @@
 import {
 	BookOutlined,
-	EditOutlined,
 	EnvironmentOutlined,
-	EyeOutlined,
 	MailOutlined,
 	PhoneOutlined,
 	TeamOutlined,
@@ -10,28 +8,17 @@ import {
 	UserOutlined,
 } from "@ant-design/icons";
 import { getItem } from "@helpers";
-import {
-	Avatar,
-	Badge,
-	Button,
-	Card,
-	Col,
-	Progress,
-	Row,
-	Space,
-	Table,
-	Tag,
-	Timeline,
-	Tooltip,
-} from "antd";
-import { useTeachers } from "../../hooks";
-
+import { useGroups, useTeachers } from "@hooks";
+import { Avatar, Badge, Card, Col, Progress, Row, Table, Timeline } from "antd";
 const TeacherDashboard = () => {
 	const user_id = getItem("user_id");
+	const { data } = useGroups({});
+	const allGroups = data?.data?.data || [];
 	const { teacherDataById } = useTeachers({}, +user_id!);
 	const teacherData = teacherDataById?.data?.teacher;
-	// console.log("teacherGroupsData", teacherGroups);
-
+	// console.log("teacherData", teacherData);
+	// console.log("group", allGroups);
+	// console.log("data", data);
 	const stats = [
 		{
 			title: "All Students",
@@ -78,38 +65,23 @@ const TeacherDashboard = () => {
 			nextLesson: "2025-01-26",
 			level: "Intermediate",
 		},
-		{
-			key: "2",
-			name: "React Advanced #8",
-			students: 12,
-			progress: 45,
-			status: "active",
-			schedule: "Sesh, Pay, Shan 20:00",
-			nextLesson: "2025-01-25",
-			level: "Advanced",
-		},
-		{
-			key: "3",
-			name: "JavaScript Basics #24",
-			students: 25,
-			progress: 90,
-			status: "finishing",
-			schedule: "Har kuni 16:00",
-			nextLesson: "2025-01-24",
-			level: "Beginner",
-		},
-		{
-			key: "4",
-			name: "Vue.js Masterclass #5",
-			students: 15,
-			progress: 30,
-			status: "active",
-			schedule: "Dush, Juma 19:00",
-			nextLesson: "2025-01-27",
-			level: "Intermediate",
-		},
+		...allGroups.map((group: any) => {
+			return {
+				key: group?.id,
+				name: group?.name,
+				course: group?.course?.title,
+				students: group?.students?.length || 0,
+				progress:
+					group?.lessons?.length /
+					group?.lessons?.map((lesson: any) => lesson.status == "completed")
+						.length,
+				status: group?.status,
+				level: group?.status,
+				nextLesson: group?.next_lesson,
+				schedule: group.schedule,
+			};
+		}),
 	];
-
 	const recentActivities = [
 		{
 			time: "10:30",
@@ -147,6 +119,14 @@ const TeacherDashboard = () => {
 			),
 		},
 		{
+			title: "Course",
+			dataIndex: "course",
+			key: "course",
+			render: (course: any) => (
+				<div className="font-medium text-gray-900">{course?.name}</div>
+			),
+		},
+		{
 			title: "Students",
 			dataIndex: "students",
 			key: "students",
@@ -156,19 +136,6 @@ const TeacherDashboard = () => {
 					<span>{count}</span>
 				</div>
 			),
-		},
-		{
-			title: "Level",
-			dataIndex: "level",
-			key: "level",
-			render: (level: any) => {
-				const colors = {
-					Beginner: "green",
-					Intermediate: "blue",
-					Advanced: "purple",
-				};
-				return <Tag color={colors[level as keyof typeof colors]}>{level}</Tag>;
-			},
 		},
 		{
 			title: "Progress",
@@ -198,8 +165,8 @@ const TeacherDashboard = () => {
 				};
 				return (
 					<Badge
-						status={config[status as keyof typeof config].color as any}
-						text={config[status as keyof typeof config].text}
+						status={config[status as keyof typeof config]?.color as any}
+						text={config[status as keyof typeof config]?.text}
 					/>
 				);
 			},
@@ -210,20 +177,6 @@ const TeacherDashboard = () => {
 			key: "nextLesson",
 			render: (date: any) => (
 				<div className="text-sm text-gray-600">{date}</div>
-			),
-		},
-		{
-			title: "Actions",
-			key: "actions",
-			render: (_: any) => (
-				<Space size="small">
-					<Tooltip title="View">
-						<Button type="text" icon={<EyeOutlined />} size="small" />
-					</Tooltip>
-					<Tooltip title="Edit">
-						<Button type="text" icon={<EditOutlined />} size="small" />
-					</Tooltip>
-				</Space>
 			),
 		},
 	];
@@ -261,7 +214,6 @@ const TeacherDashboard = () => {
 						</div>
 					</div>
 				</div>
-
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pt-6 border-t border-white border-opacity-20">
 					<div className="flex items-center text-blue-100">
 						<MailOutlined className="mr-2" />
@@ -275,7 +227,7 @@ const TeacherDashboard = () => {
 						<EnvironmentOutlined className="mr-2" />
 						<span className="text-sm">
 							{teacherData?.branches
-								.map((branch: any) => branch.name)
+								.map((branch: any) => branch?.name)
 								.join(" | ")}
 						</span>
 					</div>
@@ -285,7 +237,7 @@ const TeacherDashboard = () => {
 				{stats.map((stat, index) => (
 					<Col xs={24} sm={12} lg={6} key={index}>
 						<Card
-							className={`${stat.color} border hover:shadow-lg transition-all duration-300 cursor-pointer group`}
+							className={`${stat?.color} border hover:shadow-lg transition-all duration-300 cursor-pointer group`}
 						>
 							<div className="flex items-center justify-between">
 								<div>

@@ -4,6 +4,14 @@ import { defineConfig } from "vite";
 // https://vite.dev/config/
 export default defineConfig({
 	plugins: [react(), tailwindcss()],
+	server: {
+		host: true,
+		port: 5173,
+		strictPort: true,
+		hmr: {
+			port: 5173,
+		},
+	},
 	resolve: {
 		alias: [
 			{ find: "@", replacement: "/src/" },
