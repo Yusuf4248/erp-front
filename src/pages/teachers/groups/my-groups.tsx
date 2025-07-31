@@ -31,7 +31,7 @@ const TeacherGroups = () => {
 	const [levelFilter, setLevelFilter] = useState("all");
 	const user_id = getItem("user_id");
 	const {data} = useGroups({})
-	const { teacherDataById, teacherGroup } = useTeachers({}, +user_id!);
+	const { teacherDataById } = useTeachers({}, +user_id!);
 	const teacherData = teacherDataById?.data?.teacher;
 	console.log("teacherData", teacherData);
 	console.log("teacherGroup", data);
