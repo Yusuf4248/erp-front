@@ -7,17 +7,16 @@ import {
 	MailOutlined,
 	PhoneOutlined,
 	PlayCircleOutlined,
-	PlusOutlined,
 	StarFilled,
 	UserOutlined,
 } from "@ant-design/icons";
+import { useAttendance, useLessons, useTeachers } from "@hooks";
 import {
 	Avatar,
 	Badge,
 	Button,
 	Card,
 	Col,
-	DatePicker,
 	Divider,
 	Form,
 	Input,
@@ -30,13 +29,22 @@ import {
 	Table,
 	Tabs,
 	Tag,
+	Tooltip,
 	message,
 } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
 const { TabPane } = Tabs;
 const { TextArea } = Input;
 const SingleGroupPage = () => {
+	const { id } = useParams();
+	const { groupDetailsForTeacher } = useTeachers({}, +id!);
+	const groupDatas = groupDetailsForTeacher?.data;
+	const { useLessonUpdateStatusAndNotes } = useLessons({});
+	const { mutate: updateLessonStatusAndNote } = useLessonUpdateStatusAndNotes();
+	const { useAttendanceBulkUpdate } = useAttendance();
+	const { mutate: updateAttendance } = useAttendanceBulkUpdate();
 	const [activeTab, setActiveTab] = useState("1");
 	const [isLessonModalVisible, setIsLessonModalVisible] = useState(false);
 	const [attendanceData, setAttendanceData] = useState<
@@ -53,129 +61,140 @@ const SingleGroupPage = () => {
 	const streamRef = useRef<MediaStream | null>(null);
 	const groupData = {
 		id: 1,
-		name: "Frontend Bootcamp #12",
-		course: "Frontend Development",
-		level: "Intermediate",
-		students: 18,
-		maxStudents: 20,
-		progress: 75,
-		status: "active",
+		name: groupDatas?.group?.name || "No Name",
+		course: groupDatas?.group?.course?.title || "No Course",
+		level: groupDatas?.group?.level || "Intermediate",
+		students: Array.isArray(groupDatas?.groupStudents)
+			? groupDatas.groupStudents.filter(
+					(student: any) => student.status === true
+			  ).length
+			: 0,
+		maxStudents: Array.isArray(groupDatas?.groupStudents)
+			? groupDatas.groupStudents.length
+			: 0,
+		progress:
+			Array.isArray(groupDatas?.lessons) && groupDatas.lessons.length > 0
+				? +(
+						(groupDatas.lessons.filter(
+							(lesson: any) => lesson.status === "completed"
+						).length /
+							groupDatas.lessons.length) *
+						100
+				  ).toFixed(0)
+				: 0,
+		status: groupDatas?.group?.status || "active",
 		schedule: {
-			days: ["Mon", "Wed", "Fri"],
-			startTime: "18:00",
-			endTime: "20:00",
+			days:
+				groupDatas?.group?.course?.lessons_in_a_week == 3
+					? ["Mon", "Wed", "Fri"]
+					: ["Mon", "Tue", "Wed", "Thu", "Fri"],
+			startTime: groupDatas?.group?.start_time?.slice(0, 5) || "18:00",
+			endTime: groupDatas?.group?.end_time?.slice(0, 5) || "20:00",
 		},
-		startDate: "2024-10-15",
-		endDate: "2025-02-15",
-		description: "Frontend Development Bootcamp",
-		room: "A-201",
-		price: "1,200,000",
-		totalLessons: 48,
-		completedLessons: 36,
-		avatar: null,
+		startDate: groupDatas?.group?.start_date || "2024-01-01",
+		endDate: groupDatas?.group?.end_date || "2024-12-31",
+		room: groupDatas?.group?.room || "No Data",
+		price: groupDatas?.group?.course?.price || "0",
+		totalLessons: Array.isArray(groupDatas?.lessons)
+			? groupDatas.lessons.length
+			: 0,
+		completedLessons: Array.isArray(groupDatas?.lessons)
+			? groupDatas.lessons.filter(
+					(lesson: any) => lesson.status === "completed"
+			  ).length
+			: 0,
+		description: groupDatas?.group?.course?.description || "No Data",
 	};
 	const teachersData = [
-		{
-			id: 1,
-			name: "Sardor Rahimov",
-			role: "Main Teacher",
-			email: "sardor@crm.uz",
-			phone: "+998 90 123 45 67",
-			rating: 4.8,
-			experience: "3 yil",
-			avatar: null,
-			isMain: true,
-		},
-		{
-			id: 2,
-			name: "Dilshod Karimov",
-			role: "Assistant Teacher",
-			email: "dilshod@crm.uz",
-			phone: "+998 91 234 56 78",
-			rating: 4.6,
-			experience: "2 yil",
-			avatar: null,
-			isMain: false,
-		},
+		// {
+		// 	id: 1,
+		// 	name: "Sardor Rahimov",
+		// 	role: "Main Teacher",
+		// 	email: "sardor@crm.uz",
+		// 	phone: "+998 90 123 45 67",
+		// 	rating: 4.8,
+		// 	experience: "3 yil",
+		// 	avatar: null,
+		// 	isMain: true,
+		// },
+		...(Array.isArray(groupDatas?.groupTeachers)
+			? groupDatas.groupTeachers.map((teacher: any) => {
+					return {
+						id: teacher.id,
+						name: teacher.teacher.first_name + " " + teacher.teacher.last_name,
+						email: teacher.teacher.email,
+						phone: teacher.teacher.phone,
+						rating: teacher.teacher.rating || "N/A",
+						avatar: teacher.teacher.avatar_url,
+						isMain: teacher.teacher.role === "main teacher",
+						experience:
+							new Date().getFullYear() -
+							new Date(teacher.teacher.created_at).getFullYear() +
+							" yil",
+					};
+			  })
+			: []),
 	];
 	const studentsData = [
-		{
-			id: 1,
-			name: "Alisher Karimov",
-			email: "alisher@gmail.com",
-			phone: "+998 90 111 22 33",
-			joinDate: "2024-10-15",
-			progress: 85,
-			attendance: 92,
-			status: "active",
-			avatar: null,
-			rating: 4.5,
-		},
-		{
-			id: 2,
-			name: "Mohira Toshmatova",
-			email: "mohira@gmail.com",
-			phone: "+998 91 222 33 44",
-			joinDate: "2024-10-15",
-			progress: 78,
-			attendance: 88,
-			status: "active",
-			avatar: null,
-			rating: 4.2,
-		},
-		{
-			id: 3,
-			name: "Jasur Abdullayev",
-			email: "jasur@gmail.com",
-			phone: "+998 93 333 44 55",
-			joinDate: "2024-10-20",
-			progress: 92,
-			attendance: 95,
-			status: "active",
-			avatar: null,
-			rating: 4.8,
-		},
-		{
-			id: 4,
-			name: "Nigora Yunusova",
-			email: "nigora@gmail.com",
-			phone: "+998 94 444 55 66",
-			joinDate: "2024-10-18",
-			progress: 70,
-			attendance: 80,
-			status: "warning",
-			avatar: null,
-			rating: 3.9,
-		},
+		// {
+		// 	id: 1,
+		// 	name: "Alisher Karimov",
+		// 	email: "alisher@gmail.com",
+		// 	phone: "+998 90 111 22 33",
+		// 	joinDate: "2024-10-15",
+		// 	progress: 85,
+		// 	attendance: 92,
+		// 	status: "active",
+		// 	avatar: null,
+		// 	rating: 4.5,
+		// },
+		...(Array.isArray(groupDatas?.groupStudents)
+			? groupDatas.groupStudents.map((student: any) => {
+					return {
+						id: student.id,
+						name: student.student.first_name + " " + student.student.last_name,
+						email: student.student.email,
+						phone: student.student.phone,
+						status: student.student.is_active ? "active" : "inactive",
+						attendance: +(
+							(student.student.attendance.filter(
+								(attendance: any) => attendance.status === "present"
+							).length /
+								student.student.attendance.length) *
+							100
+						).toFixed(0),
+						rating: student.student.rating || "N/A",
+						avatar: student.student.avatar_url,
+						joinDate: student.student.created_at,
+					};
+			  })
+			: []),
 	];
 	const lessonsData = [
-		{
-			id: 1,
-			title: "HTML Asoslari",
-			date: "2024-10-15",
-			time: "18:00-20:00",
-			status: "completed",
-			videoUrl: "https://example.com/video1",
-			attendance: 18,
-		},
-		{
-			id: 2,
-			title: "CSS va Flexbox",
-			date: "2024-10-17",
-			time: "18:00-20:00",
-			status: "completed",
-			videoUrl: "https://example.com/video2",
-			attendance: 17,
-		},
-		{
-			id: 3,
-			title: "JavaScript Variables",
-			date: "2024-10-20",
-			time: "18:00-20:00",
-			status: "upcoming",
-			videoUrl: null,
-			attendance: 0,
-		},
+		// {
+		// 	id: 1,
+		// 	title: "HTML Asoslari",
+		// 	date: "2024-10-15",
+		// 	time: "18:00-20:00",
+		// 	status: "completed",
+		// 	videoUrl: "https://example.com/video1",
+		// 	attendance: 18,
+		// },
+		...(Array.isArray(groupDatas?.lessons)
+			? groupDatas.lessons.map((lesson: any) => {
+					return {
+						id: lesson.id,
+						title: lesson.title,
+						date: lesson.date,
+						time:
+							groupDatas?.group?.start_time?.slice(0, 5) +
+							"-" +
+							groupDatas?.group?.end_time?.slice(0, 5),
+						status: lesson.status,
+						description: lesson.notes,
+					};
+			  })
+			: []),
 	];
 	const handleStartLesson = () => {
 		setIsLessonModalVisible(true);
@@ -187,9 +206,35 @@ const SingleGroupPage = () => {
 	};
 	const handleLessonSubmit = async () => {
 		try {
+			const currentLesson = lessonsData.find(
+				(lesson: any) =>
+					lesson.date.split("T")[0] ===
+					new Date().toISOString().split("T")[0]
+			);
+			// console.log(lessonsData, new Date().toISOString().split("T")[0]);
+			if (!currentLesson) {
+				message.error("No lesson found for today!");
+				return;
+			}
 			const values = await form.validateFields();
+			const data = {
+				note: values.lessonName,
+				status: "in_progress",
+			};
+			updateLessonStatusAndNote({ id: currentLesson?.id, data });
+			updateAttendance({
+				lessonTitle: values.lessonName,
+				lessonId: currentLesson?.id,
+				students: attendanceData.map((att) => {
+					return {
+						studentId: att.studentId,
+						status: att.isPresent ? "came" : "did not came",
+					};
+				}),
+			});
 			console.log("Lesson data:", values);
 			console.log("Attendance:", attendanceData);
+			console.log(currentLesson);
 			// if (capturedImage) {
 			// 	await sendPhotoToBackend();
 			// } else {
@@ -360,23 +405,6 @@ const SingleGroupPage = () => {
 			render: (phone: string) => <span className="text-gray-600">{phone}</span>,
 		},
 		{
-			title: "Progress",
-			dataIndex: "progress",
-			key: "progress",
-			render: (progress: number) => (
-				<div className="flex items-center space-x-2">
-					<Progress
-						percent={progress}
-						size="small"
-						className="w-20"
-						strokeColor={
-							progress > 80 ? "#52c41a" : progress > 60 ? "#1890ff" : "#faad14"
-						}
-					/>
-				</div>
-			),
-		},
-		{
 			title: "Attendance",
 			dataIndex: "attendance",
 			key: "attendance",
@@ -432,6 +460,18 @@ const SingleGroupPage = () => {
 			),
 		},
 		{
+			title: "Desc",
+			dataIndex: "description",
+			key: "description",
+			render: (description: string) => (
+				<Tooltip title={description}>
+					{description.length > 100
+						? description.slice(0, 100) + "..."
+						: description}
+				</Tooltip>
+			),
+		},
+		{
 			title: "Date",
 			dataIndex: "date",
 			key: "date",
@@ -454,8 +494,9 @@ const SingleGroupPage = () => {
 			render: (status: string) => {
 				const config = {
 					completed: { color: "success", text: "Completed" },
-					upcoming: { color: "processing", text: "Upcoming" },
+					upcoming: { color: "processing", text: "in_progress" },
 					cancelled: { color: "error", text: "Cancelled" },
+					new: { color: "error", text: "New" },
 				};
 				type StatusKey = keyof typeof config;
 				const statusKey = status as StatusKey;
@@ -470,7 +511,7 @@ const SingleGroupPage = () => {
 			},
 		},
 		{
-			title: "Attendance",
+			title: "Att",
 			dataIndex: "attendance",
 			key: "attendance",
 			render: (attendance: number, record: any) => (
@@ -484,7 +525,6 @@ const SingleGroupPage = () => {
 	];
 	return (
 		<div className="space-y-6">
-			{/* Header */}
 			<div className="flex items-center justify-between">
 				<div className="flex items-center space-x-4">
 					<Button
@@ -501,15 +541,21 @@ const SingleGroupPage = () => {
 						<p className="text-gray-600">{groupData.course}</p>
 					</div>
 				</div>
+				<div className="flex items-center space-x-2 flex-col">
 				<Button
 					type="primary"
 					icon={<PlayCircleOutlined />}
 					onClick={handleStartLesson}
 					size="large"
 					className="bg-green-600 hover:bg-green-700"
+					disabled={groupDatas?.data.isAttended}
 				>
 					Start Lesson
 				</Button>
+				<span className={`text-sm ${groupDatas?.data.isAttended ? "text-green-500" : "text-red-500"}`}>
+					{groupDatas?.data.isAttended ? "Lesson started" : "Lesson not started"}
+				</span>
+				</div>
 			</div>
 			<Card className="shadow-sm border border-gray-200">
 				<Row gutter={[24, 24]}>
@@ -614,6 +660,9 @@ const SingleGroupPage = () => {
 												icon={<UserOutlined />}
 												src={teacher.avatar}
 												className="bg-blue-500"
+												style={{
+													marginRight: "10px",
+												}}
 											/>
 											<div className="flex-1">
 												<div className="flex items-center space-x-2 mb-1">
@@ -623,6 +672,11 @@ const SingleGroupPage = () => {
 													{teacher.isMain && (
 														<Tag color="gold" className="text-xs px-2 py-0.5">
 															Main
+														</Tag>
+													)}
+													{!teacher.isMain && (
+														<Tag color="blue" className="text-xs px-2 py-0.5">
+															Assistant
 														</Tag>
 													)}
 												</div>
@@ -653,7 +707,7 @@ const SingleGroupPage = () => {
 						</Row>
 					</TabPane>
 					<TabPane tab={`Lessons (${lessonsData.length})`} key="3">
-						<div className="mb-4 flex justify-between items-center">
+						{/* <div className="mb-4 flex justify-between items-center">
 							<Button
 								type="primary"
 								icon={<PlusOutlined />}
@@ -662,12 +716,13 @@ const SingleGroupPage = () => {
 							>
 								New Lesson
 							</Button>
-						</div>
+						</div> */}
 						<Table
 							columns={lessonsColumns}
 							dataSource={lessonsData}
 							rowKey="id"
 							pagination={{ pageSize: 10 }}
+							scroll={{ x: "max-content", y: 300 }}
 						/>
 					</TabPane>
 				</Tabs>
@@ -718,15 +773,7 @@ const SingleGroupPage = () => {
 										{ required: true, message: "Lesson name is required!" },
 									]}
 								>
-									<Input placeholder="Masalan: React Components" />
-								</Form.Item>
-								<Form.Item
-									label="Date"
-									name="lessonDate"
-									rules={[{ required: true, message: "Date is required!" }]}
-									initialValue={dayjs()}
-								>
-									<DatePicker className="w-full" format="DD.MM.YYYY" />
+									<Input placeholder="For example: React Components" />
 								</Form.Item>
 							</div>
 							<Form.Item label="Lesson description" name="lessonDescription">
@@ -791,8 +838,8 @@ const SingleGroupPage = () => {
 								<div className="flex justify-center space-x-4">
 									<Button
 										onClick={() => {
-											setCapturedImage(null); // Olingan rasmni tozalash
-											openCamera(); // Kamerani qayta ochish
+											setCapturedImage(null);
+											openCamera();
 										}}
 										className="bg-orange-500 hover:bg-orange-600 text-white"
 									>
@@ -800,7 +847,7 @@ const SingleGroupPage = () => {
 									</Button>
 									<Button
 										type="primary"
-										onClick={sendPhotoToBackend} // Rasmni backendga yuborish
+										onClick={sendPhotoToBackend}
 										className="bg-green-600 hover:bg-green-700"
 									>
 										Tasdiqlash va yuklash

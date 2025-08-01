@@ -1,5 +1,6 @@
 import {
 	Admin,
+	ForgotPassword,
 	Groups,
 	NotFound,
 	Rooms,
@@ -34,24 +35,11 @@ const Router = () => {
 		createRoutesFromElements(
 			<>
 				<Route path="/" element={<App />}>
-					<Route
-						index
-						element={
-							<ProtectLogin>
-								<SignIn />
-							</ProtectLogin>
-						}
-					/>
+					<Route index element={<ProtectLogin><SignIn/></ProtectLogin>}/>
 					<Route path="sign-up" element={<SignUp />} />
+					<Route path="forgot-password" element={<ForgotPassword />} />
 					{/* ADMIN */}
-					<Route
-						path="admin"
-						element={
-							<ProtectLayout>
-								<Admin />
-							</ProtectLayout>
-						}
-					>
+					<Route path="admin" element={<ProtectLayout><Admin/></ProtectLayout>}>
 						<Route path="dashboard" element={<Dashboard />} />
 						<Route path="groups" element={<Groups />} />
 						<Route path="groups/:id" element={<SingleGroup />} />
@@ -64,20 +52,12 @@ const Router = () => {
 					{/* STUDENT */}
 					<Route path="student" element={<Student />}></Route>
 					{/* Teacher */}
-					<Route
-						path="teacher"
-						element={
-							<ProtectLayout>
-								<TeachersLayout />
-							</ProtectLayout>
-						}
-					>
+					<Route path="teacher" element={<ProtectLayout><TeachersLayout /></ProtectLayout>}>
 						<Route path="dashboard" element={<TeacherDashboard />} />
 						<Route path="me" element={<TeacherProfile />} />
 						<Route path="my-groups" element={<TeacherGroups />} />
 						<Route path="my-groups/:id" element={<TeacherSingleGroupPage />} />
 					</Route>
-
 					<Route path="worker" element={<Worker />} />
 					<Route path="*" element={<NotFound />} />
 				</Route>

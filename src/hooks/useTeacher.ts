@@ -5,7 +5,7 @@ import type { ParamsType } from "@types";
 const hasPageAndLimit = (p: any): p is { page: any; limit: any } =>
 	p && typeof p.page !== "undefined" && typeof p.limit !== "undefined";
 
-export const useTeachers = (params: ParamsType | {}, id: number = 0) => {
+export const useTeachers = (params: ParamsType | {}, id: number = 0,) => {
 	const queryClient = useQueryClient();
 	const { data } = useQuery({
 		enabled: hasPageAndLimit(params),
@@ -18,15 +18,15 @@ export const useTeachers = (params: ParamsType | {}, id: number = 0) => {
 		queryFn: async () => teacherService.getTeacherById(id),
 	});
 
-	const { data: teacherGroups } = useQuery({
-		enabled: !!id,
-		queryKey: ["teacherGroups", id],
-		queryFn: async () => teacherService.getAllTeacherGroups(id),
-	});
+	// const { data: teacherGroups } = useQuery({
+	// 	enabled: !!id,
+	// 	queryKey: ["teacherGroups", id],
+	// 	queryFn: async () => teacherService.getAllTeacherGroups(id),
+	// });
 
 	const { data: teacherGroup } = useQuery({
 		enabled: !id,
-		queryKey: ["teacherGroups", id],
+		queryKey: ["teacherGroups"],
 		queryFn: async () => teacherService.getTeacherGroups(),
 	});
 
@@ -73,7 +73,7 @@ export const useTeachers = (params: ParamsType | {}, id: number = 0) => {
 	return {
 		useTeacherCreate,
 		data,
-		teacherGroups,
+		// teacherGroups,
 		groupDetailsForTeacher,
 		useTeacherUpdate,
 		useTeacherDelete,

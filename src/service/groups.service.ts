@@ -29,6 +29,13 @@ export const groupsService = {
 		);
 		return res;
 	},
+	async getGroupStudentsById(id: number) {
+		const res = await apiConfig().getRequest(
+			`${ApiUrls.GET_GROUP_STUDENTS_BY_GROUP_ID}/${id}`
+		);
+		return res;
+	},
+
 	async deleteGroup(id: number) {
 		const res = await apiConfig().deleteRequest(`${ApiUrls.GROUPS}/${id}`);
 		return res;

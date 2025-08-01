@@ -8,21 +8,63 @@ import {
 	UserOutlined,
 } from "@ant-design/icons";
 import { getItem } from "@helpers";
-import { useGroups, useTeachers } from "@hooks";
+import { useTeachers } from "@hooks";
 import { Avatar, Badge, Card, Col, Progress, Row, Table, Timeline } from "antd";
+import { useEffect, useMemo, useState } from "react"
+const useMultipleGroupDetails = (groupIds: number[]) => {
+	const [groupDetails, setGroupDetails] = useState<any[]>([]);
+	const [loading, setLoading] = useState(false);
+	useEffect(() => {
+		if (!groupIds.length) return;
+		const fetchGroupDetails = async () => {
+			setLoading(true);
+			const promises = groupIds.map(async (groupId) => {
+				try {
+					const { teacherService } = await import("@service");
+					const response = await teacherService.getGroupDetailsForTeacher(
+						groupId
+					);
+					return { groupId, data: response?.data };
+				} catch (error) {
+					console.error(
+						`Error fetching group details for group ${groupId}:`,
+						error
+					);
+					return { groupId, data: null };
+				}
+			});
+			try {
+				const results = await Promise.all(promises);
+				setGroupDetails(results);
+			} catch (error) {
+				console.error("Error fetching group details:", error);
+			} finally {
+				setLoading(false);
+			}
+		};
+		fetchGroupDetails();
+	}, [groupIds]);
+
+	return { groupDetails, loading };
+};
 const TeacherDashboard = () => {
 	const user_id = getItem("user_id");
-	const { data } = useGroups({});
-	const allGroups = data?.data?.data || [];
 	const { teacherDataById } = useTeachers({}, +user_id!);
 	const teacherData = teacherDataById?.data?.teacher;
-	// console.log("teacherData", teacherData);
-	// console.log("group", allGroups);
-	// console.log("data", data);
+	const { teacherGroup } = useTeachers({});
+	const teacherGroups = teacherGroup?.data || [];
+	const groupIds = useMemo(() => {
+		if (!Array.isArray(teacherGroups)) return [];
+		return teacherGroups
+			.filter((group) => group?.group?.id)
+			.map((group) => group?.group?.id);
+	}, [teacherGroups]);
+	const { groupDetails, loading: groupDetailsLoading } =
+		useMultipleGroupDetails(groupIds);
 	const stats = [
 		{
 			title: "All Students",
-			value: 156,
+			value: groupDetails.reduce((acc: number, group: any) => acc + group.data.groupStudents.length, 0),
 			icon: <UserOutlined className="text-blue-500 text-2xl" />,
 			color: "bg-blue-50 border-blue-200",
 			change: "+12%",
@@ -30,85 +72,65 @@ const TeacherDashboard = () => {
 		},
 		{
 			title: "Active Groups",
-			value: 15,
+			value: groupDetails.reduce((acc: number, group: any) => acc + (group.data.group?.status === "active" ? 1 : 0), 0),
 			icon: <TeamOutlined className="text-green-500 text-2xl" />,
 			color: "bg-green-50 border-green-200",
 			change: "+2",
 			changeType: "increase",
 		},
 		{
-			title: "Complated Courses",
-			value: 15,
+			title: "Complated Groups",
+			value: groupDetails.reduce((acc: number, group: any) => acc + (group.data.group?.status === "completed" ? 1 : 0), 0),
 			icon: <BookOutlined className="text-purple-500 text-2xl" />,
 			color: "bg-purple-50 border-purple-200",
-			change: "+3",
+			change: "0",
 			changeType: "increase",
 		},
 		{
 			title: "All Lessons",
-			value: 15,
+			value: groupDetails.reduce((acc: number, group: any) => acc + group.data.lessons.length, 0),
 			icon: <TrophyOutlined className="text-orange-500 text-2xl" />,
 			color: "bg-orange-50 border-orange-200",
-			change: "+15",
+			change: "0",
 			changeType: "increase",
 		},
 	];
 
 	const groups = [
-		{
-			key: "1",
-			name: "Frontend Bootcamp #12",
-			students: 18,
-			progress: 75,
-			status: "active",
-			schedule: "Dush, Chor, Juma 18:00",
-			nextLesson: "2025-01-26",
-			level: "Intermediate",
-		},
-		...allGroups.map((group: any) => {
-			return {
-				key: group?.id,
-				name: group?.name,
-				course: group?.course?.title,
-				students: group?.students?.length || 0,
-				progress:
-					group?.lessons?.length /
-					group?.lessons?.map((lesson: any) => lesson.status == "completed")
-						.length,
-				status: group?.status,
-				level: group?.status,
-				nextLesson: group?.next_lesson,
-				schedule: group.schedule,
-			};
-		}),
+		...(Array.isArray(groupDetails)
+			? groupDetails.map((group: any) => {
+					return {
+						id: group.data.group?.id || 1,
+						name: group.data.group?.name,
+						course: group.data.group?.course?.title,
+						students: group.data?.groupStudents.map(
+							(student: any) => student.status === true
+						).length,
+						maxStudents: group.data?.groupStudents.length,
+						progress: (
+							(group.data?.lessons.filter(
+								(lesson: any) => lesson.status === "completed"
+							).length /
+								group.data?.lessons.length) *
+							100
+						).toFixed(0),
+						status: group.data.group?.status,
+						schedule: {
+							days:
+								group.data.group?.course?.lessons_in_a_week == 3
+									? ["Mon", "Wed", "Fri"]
+									: ["Mon", "Tue", "Wed", "Thu", "Fri"],
+							startTime: group.data.group?.start_time?.slice(0, 5),
+							endTime: group.data.group?.end_time?.slice(0, 5),
+						},
+						startDate: group.data.group?.start_date,
+						endDate: group.data.group?.end_date,
+						nextLesson: group.data.lessons.find((lesson:any)=>lesson.status==="new")?.date.split("T")[0],
+						room: "TBD",
+					};
+			  })
+			: []),
 	];
-	const recentActivities = [
-		{
-			time: "10:30",
-			title: "Frontend Bootcamp #12 group lesson complated",
-			description: "React Hooks",
-			type: "lesson",
-		},
-		{
-			time: "09:15",
-			title: "New Student added",
-			description: "Alisher Karimov React Advanced #8",
-			type: "student",
-		},
-		{
-			time: "08:45",
-			title: "Homework marked",
-			description: "15 homework chacked and marked",
-			type: "homework",
-		},
-		{
-			time: "Yesterday",
-			title: "Group Complated",
-			description: "JavaScript Basics #23 complated",
-			type: "completion",
-		},
-	];
-
 	const columns = [
 		{
 			title: "Group Name",
@@ -123,7 +145,7 @@ const TeacherDashboard = () => {
 			dataIndex: "course",
 			key: "course",
 			render: (course: any) => (
-				<div className="font-medium text-gray-900">{course?.name}</div>
+				<div className="font-medium text-gray-900">{course}</div>
 			),
 		},
 		{
@@ -160,7 +182,7 @@ const TeacherDashboard = () => {
 			render: (status: any) => {
 				const config = {
 					active: { color: "success", text: "Active" },
-					finishing: { color: "warning", text: "Uploading" },
+					new: { color: "warning", text: "New" },
 					completed: { color: "default", text: "Complated" },
 				};
 				return (
@@ -285,39 +307,34 @@ const TeacherDashboard = () => {
 							pagination={false}
 							size="small"
 							scroll={{ x: 800 }}
+							loading={groupDetailsLoading}
 							className="ant-table-responsive"
 						/>
 					</Card>
 				</Col>
-
-				{/* Recent Activities */}
 				<Col xs={24} xl={8}>
 					<Card
-						title="Last Activity"
+						title="Today's Lessons"
 						className="shadow-sm border border-gray-200 h-fit"
 					>
 						<Timeline
-							items={recentActivities.map((activity, index) => ({
+							items={groupDetails.map((group: any) => ({
 								color:
-									activity.type === "lesson"
+									group.data.lessons.find((lesson: any) => lesson.status === "new")?.date.split("T")[0] === new Date().toISOString().split("T")[0]
 										? "blue"
-										: activity.type === "student"
-										? "green"
-										: activity.type === "homework"
-										? "orange"
-										: "purple",
+										: "green",
 								children: (
-									<div key={index}>
+									<div >
 										<div className="flex items-center justify-between mb-1">
 											<span className="font-medium text-sm text-gray-900">
-												{activity.title}
+												{group.data.group?.name}
 											</span>
 											<span className="text-xs text-gray-500">
-												{activity.time}
+												{group.data.lessons.find((lesson: any) => lesson.status === "new")?.date.split("T")[0]}
 											</span>
 										</div>
 										<p className="text-xs text-gray-600 m-0">
-											{activity.description}
+											{group.data.group?.start_time?.slice(0, 5)} - {group.data.group?.end_time?.slice(0, 5)}
 										</p>
 									</div>
 								),

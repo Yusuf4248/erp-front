@@ -32,6 +32,13 @@ export const useGroups = (params: ParamsType | {}, id = 0) => {
 	});
 	const teachers = groupTeachersQuery.data;
 
+	const groupStudentsByIdQuery = useQuery({
+		enabled: !!id,
+		queryKey: ["group-student-by-id"],
+		queryFn: async () => groupsService.getGroupStudentsById(id),
+	});
+	const studentsById = groupStudentsByIdQuery.data;
+
 	const useGroupCreate = () => {
 		return useMutation({
 			mutationFn: async (data: any) => groupsService.createGroup(data),
@@ -87,5 +94,6 @@ export const useGroups = (params: ParamsType | {}, id = 0) => {
 		students,
 		teachers,
 		lessons,
+		studentsById,
 	};
 };

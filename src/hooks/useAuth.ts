@@ -7,4 +7,10 @@ export const useAuth = () => {
 		mutationFn: async ({ data, role }: { data: SignInType; role: string }) =>
 			authService.signIn(data, role),
 	});
+	
+};
+export const useForgotPassword = () => {
+	return useMutation({
+		mutationFn: async (data: any) => authService.forgotPassword(data),
+	});
 };

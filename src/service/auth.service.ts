@@ -9,4 +9,11 @@ export const authService = {
 		);
 		return res;
 	},
+	async forgotPassword(model: any) {
+		const res = await apiConfig().postRequest(
+			ApiUrls.FORGOT_PASSWORD,
+			model
+		);
+		return res;
+	},
 };

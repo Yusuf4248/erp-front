@@ -17,6 +17,8 @@ import {
 	TrophyOutlined,
 	UserOutlined,
 } from "@ant-design/icons";
+import { getItem } from "@helpers";
+import { useTeachers } from "@hooks";
 import {
 	Avatar,
 	Badge,
@@ -40,8 +42,6 @@ import {
 } from "antd";
 import dayjs from "dayjs";
 import { useState } from "react";
-import { useTeachers } from "@hooks"
-import { getItem } from "@helpers"
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -52,8 +52,7 @@ const TeacherProfile = () => {
 	const [form] = Form.useForm();
 	const [activeTab, setActiveTab] = useState("1");
 	const { useTeacherUploadAvatar } = useTeachers({});
-	const {mutate:uploadAvatar,}=useTeacherUploadAvatar()
-	const formData = new FormData();
+	const { mutate: uploadAvatar } = useTeacherUploadAvatar();
 	const user_id = getItem("user_id");
 	const { teacherDataById } = useTeachers({}, +user_id!);
 	const teacherDatas = teacherDataById?.data?.teacher;
@@ -181,8 +180,8 @@ const TeacherProfile = () => {
 		form.resetFields();
 	};
 	const handleAvatarUpload = (info: any) => {
-		console.log(info.file);
-		formData.append("avatar_url", info.file.originFileObj);
+		const formData = new FormData();
+		formData.append("file", info.file.originFileObj);
 		uploadAvatar({
 			id: Number(teacherDatas.id),
 			body: formData,
@@ -199,7 +198,7 @@ const TeacherProfile = () => {
 								<Avatar
 									size={120}
 									icon={<UserOutlined />}
-									src={teacherDatas?.avatar_url|| <UserOutlined />}
+									src={teacherDatas?.avatar_url || <UserOutlined />}
 									className="border-4 border-white shadow-lg bg-white"
 								/>
 								{isEditing && (
@@ -232,7 +231,9 @@ const TeacherProfile = () => {
 												<span className="flex items-center">
 													<CalendarOutlined className="mr-1" />
 													{new Date().getFullYear() -
-														new Date(teacherDatas?.created_at).getFullYear()}{" "}
+														new Date(
+															teacherDatas?.created_at
+														).getFullYear()}{" "}
 													years experience
 												</span>
 												<span className="flex items-center">
@@ -324,14 +325,18 @@ const TeacherProfile = () => {
 												<MailOutlined className="text-gray-400 mr-3" />
 												<div>
 													<div className="text-sm text-gray-600">Email</div>
-													<div className="font-medium">{teacherDatas?.email}</div>
+													<div className="font-medium">
+														{teacherDatas?.email}
+													</div>
 												</div>
 											</div>
 											<div className="flex items-center">
 												<PhoneOutlined className="text-gray-400 mr-3" />
 												<div>
 													<div className="text-sm text-gray-600">Phone</div>
-													<div className="font-medium">{teacherDatas?.phone}</div>
+													<div className="font-medium">
+														{teacherDatas?.phone}
+													</div>
 												</div>
 											</div>
 											<div className="flex items-center">
@@ -340,8 +345,8 @@ const TeacherProfile = () => {
 													<div className="text-sm text-gray-600">Branches</div>
 													<div className="font-medium">
 														{teacherDatas?.branches
-														.map((branch: any) => branch.name)
-														.join(" | ")}
+															.map((branch: any) => branch.name)
+															.join(" | ")}
 													</div>
 												</div>
 											</div>
@@ -409,9 +414,7 @@ const TeacherProfile = () => {
 											</div>
 											<div>
 												<div className="text-sm text-gray-600 mb-1">Salary</div>
-												<div className="font-medium">
-													5000000 UZS
-												</div>
+												<div className="font-medium">5000000 UZS</div>
 											</div>
 											<div>
 												<div className="text-sm text-gray-600 mb-1">Rating</div>
@@ -422,9 +425,7 @@ const TeacherProfile = () => {
 														allowHalf
 														className="text-sm mr-2"
 													/>
-													<span className="font-medium">
-														(4.8)
-													</span>
+													<span className="font-medium">(4.8)</span>
 												</div>
 											</div>
 										</div>

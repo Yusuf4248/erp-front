@@ -32,29 +32,24 @@ const LessonsList = ({ lessons }: any) => {
 			containerRef.current.scrollWidth - 3
 		);
 	};
-
 	const updateItem = (lessonData: LessonType) => {
 		setOpen(true);
 		setUpdate(lessonData);
 	};
-
 	const toggle = () => {
 		setOpen((prev) => !prev);
 		if (update) {
 			setUpdate(null);
 		}
 	};
-
 	const handleClickInfo = (lesson: LessonType) => {
 		setSelectedLesson(lesson);
 		setOpenInfo(true);
 	};
-
 	const toggleInfo = () => {
 		setOpenInfo(!openInfo);
 		setSelectedLesson(null);
 	};
-
 	const getStatusColor = (status: string) => {
 		switch (status.toLowerCase()) {
 			case "bekor qilingan":
