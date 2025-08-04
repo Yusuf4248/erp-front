@@ -2,8 +2,9 @@ import {
 	CalendarOutlined,
 	ClockCircleOutlined,
 	TeamOutlined,
-	UserOutlined,
 } from "@ant-design/icons";
+import { getItem } from "@helpers";
+import { useStudentGroups } from "@hooks";
 import {
 	Badge,
 	Card,
@@ -16,24 +17,21 @@ import {
 	Statistic,
 	Table,
 } from "antd";
-import { useTeacherGroups } from "@hooks";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 const { Option } = Select;
 const { Search } = Input;
-const useMultipleGroupDetails = (groupIds: number[]) => {
-	const [groupDetails, setGroupDetails] = useState<any[]>([]);
+const useMultipleGroupLessons = (groupIds: number[]) => {
+	const [groupLessons, setGroupLessons] = useState<any[]>([]);
 	const [loading, setLoading] = useState(false);
 	useEffect(() => {
 		if (!groupIds.length) return;
-		const fetchGroupDetails = async () => {
+		const fetchGroupLessons = async () => {
 			setLoading(true);
 			const promises = groupIds.map(async (groupId) => {
 				try {
-					const { teacherService } = await import("@service");
-					const response = await teacherService.getGroupDetailsForTeacher(
-						groupId
-					);
+					const { lessonsService } = await import("@service");
+					const response = await lessonsService.getLessonsByGroupId(groupId);
 					return { groupId, data: response?.data };
 				} catch (error) {
 					console.error(
@@ -45,66 +43,67 @@ const useMultipleGroupDetails = (groupIds: number[]) => {
 			});
 			try {
 				const results = await Promise.all(promises);
-				setGroupDetails(results);
+				setGroupLessons(results);
 			} catch (error) {
 				console.error("Error fetching group details:", error);
 			} finally {
 				setLoading(false);
 			}
 		};
-		fetchGroupDetails();
+		fetchGroupLessons();
 	}, [groupIds]);
 
-	return { groupDetails, loading };
+	return { groupLessons, loading };
 };
-const TeacherGroups = () => {
+const StudentGroups = () => {
 	const navigate = useNavigate();
+	const userId = getItem("user_id");
+	const { studentGroups } = useStudentGroups(+userId!);
 	const [searchTerm, setSearchTerm] = useState("");
 	const [statusFilter, setStatusFilter] = useState("all");
 	const [levelFilter] = useState("all");
-	const { teacherGroup } = useTeacherGroups();
-	const groups = teacherGroup?.data || [];
+	const groups = studentGroups?.data || [];
 	const groupIds = useMemo(() => {
 		if (!Array.isArray(groups)) return [];
 		return groups
 			.filter((group) => group?.group?.id)
 			.map((group) => group?.group?.id);
 	}, [groups]);
-	const { groupDetails, loading: groupDetailsLoading } =
-		useMultipleGroupDetails(groupIds);
+	const { groupLessons, loading: groupLessonsLoading } =
+		useMultipleGroupLessons(groupIds);
 	const groupsData = [
 		...(Array.isArray(groups)
-			? groupDetails.map((group: any) => {
+			? groups.map((group: any) => {
+					const lesson = groupLessons.find(
+						(ind) => ind.groupId == group.group.id
+					);
 					return {
-						id: group.data?.group?.id || 1,
-						name: group.data?.group?.name,
-						course: group.data?.group?.course?.title,
-						students: group.data?.groupStudents?.map(
-							(student: any) => student.status === true
-						).length,
-						maxStudents: group.data?.groupStudents?.length,
-						progress: (
-							(group.data?.lessons?.filter(
-								(lesson: any) => lesson.status === "completed"
-							).length /
-								group.data?.lessons.length) *
-							100
-						).toFixed(0),
-						status: group.data?.group?.status,
+						id: group.group?.id || 1,
+						name: group.group?.name,
+						course: group.group?.course?.title,
+						status: group.group?.status,
 						schedule: {
 							days:
 								group.data?.group?.course?.lessons_in_a_week == 3
 									? ["Mon", "Wed", "Fri"]
 									: ["Mon", "Tue", "Wed", "Thu", "Fri"],
-							startTime: group.data?.group?.start_time?.slice(0, 5),
-							endTime: group.data?.group?.end_time?.slice(0, 5),
+							startTime: group.group?.start_time?.slice(0, 5),
+							endTime: group.group?.end_time?.slice(0, 5),
 						},
-						startDate: group.data?.group?.start_date,
-						endDate: group.data?.group?.end_date,
-						nextLesson: group.data?.lessons
-							.find((lesson: any) => lesson.status === "new")
+						startDate: group.group?.start_date,
+						endDate: group.group?.end_date,
+						nextLesson: lesson?.data.lessons
+							.find((ind: any) => ind.status == "new")
 							?.date.split("T")[0],
+						start_time: group.group.start_time.slice(0, 5),
 						room: "TBD",
+						progress: (
+							(lesson?.data.lessons.filter(
+								(les: any) => les.status == "completed"
+							).length /
+								lesson?.data.lessons.length) *
+							100
+						).toFixed(0),
 					};
 			  })
 			: []),
@@ -124,7 +123,6 @@ const TeacherGroups = () => {
 		active: groupsData.filter((g) => g.status === "new").length,
 		finishing: groupsData.filter((g) => g.status === "completed").length,
 		starting: groupsData.filter((g) => g.status === "active").length,
-		totalStudents: groupsData.reduce((sum, g) => sum + (g.students || 0), 0),
 	};
 	const getStatusConfig = (status: any) => {
 		const configs = {
@@ -186,19 +184,7 @@ const TeacherGroups = () => {
 				</div>
 			),
 		},
-		{
-			title: "Students",
-			dataIndex: "students",
-			key: "students",
-			render: (students: number, record: any) => (
-				<div className="flex items-center space-x-2">
-					<UserOutlined className="text-gray-400 text-sm" />
-					<span className="font-medium">
-						{students || 0}/{record.maxStudents || 0}
-					</span>
-				</div>
-			),
-		},
+
 		{
 			title: "Progress",
 			dataIndex: "progress",
@@ -233,7 +219,8 @@ const TeacherGroups = () => {
 					<div className="flex items-center space-x-1">
 						<ClockCircleOutlined className="text-gray-400 text-sm" />
 						<span className="text-xs text-gray-500">
-							Next: {record.nextLesson || "TBD"}
+							Next: {record.nextLesson || "TBD"} |{" "}
+							{record.start_time || "00:00"}
 						</span>
 					</div>
 				</div>
@@ -306,12 +293,7 @@ const TeacherGroups = () => {
 				</Col>
 				<Col xs={24} sm={12} lg={6}>
 					<Card className="text-center hover:shadow-lg transition-all duration-300 border border-gray-200">
-						<Statistic
-							title="Total Students"
-							value={stats.totalStudents}
-							prefix={<UserOutlined className="text-green-500" />}
-							className="mb-0"
-						/>
+						<Statistic title="Lessons" value={100} className="mb-0" />
 					</Card>
 				</Col>
 				<Col xs={24} sm={12} lg={6}>
@@ -355,7 +337,7 @@ const TeacherGroups = () => {
 				</div>
 			</Card>
 			<Card className="shadow-sm border border-gray-200">
-				{groupDetailsLoading ? (
+				{!groups ? (
 					<div className="text-center py-12">
 						<p className="text-gray-500">
 							Loading detailed group information...
@@ -363,6 +345,7 @@ const TeacherGroups = () => {
 					</div>
 				) : filteredGroups.length > 0 ? (
 					<Table
+						loading={groupLessonsLoading}
 						columns={columns}
 						dataSource={filteredGroups}
 						rowKey="id"
@@ -402,4 +385,4 @@ const TeacherGroups = () => {
 		</div>
 	);
 };
-export default TeacherGroups;
+export default StudentGroups;

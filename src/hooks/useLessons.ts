@@ -1,13 +1,18 @@
 import { lessonsService } from "@service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ParamsType } from "@types";
-
 export const useLessons = (params: ParamsType | {}) => {
-	const queryClient = useQueryClient();
+	const queryKey = ["lessons", JSON.stringify(params)];
 	const { data } = useQuery({
-		queryKey: ["lessons", params],
+		queryKey,
 		queryFn: async () => lessonsService.getLessons(params),
+		staleTime: 5 * 60 * 1000,
+		gcTime: 10 * 60 * 1000,
 	});
+	return { data };
+};
+export const useLessonMutations = () => {
+	const queryClient = useQueryClient();
 	const useLessonCreate = () => {
 		return useMutation({
 			mutationFn: async (data: any) => lessonsService.createLessons(data),
@@ -42,12 +47,21 @@ export const useLessons = (params: ParamsType | {}) => {
 			},
 		});
 	};
-
 	return {
 		useLessonCreate,
-		data,
 		useLessonUpdate,
 		useLessonDelete,
 		useLessonUpdateStatusAndNotes,
 	};
+};
+
+export const useLessonsByGroupId = (id: number) => {
+	const queryKey = ["lessons-group"];
+	const { data: groupLessons } = useQuery({
+		queryKey,
+		queryFn: async () => lessonsService.getLessonsByGroupId(id),
+		staleTime: 5 * 60 * 1000,
+		gcTime: 10 * 60 * 1000,
+	});
+	return { groupLessons };
 };

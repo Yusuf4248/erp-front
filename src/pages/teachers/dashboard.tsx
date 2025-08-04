@@ -8,9 +8,9 @@ import {
 	UserOutlined,
 } from "@ant-design/icons";
 import { getItem } from "@helpers";
-import { useTeachers } from "@hooks";
+import { useTeacherById, useTeacherGroups } from "@hooks";
 import { Avatar, Badge, Card, Col, Progress, Row, Table, Timeline } from "antd";
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react";
 const useMultipleGroupDetails = (groupIds: number[]) => {
 	const [groupDetails, setGroupDetails] = useState<any[]>([]);
 	const [loading, setLoading] = useState(false);
@@ -49,9 +49,9 @@ const useMultipleGroupDetails = (groupIds: number[]) => {
 };
 const TeacherDashboard = () => {
 	const user_id = getItem("user_id");
-	const { teacherDataById } = useTeachers({}, +user_id!);
+	const { teacherDataById } = useTeacherById(+user_id!);
 	const teacherData = teacherDataById?.data?.teacher;
-	const { teacherGroup } = useTeachers({});
+	const { teacherGroup } = useTeacherGroups();
 	const teacherGroups = teacherGroup?.data || [];
 	const groupIds = useMemo(() => {
 		if (!Array.isArray(teacherGroups)) return [];
@@ -64,7 +64,10 @@ const TeacherDashboard = () => {
 	const stats = [
 		{
 			title: "All Students",
-			value: groupDetails.reduce((acc: number, group: any) => acc + group.data.groupStudents.length, 0),
+			value: groupDetails.reduce(
+				(acc: number, group: any) => acc + group?.data?.groupStudents.length,
+				0
+			),
 			icon: <UserOutlined className="text-blue-500 text-2xl" />,
 			color: "bg-blue-50 border-blue-200",
 			change: "+12%",
@@ -72,7 +75,11 @@ const TeacherDashboard = () => {
 		},
 		{
 			title: "Active Groups",
-			value: groupDetails.reduce((acc: number, group: any) => acc + (group.data.group?.status === "active" ? 1 : 0), 0),
+			value: groupDetails.reduce(
+				(acc: number, group: any) =>
+					acc + (group.data?.group?.status === "active" ? 1 : 0),
+				0
+			),
 			icon: <TeamOutlined className="text-green-500 text-2xl" />,
 			color: "bg-green-50 border-green-200",
 			change: "+2",
@@ -80,7 +87,11 @@ const TeacherDashboard = () => {
 		},
 		{
 			title: "Complated Groups",
-			value: groupDetails.reduce((acc: number, group: any) => acc + (group.data.group?.status === "completed" ? 1 : 0), 0),
+			value: groupDetails.reduce(
+				(acc: number, group: any) =>
+					acc + (group.data?.group?.status === "completed" ? 1 : 0),
+				0
+			),
 			icon: <BookOutlined className="text-purple-500 text-2xl" />,
 			color: "bg-purple-50 border-purple-200",
 			change: "0",
@@ -88,21 +99,23 @@ const TeacherDashboard = () => {
 		},
 		{
 			title: "All Lessons",
-			value: groupDetails.reduce((acc: number, group: any) => acc + group.data.lessons.length, 0),
+			value: groupDetails.reduce(
+				(acc: number, group: any) => acc + group.data?.lessons.length,
+				0
+			),
 			icon: <TrophyOutlined className="text-orange-500 text-2xl" />,
 			color: "bg-orange-50 border-orange-200",
 			change: "0",
 			changeType: "increase",
 		},
 	];
-
 	const groups = [
 		...(Array.isArray(groupDetails)
 			? groupDetails.map((group: any) => {
 					return {
-						id: group.data.group?.id || 1,
-						name: group.data.group?.name,
-						course: group.data.group?.course?.title,
+						id: group.data?.group?.id || 1,
+						name: group.data?.group?.name,
+						course: group.data?.group?.course?.title,
 						students: group.data?.groupStudents.map(
 							(student: any) => student.status === true
 						).length,
@@ -114,18 +127,20 @@ const TeacherDashboard = () => {
 								group.data?.lessons.length) *
 							100
 						).toFixed(0),
-						status: group.data.group?.status,
+						status: group.data?.group?.status,
 						schedule: {
 							days:
-								group.data.group?.course?.lessons_in_a_week == 3
+								group.data?.group?.course?.lessons_in_a_week == 3
 									? ["Mon", "Wed", "Fri"]
 									: ["Mon", "Tue", "Wed", "Thu", "Fri"],
-							startTime: group.data.group?.start_time?.slice(0, 5),
-							endTime: group.data.group?.end_time?.slice(0, 5),
+							startTime: group.data?.group?.start_time?.slice(0, 5),
+							endTime: group.data?.group?.end_time?.slice(0, 5),
 						},
-						startDate: group.data.group?.start_date,
-						endDate: group.data.group?.end_date,
-						nextLesson: group.data.lessons.find((lesson:any)=>lesson.status==="new")?.date.split("T")[0],
+						startDate: group.data?.group?.start_date,
+						endDate: group.data?.group?.end_date,
+						nextLesson: group.data?.lessons
+							.find((lesson: any) => lesson.status === "new")
+							?.date.split("T")[0],
 						room: "TBD",
 					};
 			  })
@@ -248,9 +263,11 @@ const TeacherDashboard = () => {
 					<div className="flex items-center text-blue-100">
 						<EnvironmentOutlined className="mr-2" />
 						<span className="text-sm">
-							{teacherData?.branches
-								.map((branch: any) => branch?.name)
-								.join(" | ")}
+						{teacherData?.branches.length > 0
+													? teacherData?.branches
+															.map((branch: any) => branch.name)
+															.join(" | ")
+													: "No branches"}
 						</span>
 					</div>
 				</div>
@@ -288,10 +305,7 @@ const TeacherDashboard = () => {
 					</Col>
 				))}
 			</Row>
-
-			{/* Main Content */}
 			<Row gutter={[16, 16]}>
-				{/* Groups Table */}
 				<Col xs={24} xl={16}>
 					<Card
 						title={
@@ -318,27 +332,40 @@ const TeacherDashboard = () => {
 						className="shadow-sm border border-gray-200 h-fit"
 					>
 						<Timeline
-							items={groupDetails.map((group: any) => ({
+							items={
+								groupDetails.length > 0 ? groupDetails.map((group: any) => ({
 								color:
-									group.data.lessons.find((lesson: any) => lesson.status === "new")?.date.split("T")[0] === new Date().toISOString().split("T")[0]
+									group.data?.lessons
+										.find((lesson: any) => lesson.status === "new")
+										?.date.split("T")[0] ===
+									new Date().toISOString().split("T")[0]
 										? "blue"
 										: "green",
 								children: (
-									<div >
+									<div>
 										<div className="flex items-center justify-between mb-1">
 											<span className="font-medium text-sm text-gray-900">
-												{group.data.group?.name}
+												{group.data?.group?.name}
 											</span>
 											<span className="text-xs text-gray-500">
-												{group.data.lessons.find((lesson: any) => lesson.status === "new")?.date.split("T")[0]}
+												{
+													group.data?.lessons
+														.find((lesson: any) => lesson.status === "new")
+														?.date.split("T")[0]
+												}
 											</span>
 										</div>
 										<p className="text-xs text-gray-600 m-0">
-											{group.data.group?.start_time?.slice(0, 5)} - {group.data.group?.end_time?.slice(0, 5)}
+											{group.data?.group?.start_time?.slice(0, 5)} -{" "}
+											{group.data?.group?.end_time?.slice(0, 5)}
 										</p>
 									</div>
 								),
-							}))}
+							})) : [{
+								color: "blue",
+								children: <div>No lessons today</div>
+							}]
+							}
 							className="mt-4"
 						/>
 					</Card>
@@ -347,5 +374,4 @@ const TeacherDashboard = () => {
 		</div>
 	);
 };
-
 export default TeacherDashboard;

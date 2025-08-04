@@ -11,8 +11,7 @@ import {
 	TeamOutlined,
 	UserOutlined,
 } from "@ant-design/icons";
-import { getItem } from "@helpers";
-import { useTeacherById, useTeachers } from "@hooks";
+import { useAdmin, useAdmins } from "@hooks";
 import {
 	Avatar,
 	Button,
@@ -29,46 +28,31 @@ import {
 } from "antd";
 import dayjs from "dayjs";
 import { useState } from "react";
+import { getItem } from "@helpers";
 const { TabPane } = Tabs;
-const TeacherProfile = () => {
+const AdminProfile = () => {
+	const {useAdminUpdate,changePassword}= useAdmins();
+	const {mutate:updateAdmin,isPending:updating}=useAdminUpdate()
+	const {mutate:adminChangePassword,isPending:passwordLoading}=changePassword()
 	const [isEditing, setIsEditing] = useState(false);
 	const [form] = Form.useForm();
 	const [activeTab, setActiveTab] = useState("1");
-	const { useTeacherUploadAvatar, useTeacherChangePassword, useTeacherUpdate } =
-		useTeachers({});
-	const { mutate: changePassword } = useTeacherChangePassword();
-	const { mutate: uploadAvatar } = useTeacherUploadAvatar();
-	const { mutate: updateTeacher, isPending: isUpdating } = useTeacherUpdate();
+	const { data } = useAdmin();
+	const adminData = data?.data;
 	const user_id = getItem("user_id");
-	const { teacherDataById } = useTeacherById(+user_id!);
-	const teacherDatas = teacherDataById?.data?.teacher;
 	const handleEdit = () => {
 		setIsEditing(true);
 		form.setFieldsValue({
-			first_name: teacherDatas?.first_name,
-			last_name: teacherDatas?.last_name,
-			email: teacherDatas?.email,
-			phone: teacherDatas?.phone,
+			first_name: adminData?.first_name,
+			last_name: adminData?.last_name,
+			email: adminData?.email,
+			phone: adminData?.phone,
 		});
 	};
 	const handleSave = async () => {
 		try {
 			const values = await form.validateFields();
-			console.log("Form values:", values);
-
-			updateTeacher(
-				{ id: +user_id!, data: values },
-				{
-					onSuccess: () => {
-						message.success("Profile updated successfully!");
-						setIsEditing(false);
-					},
-					onError: (error) => {
-						console.error("Update error:", error);
-						message.error("Failed to update profile. Please try again!");
-					},
-				}
-			);
+			updateAdmin({ id: +user_id!, data: values },{onSuccess:()=>handleCancel()});
 		} catch (error) {
 			console.error("Validation error:", error);
 			message.error("Please fill all required fields correctly!");
@@ -78,23 +62,17 @@ const TeacherProfile = () => {
 		setIsEditing(false);
 		form.resetFields();
 	};
-	const handleAvatarUpload = (info: any) => {
-		const formData = new FormData();
-		formData.append("file", info.file.originFileObj);
-		uploadAvatar({
-			id: Number(teacherDatas.id),
-			body: formData,
-		});
-	};
 	const handleChangePassword = async (values: any) => {
 		if (values.password !== values.confirm_password) {
 			message.error("Password and confirm password are not the same!");
 			return;
 		}
-		changePassword({ id: +user_id!, data: values });
+		adminChangePassword({ id: +user_id!, data: values });
 	};
 	return (
-		<div className="space-y-6">
+		<div
+			hidden={!adminData}
+			className="space-y-6">
 			<Card className="shadow-sm border border-gray-200">
 				<div className="relative">
 					<div className="absolute inset-0 bg-gradient-to-r from-gray-600 to-gray-400 rounded-lg h-44"></div>
@@ -104,13 +82,12 @@ const TeacherProfile = () => {
 								<Avatar
 									size={120}
 									icon={<UserOutlined />}
-									src={teacherDatas?.avatar_url || <UserOutlined />}
+									src={adminData?.avatar_url || <UserOutlined />}
 									className="border-4 border-white shadow-lg bg-white"
 								/>
 								{isEditing && (
 									<Upload
 										showUploadList={false}
-										onChange={handleAvatarUpload}
 										accept="image/*"
 									>
 										<Button
@@ -127,16 +104,16 @@ const TeacherProfile = () => {
 								<div className=" from-gray-600 to-gray-400 rounded-lg p-4 shadow-sm">
 									<>
 										<h1 className="text-2xl font-bold text-gray-100 mb-1">
-											{teacherDatas?.first_name} {teacherDatas?.last_name}
+											{adminData?.first_name} {adminData?.last_name}
 										</h1>
 										<p className="text-gray-300 font-medium mb-2">
-											{teacherDatas?.role.toUpperCase()}
+											{adminData?.role?.toUpperCase()}
 										</p>
 										<div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm text-gray-300">
 											<span className="flex items-center">
 												<CalendarOutlined className="mr-1" />
 												{new Date().getFullYear() -
-													new Date(teacherDatas?.created_at).getFullYear()}{" "}
+													new Date(adminData?.created_at).getFullYear()}{" "}
 												years experience
 											</span>
 											<span className="flex items-center">
@@ -145,9 +122,8 @@ const TeacherProfile = () => {
 											</span>
 											<span className="flex items-center">
 												<TeamOutlined className="mr-1" />
-												{teacherDatas?.branches.length > 0
-													? teacherDatas?.branches
-															.map((branch: any) => branch.name)
+												{adminData?.branch?.length > 0
+													? adminData?.branch?.map((branch: any) => branch.name)
 															.join(" | ")
 													: "No branches"}
 											</span>
@@ -162,6 +138,7 @@ const TeacherProfile = () => {
 										icon={<EditOutlined />}
 										onClick={handleEdit}
 										className="bg-blue-600 hover:bg-blue-700"
+										loading={updating}
 									>
 										Edit
 									</Button>
@@ -171,7 +148,7 @@ const TeacherProfile = () => {
 											type="primary"
 											icon={<SaveOutlined />}
 											onClick={handleSave}
-											loading={isUpdating}
+											// loading={isUpdating}
 											className="bg-green-600 hover:bg-green-700"
 										>
 											Save
@@ -199,7 +176,7 @@ const TeacherProfile = () => {
 												<div>
 													<div className="text-sm text-gray-600">Email</div>
 													<div className="font-medium">
-														{teacherDatas?.email}
+														{adminData?.email}
 													</div>
 												</div>
 											</div>
@@ -208,7 +185,7 @@ const TeacherProfile = () => {
 												<div>
 													<div className="text-sm text-gray-600">Phone</div>
 													<div className="font-medium">
-														{teacherDatas?.phone}
+														{adminData?.phone}
 													</div>
 												</div>
 											</div>
@@ -217,8 +194,7 @@ const TeacherProfile = () => {
 												<div>
 													<div className="text-sm text-gray-600">Branches</div>
 													<div className="font-medium">
-														{teacherDatas?.branches
-															.map((branch: any) => branch.name)
+														{adminData?.branch?.map((branch: any) => branch.name)
 															.join(" | ")}
 													</div>
 												</div>
@@ -244,7 +220,7 @@ const TeacherProfile = () => {
 													<div>
 														<div className="text-sm text-gray-600">Phone</div>
 														<div className="font-medium">
-															{teacherDatas?.phone}
+															{adminData?.phone}
 														</div>
 													</div>
 												</div>
@@ -255,8 +231,7 @@ const TeacherProfile = () => {
 															Branches
 														</div>
 														<div className="font-medium">
-															{teacherDatas?.branches
-																.map((branch: any) => branch.name)
+															{adminData?.branch?.map((branch: any) => branch.name)
 																.join(" | ")}
 														</div>
 													</div>
@@ -278,9 +253,8 @@ const TeacherProfile = () => {
 												Department
 											</div>
 											<div className="font-medium">
-											{teacherDatas?.branches.length > 0
-													? teacherDatas?.branches
-															.map((branch: any) => branch.name)
+												{adminData?.branch?.length > 0
+													? adminData?.branch?.map((branch: any) => branch.name)
 															.join(" | ")
 													: "No department"}
 											</div>
@@ -290,7 +264,7 @@ const TeacherProfile = () => {
 												Joined Date
 											</div>
 											<div className="font-medium">
-												{dayjs(teacherDatas?.created_at).format("DD.MM.YYYY")}
+												{dayjs(adminData?.created_at).format("DD.MM.YYYY")}
 											</div>
 										</div>
 										<div>
@@ -330,7 +304,7 @@ const TeacherProfile = () => {
 									<Form.Item name="confirm_password" label="Confirm Password">
 										<Input.Password />
 									</Form.Item>
-									<Button type="primary" htmlType="submit">
+									<Button type="primary" htmlType="submit" loading={passwordLoading}>
 										Change Password
 									</Button>
 								</Form>
@@ -341,5 +315,6 @@ const TeacherProfile = () => {
 			</Card>
 		</div>
 	);
+	// return <div>AdminProfile</div>;
 };
-export default TeacherProfile;
+export default AdminProfile;

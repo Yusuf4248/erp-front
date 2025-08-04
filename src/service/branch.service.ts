@@ -3,7 +3,7 @@ import { apiConfig } from "@api/config";
 import type { ParamsType } from "@types";
 
 export const branchService = {
-	async getBranch(params: ParamsType) {
+	async getBranch(params: ParamsType|{}) {
 		const res = await apiConfig().getRequest(ApiUrls.BRANCHES, params);
 		return res;
 	},

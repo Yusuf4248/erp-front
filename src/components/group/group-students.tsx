@@ -1,14 +1,89 @@
-import { CheckCircle, Mail, Phone, User, XCircle } from "lucide-react";
+import { UserOutlined } from "@ant-design/icons";
+import { Avatar, Badge, Table } from "antd";
+import { User } from "lucide-react";
 import React, { useState } from "react";
 import { FaPlus } from "react-icons/fa";
+import GroupStudentAttendance from "../students/group-students-attendance";
 import AddTeacherorStudentModal from "./single-modal";
 const GroupStudent = ({ students, id }: any) => {
 	const [open, setOpen] = useState(false);
-	const [addingTeacher, setAddingTeacher] = useState(true)
+	const [addingTeacher, setAddingTeacher] = useState(true);
 	// console.log(students)
 	const toggle = () => {
 		setOpen(!open);
 	};
+	const studentsColumns = [
+		Table.EXPAND_COLUMN,
+		{
+			title: "Student",
+			dataIndex: "name",
+			key: "name",
+			render: (text: string, record: any) => (
+				<div className="flex items-center space-x-3">
+					<Avatar
+						size={40}
+						icon={<UserOutlined />}
+						src={record.avatar}
+						className="bg-blue-500"
+					/>
+					<div>
+						<div className="font-medium text-gray-900">{text}</div>
+						<div className="text-sm text-gray-500">{record.email}</div>
+					</div>
+				</div>
+			),
+		},
+		{
+			title: "Phone",
+			dataIndex: "phone",
+			key: "phone",
+			render: (phone: string) => <span className="text-gray-600">{phone}</span>,
+		},
+		{
+			title: "Mail",
+			dataIndex: "email",
+			key: "email",
+			render: (email: string) => <span className="text-gray-600">{email}</span>,
+		},
+		{
+			title: "Status",
+			dataIndex: "status",
+			key: "status",
+			render: (status: string) => {
+				const config = {
+					active: { color: "success", text: "Active" },
+					warning: { color: "warning", text: "Warning" },
+					inactive: { color: "default", text: "Inactive" },
+				} as const;
+				type StatusKey = keyof typeof config;
+				const statusKey = status as StatusKey;
+				return (
+					<Badge
+						status={config[statusKey]?.color}
+						text={config[statusKey]?.text}
+					/>
+				);
+			},
+		},
+		{
+			title: "Birth date",
+			dataIndex: "date_of_birth",
+			key: "date_of_birth",
+			render: (date_of_birth: string) => (
+				<span className="text-gray-600">{date_of_birth}</span>
+			),
+		},
+	];
+	const studentData = students.map((student: any) => ({
+		key: student.student.id,
+		name: student.student.first_name,
+		phone: student.student.phone,
+		email: student.student.email,
+		status: student.status,
+		date_of_birth: student.student.date_of_birth,
+		attendance: student.student.attendance,
+	}));
+	console.log(studentData)
 	return (
 		<>
 			{open && (
@@ -57,88 +132,17 @@ const GroupStudent = ({ students, id }: any) => {
 				</div>
 
 				<div className="overflow-x-auto overflow-y-auto max-h-[500px] [&::-webkit-scrollbar]:hidden">
-					<table className="w-full">
-						<thead className="bg-gray-50">
-							<tr className="sticky top-0 bg-white">
-								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-									Students
-								</th>
-								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-									Phone
-								</th>
-								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-									Mail
-								</th>
-								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-									Status
-								</th>
-								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-									Birth date
-								</th>
-							</tr>
-						</thead>
-						<tbody className="bg-white divide-y divide-gray-200">
-							{students.map((student:any) => (
-								<tr key={student.student.id} className="hover:bg-gray-50">
-									<td className="px-6 py-4 whitespace-nowrap">
-										<div className="flex items-center gap-3">
-											<div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-												<span className="text-green-700 font-medium">
-													{student.student.first_name?.charAt(0)}
-												</span>
-											</div>
-											<div>
-												<p className="font-medium text-gray-900">
-													{student.student.first_name} {student.last_name}
-												</p>
-												<p className="text-sm text-gray-500 capitalize">
-													{student.student.gender}
-												</p>
-											</div>
-										</div>
-									</td>
-									<td className="px-6 py-4 whitespace-nowrap">
-										<div className="flex items-center gap-1 text-sm text-gray-900">
-											<Phone className="w-4 h-4 text-gray-400" />
-											{student.student.phone}
-										</div>
-									</td>
-									<td className="px-6 py-4 whitespace-nowrap">
-										<div className="flex items-center gap-1 text-sm text-gray-900">
-											<Mail className="w-4 h-4 text-gray-400" />
-											{student.student.email}
-										</div>
-									</td>
-									<td className="px-6 py-4 whitespace-nowrap">
-										<span
-											className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${
-												student.status
-													? "bg-green-50 text-green-700"
-													: "bg-red-50 text-red-700"
-											}`}
-										>
-											{student.status ? (
-												<>
-													<CheckCircle className="w-3 h-3 mr-1" />
-													Active
-												</>
-											) : (
-												<>
-													<XCircle className="w-3 h-3 mr-1" />
-													Disactive
-												</>
-											)}
-										</span>
-									</td>
-									<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-										{new Date(student.student.date_of_birth).toLocaleDateString(
-											"uz-UZ"
-										)}
-									</td>
-								</tr>
-							))}
-						</tbody>
-					</table>
+					<Table
+						columns={studentsColumns}
+						dataSource={studentData}
+						pagination={{ pageSize: 10 }}
+						scroll={{ x: 800 }}
+						expandable={{
+							expandedRowRender: (record) => (
+								<GroupStudentAttendance data={record.attendance} />
+							),
+						}}
+					/>
 				</div>
 			</div>
 		</>

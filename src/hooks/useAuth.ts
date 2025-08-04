@@ -14,3 +14,13 @@ export const useForgotPassword = () => {
 		mutationFn: async (data: any) => authService.forgotPassword(data),
 	});
 };
+export const useVerifyOtp = () => {
+	return useMutation({
+		mutationFn: async (data: any) => authService.verifyOtp(data),
+	});
+};
+export const useSetNewPassword = () => {
+	return useMutation({
+		mutationFn: async (data: any) => authService.setNewPassword(data),
+	});
+};

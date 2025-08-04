@@ -26,16 +26,12 @@ const schema = yup.object().shape({
 		),
 	gender: yup.string().required("Gender is required"),
 	date_of_birth: yup.string().required("Date of birth is required"),
-	lidId: yup.number().required("LID ID is required"),
 });
 interface StudentProps extends ModalProps {
 	update: StudentType | null;
 }
 const StudentModal = ({ open, toggle, update }: StudentProps) => {
-	const { useStudentCreate, useStudentUpdate } = useStudents({
-		page: 1,
-		limit: 10,
-	});
+	const { useStudentCreate, useStudentUpdate } = useStudents({page:1,limit:1000});
 	const { mutate: createStudent, isPending: isCreating } = useStudentCreate();
 	const { mutate: updateStudent, isPending: isUpdating } = useStudentUpdate();
 	const {
@@ -53,7 +49,6 @@ const StudentModal = ({ open, toggle, update }: StudentProps) => {
 			password_hash: "",
 			gender: "",
 			date_of_birth: "",
-			lidId: 0,
 		},
 	});
 	useEffect(() => {
@@ -65,17 +60,14 @@ const StudentModal = ({ open, toggle, update }: StudentProps) => {
 			setValue("password_hash", update.password_hash);
 			setValue("gender", update.gender);
 			setValue("date_of_birth", update.date_of_birth);
-			setValue("lidId", update.lidId);
 		}
 	}, [update]);
 	const onSubmit = (data: any) => {
-		data["confirm_password"] = data.password_hash;
+		// data["confirm_password"] = data.password_hash;
 		data.phone = data.phone.replace(/[^\d+]/g, "");
 		// delete data.confirm_password;
-		delete data.lidId;
-		delete data.groupsId;
-		delete data.eventsId;
 		console.log(data)
+		delete data.lidId;
 		if (update?.id) {
 			updateStudent({ id: update!.id, data },{
 				onSuccess: () => {
@@ -204,18 +196,6 @@ const StudentModal = ({ open, toggle, update }: StudentProps) => {
 						name="date_of_birth"
 						control={control}
 						render={({ field }) => <Input type="date" {...field} />}
-					/>
-				</Form.Item>
-				<Form.Item
-					label="LID ID"
-					name="lidId"
-					validateStatus={errors.lidId	 ? "error" : ""}
-					help={errors.lidId?.message}
-				>
-					<Controller
-						name="lidId"
-						control={control}
-						render={({ field }) => <Input type="number" {...field} />}
 					/>
 				</Form.Item>
 				<Form.Item>

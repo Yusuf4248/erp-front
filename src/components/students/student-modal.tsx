@@ -1,14 +1,12 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useLessonMutations } from "@hooks";
-import { useQueryClient } from "@tanstack/react-query";
-import type { LessonType, ModalProps } from "@types";
+import { useAttendanceMutations } from "@hooks";
 import { Button, DatePicker, Form, Input, Modal, Select } from "antd";
 import dayjs from "dayjs";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as yup from "yup";
 const schema = yup.object().shape({
-	notes: yup
+	description: yup
 		.string()
 		.min(3, "Title must be at least 3 characters")
 		.required("Title is required"),
@@ -21,16 +19,12 @@ const schema = yup.object().shape({
 				(typeof value === "string" && dayjs(value).isValid())
 			);
 		})
-		.required("Start date is required"),
+		.required("Date is required"),
 });
-interface LessonProps extends ModalProps {
-	update: LessonType | null;
-}
-const LessonModal = ({ open, toggle, update }: LessonProps) => {
-	const queryClient = useQueryClient();
-	const { useLessonUpdateStatusAndNotes } = useLessonMutations();
-	const { mutate: updateLessonStatusAndNote, isPending: isUpdating } =
-		useLessonUpdateStatusAndNotes();
+const StudentModal = ({ open, toggle, update }: any) => {
+	const { useChangeStudentAttendance } = useAttendanceMutations();
+	const { mutate: changeStudentAttendance, isPending: pending } =
+		useChangeStudentAttendance();
 	const {
 		control,
 		handleSubmit,
@@ -41,33 +35,32 @@ const LessonModal = ({ open, toggle, update }: LessonProps) => {
 	});
 	useEffect(() => {
 		if (update?.id) {
-			setValue("notes", update.notes);
+			setValue("description", update.notes);
 			setValue("status", update.status);
 			setValue("date", dayjs(update.date));
 		}
 	}, [update]);
 	const onSubmit = (data: any) => {
 		const updateItem = {
-			note: data.notes,
+			description: data.notes,
 			status: data.status,
 			date: dayjs(data.date).format("YYYY-MM-DD"),
+			studentId:update?.student.id,
+			lessonId:update?.lesson.id,
 		};
 		if (update?.id) {
-			if (
-				data.status === "cancelled" ||
-				data.status === "completed" ||
-				data.status === "in_progress"
-			) {
-				(updateItem as { date?: string }).date = undefined;
-			}
-			updateLessonStatusAndNote(
+			// if (
+			// 	data.status === "cancelled" ||
+			// 	data.status === "completed" ||
+			// 	data.status === "in_progress"
+			// ) {
+			// 	(updateItem as { date?: string }).date = undefined;
+			// }
+			changeStudentAttendance(
 				{ id: update.id, data: updateItem },
 				{
 					onSuccess: () => {
 						toggle();
-						queryClient.invalidateQueries({
-							queryKey: ["group-lessons"],
-						});
 					},
 				}
 			);
@@ -76,7 +69,7 @@ const LessonModal = ({ open, toggle, update }: LessonProps) => {
 
 	return (
 		<Modal
-			title="Lesson Modal"
+			title="Student Attendance"
 			centered
 			open={open}
 			onCancel={toggle}
@@ -92,11 +85,11 @@ const LessonModal = ({ open, toggle, update }: LessonProps) => {
 				<Form.Item
 					label="Title"
 					name="title"
-					validateStatus={errors.notes ? "error" : ""}
-					help={errors.notes?.message}
+					validateStatus={errors.description ? "error" : ""}
+					help={errors.description?.message}
 				>
 					<Controller
-						name={"notes"}
+						name={"description"}
 						control={control}
 						render={({ field }) => <Input {...field} />}
 					/>
@@ -114,10 +107,10 @@ const LessonModal = ({ open, toggle, update }: LessonProps) => {
 							<Select
 								{...field}
 								options={[
-									{ label: "New", value: "new" },
-									{ label: "Canceled", value: "cancelled" },
-									{ label: "Completed", value: "completed" },
-									{ label: "In Progress", value: "in_progress" },
+									{ label: "Came", value: "came" },
+									{ label: "Did Not Came", value: "did not came" },
+									{ label: "Late", value: "late" },
+									{ label: "Pending", value: "pending" },
 								]}
 							/>
 						)}
@@ -132,7 +125,7 @@ const LessonModal = ({ open, toggle, update }: LessonProps) => {
 				</Form.Item>
 
 				<Form.Item>
-					<Button type={"primary"} htmlType={"submit"} loading={isUpdating}>
+					<Button type={"primary"} htmlType={"submit"} loading={pending}>
 						Submit
 					</Button>
 				</Form.Item>
@@ -141,4 +134,4 @@ const LessonModal = ({ open, toggle, update }: LessonProps) => {
 	);
 };
 
-export default LessonModal;
+export default StudentModal;

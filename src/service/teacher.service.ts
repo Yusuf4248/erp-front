@@ -19,7 +19,6 @@ export const teacherService = {
 		const res = await apiConfig().getRequest(ApiUrls.TEACHER_GROUPS);
 		return res;
 	},
-
 	async getGroupDetailsForTeacher(id: number) {
 		const res = await apiConfig().getRequest(ApiUrls.GET_GROUP_DETAILS_FOR_TEACHER(id));
 		return res;
@@ -37,7 +36,13 @@ export const teacherService = {
 		);
 		return res;
 	},	
-
+	async changePassword(id: number, body: object) {
+		const res = await apiConfig().updateRequest(
+			`${ApiUrls.CHANGE_PASSWORD(id)}`,
+			body
+		);
+		return res;
+	},
 	
 	async createTeacher(body: object) {
 		const res = await apiConfig().postRequest(`${ApiUrls.TEACHER}`, body);

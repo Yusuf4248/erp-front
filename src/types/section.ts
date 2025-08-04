@@ -36,10 +36,7 @@ export interface StudentType {
 	password_hash: string;
 	gender: string;
 	date_of_birth: string;
-	lidId: number;
-	eventsId: number;
-	groupsId: number;
-	is_active?: boolean;
+	// is_active?: boolean;
 }
 export interface TeacherType {
 	id: number;
@@ -69,6 +66,7 @@ export interface CourseType {
 	duration: string;
 	lesson_in_a_week: string;
 	lesson_duration: string;
+	lesson_in_a_month: number;
 }
 
 export interface AddStudentOrTeacher {

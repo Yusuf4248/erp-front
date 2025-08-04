@@ -4,13 +4,17 @@ import {
 	MenuUnfoldOutlined,
 	UserOutlined,
 } from "@ant-design/icons";
+import { removeItem } from "@helpers";
 import { Button, Dropdown, Layout, Menu, Modal, theme } from "antd";
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { removeItem } from "../../helpers";
-import sidebarRoutes from "../../routes/sidebar-routes";
+import sidebarRoutes, {
+	sidebarRoutesForStudents,
+} from "../../routes/sidebar-routes";
+
 const { Header, Sider, Content } = Layout;
-const Index = () => {
+
+const StudentLayout = () => {
 	const [collapsed, setCollapsed] = useState(false);
 	const location = useLocation();
 	const [selectedKey, setSelectedKey] = useState("");
@@ -22,6 +26,7 @@ const Index = () => {
 			setSelectedKey(currentRouteIndex.toString());
 		}
 	}, [location.pathname]);
+
 	const {
 		token: { colorBgContainer, borderRadiusLG },
 	} = theme.useToken();
@@ -46,12 +51,13 @@ const Index = () => {
 			okText: "Confirm",
 		});
 	};
+
 	const menu = {
 		items: [
 			{
 				key: "profile",
 				icon: <UserOutlined />,
-				label: <span onClick={() => navigate("/admin/me")}>Profile</span>,
+				label: <span onClick={() => navigate("/student/me")}>Profile</span>,
 			},
 			{
 				key: "logout",
@@ -94,7 +100,7 @@ const Index = () => {
 					)}
 					{!collapsed && (
 						<p style={{ fontSize: "24px", fontWeight: "bold", color: "white" }}>
-							CRM Admin
+							CRM Teacher
 						</p>
 					)}
 				</div>
@@ -102,14 +108,14 @@ const Index = () => {
 					theme="dark"
 					mode="inline"
 					selectedKeys={[selectedKey]}
-					items={sidebarRoutes.map((item, index) => ({
+					items={sidebarRoutesForStudents.map((item, index) => ({
 						key: index.toString(),
-						icon: <item.icon />, // <-- FIX: use JSX, works for both AntD and React Icons
+						icon: <item.icon />,
 						label: <NavLink to={item.path}>{item.title}</NavLink>,
 					}))}
 				/>
 			</Sider>
-			<Layout style={{ marginLeft: collapsed ? 80 : 200, marginRight: 3 }}>
+			<Layout style={{ marginLeft: collapsed ? 80 : 200 }}>
 				<Header
 					style={{
 						padding: 0,
@@ -154,4 +160,4 @@ const Index = () => {
 	);
 };
 
-export default Index;
+export default StudentLayout;

@@ -12,7 +12,7 @@ import {
 	UserOutlined,
 } from "@ant-design/icons";
 import { getItem } from "@helpers";
-import { useTeacherById, useTeachers } from "@hooks";
+import { useStudents } from "@hooks";
 import {
 	Avatar,
 	Button,
@@ -30,25 +30,24 @@ import {
 import dayjs from "dayjs";
 import { useState } from "react";
 const { TabPane } = Tabs;
-const TeacherProfile = () => {
+const StudentProfile = () => {
+	const user_id = getItem("user_id");
 	const [isEditing, setIsEditing] = useState(false);
 	const [form] = Form.useForm();
 	const [activeTab, setActiveTab] = useState("1");
-	const { useTeacherUploadAvatar, useTeacherChangePassword, useTeacherUpdate } =
-		useTeachers({});
-	const { mutate: changePassword } = useTeacherChangePassword();
-	const { mutate: uploadAvatar } = useTeacherUploadAvatar();
-	const { mutate: updateTeacher, isPending: isUpdating } = useTeacherUpdate();
-	const user_id = getItem("user_id");
-	const { teacherDataById } = useTeacherById(+user_id!);
-	const teacherDatas = teacherDataById?.data?.teacher;
+	const { dataById:studentData,useStudentUploadAvatar, useStudentChangePassword, useStudentUpdate } =
+		useStudents({},+user_id!);
+	const { mutate: changePassword } = useStudentChangePassword();
+	const { mutate: uploadAvatar } = useStudentUploadAvatar();
+	const { mutate: updateStudent, isPending: isUpdating } = useStudentUpdate();
+	const StudentDta = studentData?.data.student||[]
 	const handleEdit = () => {
 		setIsEditing(true);
 		form.setFieldsValue({
-			first_name: teacherDatas?.first_name,
-			last_name: teacherDatas?.last_name,
-			email: teacherDatas?.email,
-			phone: teacherDatas?.phone,
+			first_name: StudentDta?.first_name,
+			last_name: StudentDta?.last_name,
+			email: StudentDta?.email,
+			phone: StudentDta?.phone,
 		});
 	};
 	const handleSave = async () => {
@@ -56,7 +55,7 @@ const TeacherProfile = () => {
 			const values = await form.validateFields();
 			console.log("Form values:", values);
 
-			updateTeacher(
+			updateStudent(
 				{ id: +user_id!, data: values },
 				{
 					onSuccess: () => {
@@ -82,7 +81,7 @@ const TeacherProfile = () => {
 		const formData = new FormData();
 		formData.append("file", info.file.originFileObj);
 		uploadAvatar({
-			id: Number(teacherDatas.id),
+			id: Number(StudentDta.id),
 			body: formData,
 		});
 	};
@@ -104,7 +103,7 @@ const TeacherProfile = () => {
 								<Avatar
 									size={120}
 									icon={<UserOutlined />}
-									src={teacherDatas?.avatar_url || <UserOutlined />}
+									src={StudentDta?.avatar_url || <UserOutlined />}
 									className="border-4 border-white shadow-lg bg-white"
 								/>
 								{isEditing && (
@@ -127,17 +126,17 @@ const TeacherProfile = () => {
 								<div className=" from-gray-600 to-gray-400 rounded-lg p-4 shadow-sm">
 									<>
 										<h1 className="text-2xl font-bold text-gray-100 mb-1">
-											{teacherDatas?.first_name} {teacherDatas?.last_name}
+											{StudentDta?.first_name} {StudentDta?.last_name}
 										</h1>
 										<p className="text-gray-300 font-medium mb-2">
-											{teacherDatas?.role.toUpperCase()}
+											{StudentDta?.role?.toUpperCase()||"student"}
 										</p>
 										<div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm text-gray-300">
 											<span className="flex items-center">
 												<CalendarOutlined className="mr-1" />
 												{new Date().getFullYear() -
-													new Date(teacherDatas?.created_at).getFullYear()}{" "}
-												years experience
+													new Date(StudentDta?.created_at).getFullYear()}{" "}
+												years studied
 											</span>
 											<span className="flex items-center">
 												<StarFilled className="mr-1 text-yellow-500" />
@@ -145,9 +144,8 @@ const TeacherProfile = () => {
 											</span>
 											<span className="flex items-center">
 												<TeamOutlined className="mr-1" />
-												{teacherDatas?.branches.length > 0
-													? teacherDatas?.branches
-															.map((branch: any) => branch.name)
+												{StudentDta?.branches?.length > 0
+													? StudentDta?.branches?.map((branch: any) => branch.name)
 															.join(" | ")
 													: "No branches"}
 											</span>
@@ -199,7 +197,7 @@ const TeacherProfile = () => {
 												<div>
 													<div className="text-sm text-gray-600">Email</div>
 													<div className="font-medium">
-														{teacherDatas?.email}
+														{StudentDta?.email}
 													</div>
 												</div>
 											</div>
@@ -208,7 +206,7 @@ const TeacherProfile = () => {
 												<div>
 													<div className="text-sm text-gray-600">Phone</div>
 													<div className="font-medium">
-														{teacherDatas?.phone}
+														{StudentDta?.phone}
 													</div>
 												</div>
 											</div>
@@ -217,8 +215,7 @@ const TeacherProfile = () => {
 												<div>
 													<div className="text-sm text-gray-600">Branches</div>
 													<div className="font-medium">
-														{teacherDatas?.branches
-															.map((branch: any) => branch.name)
+														{StudentDta?.branches?.map((branch: any) => branch.name)
 															.join(" | ")}
 													</div>
 												</div>
@@ -244,7 +241,7 @@ const TeacherProfile = () => {
 													<div>
 														<div className="text-sm text-gray-600">Phone</div>
 														<div className="font-medium">
-															{teacherDatas?.phone}
+															{StudentDta?.phone}
 														</div>
 													</div>
 												</div>
@@ -255,8 +252,7 @@ const TeacherProfile = () => {
 															Branches
 														</div>
 														<div className="font-medium">
-															{teacherDatas?.branches
-																.map((branch: any) => branch.name)
+															{StudentDta?.branches?.map((branch: any) => branch.name)
 																.join(" | ")}
 														</div>
 													</div>
@@ -278,9 +274,8 @@ const TeacherProfile = () => {
 												Department
 											</div>
 											<div className="font-medium">
-											{teacherDatas?.branches.length > 0
-													? teacherDatas?.branches
-															.map((branch: any) => branch.name)
+												{StudentDta?.branches?.length > 0
+													? StudentDta?.branches?.map((branch: any) => branch.name)
 															.join(" | ")
 													: "No department"}
 											</div>
@@ -290,12 +285,8 @@ const TeacherProfile = () => {
 												Joined Date
 											</div>
 											<div className="font-medium">
-												{dayjs(teacherDatas?.created_at).format("DD.MM.YYYY")}
+												{dayjs(StudentDta?.created_at).format("DD.MM.YYYY")}
 											</div>
-										</div>
-										<div>
-											<div className="text-sm text-gray-600 mb-1">Salary</div>
-											<div className="font-medium">5000000 UZS</div>
 										</div>
 										<div>
 											<div className="text-sm text-gray-600 mb-1">Rating</div>
@@ -342,4 +333,4 @@ const TeacherProfile = () => {
 		</div>
 	);
 };
-export default TeacherProfile;
+export default StudentProfile;

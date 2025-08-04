@@ -23,6 +23,9 @@ export default sidebarRoutes;
 const sidebarRoutesForTeacher = [
   { path: "/teacher/dashboard", icon: DashboardOutlined, title: "Dashboard" },
   { path: "/teacher/my-groups", icon: TeamOutlined, title: "Groups" },
-  { path: "/teacher/students", icon: UserOutlined, title: "Students" },
 ];
-export { sidebarRoutes, sidebarRoutesForTeacher };
+const sidebarRoutesForStudents = [
+  { path: "/student/dashboard", icon: DashboardOutlined, title: "Dashboard" },
+  { path: "/student/my-groups", icon: TeamOutlined, title: "Groups" },
+];
+export { sidebarRoutes, sidebarRoutesForTeacher,sidebarRoutesForStudents };

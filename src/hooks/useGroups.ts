@@ -1,44 +1,15 @@
 import { groupsService } from "@service";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ParamsType } from "@types";
-
-export const useGroups = (params: ParamsType | {}, id = 0) => {
+export const useGroups = (params: ParamsType | {}) => {
 	const queryClient = useQueryClient();
+	const queryKey = ["groups", JSON.stringify(params)];
 	const { data } = useQuery({
-		queryKey: ["groups", params],
+		queryKey,
 		queryFn: async () => groupsService.getGroup(params),
+		staleTime: 5 * 60 * 1000,
+		gcTime: 10 * 60 * 1000,
 	});
-	const { data: dataById } = useQuery({
-		enabled: !!id,
-		queryKey: ["groupById"],
-		queryFn: async () => groupsService.getGroupById(id),
-	});
-	const groupStudentsQuery = useQuery({
-		enabled: !!id,
-		queryKey: ["group-student"],
-		queryFn: async () => groupsService.getGroupStudents(id),
-	});
-	const students = groupStudentsQuery.data;
-	const groupLessonsQuery = useQuery({
-		enabled: !!id,
-		queryKey: ["group-lessons"],
-		queryFn: async () => groupsService.getGroupLessons(id),
-	});
-	const lessons = groupLessonsQuery.data;
-	const groupTeachersQuery = useQuery({
-		enabled: !!id,
-		queryKey: ["group-teachers"],
-		queryFn: async () => groupsService.getGroupTeachers(id),
-	});
-	const teachers = groupTeachersQuery.data;
-
-	const groupStudentsByIdQuery = useQuery({
-		enabled: !!id,
-		queryKey: ["group-student-by-id"],
-		queryFn: async () => groupsService.getGroupStudentsById(id),
-	});
-	const studentsById = groupStudentsByIdQuery.data;
-
 	const useGroupCreate = () => {
 		return useMutation({
 			mutationFn: async (data: any) => groupsService.createGroup(data),
@@ -64,36 +35,83 @@ export const useGroups = (params: ParamsType | {}, id = 0) => {
 			},
 		});
 	};
-
+	return {
+		data,
+		useGroupCreate,
+		useGroupUpdate,
+		useGroupDelete,
+	};
+};
+export const useGroupById = (id: number) => {
+	const { data: dataById } = useQuery({
+		enabled: !!id,
+		queryKey: ["groupById", id],
+		queryFn: async () => groupsService.getGroupById(id),
+		staleTime: 5 * 60 * 1000,
+		gcTime: 10 * 60 * 1000,
+	});
+	return { dataById };
+};
+export const useGroupStudents = (id: number) => {
+	const { data: students } = useQuery({
+		enabled: !!id,
+		queryKey: ["group-students"],
+		queryFn: async () => groupsService.getGroupStudents(id),
+		staleTime: 5 * 60 * 1000,
+		gcTime: 10 * 60 * 1000,
+	});
+	return { students };
+};
+export const useGroupLessons = (id: number) => {
+	const { data: lessons } = useQuery({
+		enabled: !!id,
+		queryKey: ["group-lessons"],
+		queryFn: async () => groupsService.getGroupLessons(id),
+		staleTime: 5 * 60 * 1000,
+		gcTime: 10 * 60 * 1000,
+	});
+	return { lessons };
+};
+export const useGroupTeachers = (id: number) => {
+	const { data: teachers } = useQuery({
+		enabled: !!id,
+		queryKey: ["group-teachers"],
+		queryFn: async () => groupsService.getGroupTeachers(id),
+		staleTime: 5 * 60 * 1000,
+		gcTime: 10 * 60 * 1000,
+	});
+	return { teachers };
+};
+export const useGroupStudentsById = (id: number) => {
+	const { data: studentsById } = useQuery({
+		enabled: !!id,
+		queryKey: ["group-student",id],
+		queryFn: async () => groupsService.getGroupStudentsById(id),
+		staleTime: 5 * 60 * 1000,
+		gcTime: 10 * 60 * 1000,
+	});
+	return { studentsById };
+};
+export const useGroupMutations = () => {
+	const queryClient = useQueryClient();
 	const useGroupAddStudent = () => {
 		return useMutation({
 			mutationFn: async (data: any) => groupsService.addStudentToGroup(data),
 			onSuccess: () => {
-				queryClient.invalidateQueries({ queryKey: ["group-student"] });
+				queryClient.invalidateQueries({ queryKey: ["group-students"] });
 			},
 		});
 	};
-
 	const useGroupAddTeacher = () => {
 		return useMutation({
 			mutationFn: async (data: any) => groupsService.addTeacherToGroup(data),
 			onSuccess: () => {
-				queryClient.invalidateQueries({ queryKey: ["groups", "add-teacher"] });
+				queryClient.invalidateQueries({ queryKey: ["group-teachers"] });
 			},
 		});
 	};
-
 	return {
-		useGroupCreate,
-		data,
-		useGroupUpdate,
-		useGroupDelete,
-		dataById,
 		useGroupAddStudent,
 		useGroupAddTeacher,
-		students,
-		teachers,
-		lessons,
-		studentsById,
 	};
 };

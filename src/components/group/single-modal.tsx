@@ -1,5 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useGroups, useStudents, useTeachers } from "@hooks";
+import { useGroupMutations, useStudents, useTeachers } from "@hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import type { ModalProps } from "@types";
 import { Button, Form, Modal, Select } from "antd";
@@ -23,10 +23,7 @@ const AddTeacherorStudentModal = ({
 	toggle,
 	groupId,
 }: ThisProps) => {
-	const { useGroupAddStudent, useGroupAddTeacher } = useGroups({
-		page: 1,
-		limit: 100,
-	});
+	const { useGroupAddStudent, useGroupAddTeacher } = useGroupMutations();
 	const { data: teachersData } = useTeachers({ page: 1, limit: 100 });
 	const { data: studentsData } = useStudents({ page: 1, limit: 100 });
 	const originalData = addingTeacher
@@ -35,7 +32,7 @@ const AddTeacherorStudentModal = ({
 	const { mutate: addStudent, isPending: isCreatingSt } = useGroupAddStudent();
 	const { mutate: addTeacher, isPending: isCreatingTr } = useGroupAddTeacher();
 	const queryClient = useQueryClient();
-	const { control, handleSubmit,  reset } = useForm({
+	const { control, handleSubmit, reset } = useForm({
 		resolver: yupResolver(schema),
 		defaultValues: {
 			teacherId: [],
@@ -74,7 +71,7 @@ const AddTeacherorStudentModal = ({
 			addStudent(payload, {
 				onSuccess: () => {
 					toggle();
-					reset(); 
+					reset();
 				},
 			});
 		}

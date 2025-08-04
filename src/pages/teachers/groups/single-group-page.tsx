@@ -10,7 +10,12 @@ import {
 	StarFilled,
 	UserOutlined,
 } from "@ant-design/icons";
-import { useAttendance, useLessons, useTeachers } from "@hooks";
+import {
+	useAttendanceByLessonIds,
+	useAttendanceMutations,
+	useGroupDetailsForTeacher,
+	useLessonMutations,
+} from "@hooks";
 import {
 	Avatar,
 	Badge,
@@ -35,15 +40,15 @@ import {
 import dayjs from "dayjs";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
+import StudentAttendance from "../../student-layout/student-attendance"
 const { TabPane } = Tabs;
-const { TextArea } = Input;
 const SingleGroupPage = () => {
 	const { id } = useParams();
-	const { groupDetailsForTeacher } = useTeachers({}, +id!);
+	const { groupDetailsForTeacher } = useGroupDetailsForTeacher(+id!);
 	const groupDatas = groupDetailsForTeacher?.data;
-	const { useLessonUpdateStatusAndNotes } = useLessons({});
+	const { useLessonUpdateStatusAndNotes } = useLessonMutations();
 	const { mutate: updateLessonStatusAndNote } = useLessonUpdateStatusAndNotes();
-	const { useAttendanceBulkUpdate } = useAttendance();
+	const { useAttendanceBulkUpdate } = useAttendanceMutations();
 	const { mutate: updateAttendance } = useAttendanceBulkUpdate();
 	const [activeTab, setActiveTab] = useState("1");
 	const [isLessonModalVisible, setIsLessonModalVisible] = useState(false);
@@ -106,17 +111,6 @@ const SingleGroupPage = () => {
 		description: groupDatas?.group?.course?.description || "No Data",
 	};
 	const teachersData = [
-		// {
-		// 	id: 1,
-		// 	name: "Sardor Rahimov",
-		// 	role: "Main Teacher",
-		// 	email: "sardor@crm.uz",
-		// 	phone: "+998 90 123 45 67",
-		// 	rating: 4.8,
-		// 	experience: "3 yil",
-		// 	avatar: null,
-		// 	isMain: true,
-		// },
 		...(Array.isArray(groupDatas?.groupTeachers)
 			? groupDatas.groupTeachers.map((teacher: any) => {
 					return {
@@ -136,18 +130,6 @@ const SingleGroupPage = () => {
 			: []),
 	];
 	const studentsData = [
-		// {
-		// 	id: 1,
-		// 	name: "Alisher Karimov",
-		// 	email: "alisher@gmail.com",
-		// 	phone: "+998 90 111 22 33",
-		// 	joinDate: "2024-10-15",
-		// 	progress: 85,
-		// 	attendance: 92,
-		// 	status: "active",
-		// 	avatar: null,
-		// 	rating: 4.5,
-		// },
 		...(Array.isArray(groupDatas?.groupStudents)
 			? groupDatas.groupStudents.map((student: any) => {
 					return {
@@ -170,18 +152,14 @@ const SingleGroupPage = () => {
 			  })
 			: []),
 	];
+	const lessonIds = Array.isArray(groupDatas?.lessons)
+		? groupDatas.lessons.map((lesson: any) => lesson.id)
+		: [];
+	const { data: allAttendanceData, pending: attendancePending } =
+		useAttendanceByLessonIds(lessonIds);
 	const lessonsData = [
-		// {
-		// 	id: 1,
-		// 	title: "HTML Asoslari",
-		// 	date: "2024-10-15",
-		// 	time: "18:00-20:00",
-		// 	status: "completed",
-		// 	videoUrl: "https://example.com/video1",
-		// 	attendance: 18,
-		// },
 		...(Array.isArray(groupDatas?.lessons)
-			? groupDatas.lessons.map((lesson: any) => {
+			? groupDatas.lessons.map((lesson: any, index: number) => {
 					return {
 						id: lesson.id,
 						title: lesson.title,
@@ -192,6 +170,7 @@ const SingleGroupPage = () => {
 							groupDatas?.group?.end_time?.slice(0, 5),
 						status: lesson.status,
 						description: lesson.notes,
+						attendance: allAttendanceData?.[index]?.data?.attendance?.length || 0,
 					};
 			  })
 			: []),
@@ -208,10 +187,8 @@ const SingleGroupPage = () => {
 		try {
 			const currentLesson = lessonsData.find(
 				(lesson: any) =>
-					lesson.date.split("T")[0] ===
-					new Date().toISOString().split("T")[0]
+					lesson.date.split("T")[0] === new Date().toISOString().split("T")[0]
 			);
-			// console.log(lessonsData, new Date().toISOString().split("T")[0]);
 			if (!currentLesson) {
 				message.error("No lesson found for today!");
 				return;
@@ -379,6 +356,7 @@ const SingleGroupPage = () => {
 		};
 	}, []);
 	const studentsColumns = [
+		Table.EXPAND_COLUMN,
 		{
 			title: "Student",
 			dataIndex: "name",
@@ -514,6 +492,7 @@ const SingleGroupPage = () => {
 			title: "Att",
 			dataIndex: "attendance",
 			key: "attendance",
+			loading: attendancePending,
 			render: (attendance: number, record: any) => (
 				<span className="text-gray-600">
 					{record.status === "completed"
@@ -542,19 +521,25 @@ const SingleGroupPage = () => {
 					</div>
 				</div>
 				<div className="flex items-center space-x-2 flex-col">
-				<Button
-					type="primary"
-					icon={<PlayCircleOutlined />}
-					onClick={handleStartLesson}
-					size="large"
-					className="bg-green-600 hover:bg-green-700"
-					disabled={groupDatas?.data.isAttended}
-				>
-					Start Lesson
-				</Button>
-				<span className={`text-sm ${groupDatas?.data.isAttended ? "text-green-500" : "text-red-500"}`}>
-					{groupDatas?.data.isAttended ? "Lesson started" : "Lesson not started"}
-				</span>
+					<Button
+						type="primary"
+						icon={<PlayCircleOutlined />}
+						onClick={handleStartLesson}
+						size="large"
+						className="bg-green-600 hover:bg-green-700"
+						disabled={groupDatas?.data.isAttended}
+					>
+						Start Lesson
+					</Button>
+					<span
+						className={`text-sm ${
+							groupDatas?.data.isAttended ? "text-green-500" : "text-red-500"
+						}`}
+					>
+						{groupDatas?.data.isAttended
+							? "Lesson started"
+							: "Lesson not started"}
+					</span>
 				</div>
 			</div>
 			<Card className="shadow-sm border border-gray-200">
@@ -644,6 +629,11 @@ const SingleGroupPage = () => {
 							rowKey="id"
 							pagination={{ pageSize: 10 }}
 							scroll={{ x: 800 }}
+							expandable={{
+								expandedRowRender: (record) => (
+									<StudentAttendance studentId={record.id} groupId={+id!} />
+								),
+							}}
 						/>
 					</TabPane>
 					<TabPane tab={`Teachers (${teachersData.length})`} key="2">
@@ -707,16 +697,6 @@ const SingleGroupPage = () => {
 						</Row>
 					</TabPane>
 					<TabPane tab={`Lessons (${lessonsData.length})`} key="3">
-						{/* <div className="mb-4 flex justify-between items-center">
-							<Button
-								type="primary"
-								icon={<PlusOutlined />}
-								onClick={handleStartLesson}
-								className="bg-blue-600 hover:bg-blue-700"
-							>
-								New Lesson
-							</Button>
-						</div> */}
 						<Table
 							columns={lessonsColumns}
 							dataSource={lessonsData}
@@ -776,9 +756,6 @@ const SingleGroupPage = () => {
 									<Input placeholder="For example: React Components" />
 								</Form.Item>
 							</div>
-							<Form.Item label="Lesson description" name="lessonDescription">
-								<TextArea rows={3} placeholder="Lesson description..." />
-							</Form.Item>
 						</Form>
 					</div>
 					<div>
@@ -859,7 +836,7 @@ const SingleGroupPage = () => {
 					</div>
 					<div>
 						<h3 className="font-medium text-gray-900 mb-4">Attendance</h3>
-						<div className="max-h-60 overflow-y-auto border border-gray-300 rounded-lg [&::-webkit-scrollbar]:hidden">
+						<div className="max-h-[300px] overflow-y-auto border border-gray-300 rounded-lg [&::-webkit-scrollbar]:hidden">
 							<List
 								dataSource={studentsData}
 								className="!p-[10px]"

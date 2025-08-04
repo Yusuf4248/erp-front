@@ -5,68 +5,43 @@ import {
 	TeamOutlined,
 	UserOutlined,
 } from "@ant-design/icons";
-import { Card, Statistic, Table, Typography } from "antd";
-import React from "react";
+import { useBranches, useGroups, useStudents } from "@hooks";
+import { Card, Statistic, Typography } from "antd";
+import React, { useMemo } from "react";
 
 const { Title } = Typography;
 
 const Dashboard: React.FC = () => {
-	// Statistik ma'lumotlar (API dan yoki mock data)
-	const stats = {
-		totalStudents: 1245,
-		activeStudents: 892,
-		totalGroups: 56,
-		activeGroups: 42,
-		totalBranches: 8,
-		upcomingEvents: 3,
-	};
+	const groupsParams = useMemo(() => ({}), []);
+	const studentsParams = useMemo(() => ({page:1,limit:1000}), []);
+	const branchesParams = useMemo(() => ({}), []);
 
-	// So'ngi faolliklar jadvali uchun ma'lumotlar
-	const recentActivities = [
-		{
-			key: "1",
-			student: "Ali Valiyev",
-			action: "Yangi ro'yxatdan o'tdi",
-			date: "2023-05-15",
-		},
-		{
-			key: "2",
-			student: "Gulnora Karimova",
-			action: "Guruhga qo'shildi",
-			date: "2023-05-14",
-		},
-		{
-			key: "3",
-			student: "Jamshid To'xtayev",
-			action: "To'lov qildi",
-			date: "2023-05-13",
-		},
-	];
+	const { data: groupsData } = useGroups(groupsParams);
+	const { data: studentsData } = useStudents(studentsParams);
+	const { data: branchesData } = useBranches(branchesParams);
+	const stats = useMemo(() => {
+		const groups = groupsData?.data?.data || [];
+		const students = studentsData?.data?.data || [];
+		const branches = branchesData?.data?.branch || [];
 
-	const columns = [
-		{
-			title: "O'quvchi",
-			dataIndex: "student",
-			key: "student",
-		},
-		{
-			title: "Harakat",
-			dataIndex: "action",
-			key: "action",
-		},
-		{
-			title: "Sana",
-			dataIndex: "date",
-			key: "date",
-		},
-	];
+		return {
+			totalStudents: students.length,
+			activeStudents: students.filter(
+				(student: any) => student.status === "active"
+			).length,
+			totalGroups: groups.length,
+			activeGroups: groups.filter((group: any) => group.status === "active")
+				.length,
+			totalBranches: branches.length,
+			upcomingEvents: 3,
+		};
+	}, [groupsData, studentsData, branchesData]);
 
 	return (
 		<div className="w-full max-w-full p-2 sm:p-4 md:p-6">
 			<Title level={3} className="mb-6 !text-2xl !font-semibold">
 				Dashboard
 			</Title>
-			{/* Statistik kartalar */}
 			<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
 				<Card className="!p-0 !rounded-lg !shadow !border-0">
 					<Statistic
@@ -134,20 +109,6 @@ const Dashboard: React.FC = () => {
 					</div>
 				</Card>
 			</div>
-			{/* So'nggi faolliklar */}
-			<Card
-				title="So'nggi Faolliklar"
-				className="!rounded-lg !shadow !border-0"
-			>
-				<div className="overflow-x-auto">
-					<Table
-						columns={columns}
-						dataSource={recentActivities}
-						pagination={false}
-						size="middle"
-					/>
-				</div>
-			</Card>
 		</div>
 	);
 };

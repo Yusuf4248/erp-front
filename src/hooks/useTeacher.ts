@@ -4,38 +4,16 @@ import type { ParamsType } from "@types";
 
 const hasPageAndLimit = (p: any): p is { page: any; limit: any } =>
 	p && typeof p.page !== "undefined" && typeof p.limit !== "undefined";
-
-export const useTeachers = (params: ParamsType | {}, id: number = 0,) => {
+export const useTeachers = (params: ParamsType | {}) => {
 	const queryClient = useQueryClient();
+	const queryKey = ["teacher", JSON.stringify(params)];
 	const { data } = useQuery({
 		enabled: hasPageAndLimit(params),
-		queryKey: ["teacher", params],
+		queryKey,
 		queryFn: async () => teacherService.getTeacher(params),
+		staleTime: 5 * 60 * 1000,
+		gcTime: 10 * 60 * 1000,
 	});
-	const { data: teacherDataById } = useQuery({
-		enabled: !!id,
-		queryKey: ["teacher", id],
-		queryFn: async () => teacherService.getTeacherById(id),
-	});
-
-	// const { data: teacherGroups } = useQuery({
-	// 	enabled: !!id,
-	// 	queryKey: ["teacherGroups", id],
-	// 	queryFn: async () => teacherService.getAllTeacherGroups(id),
-	// });
-
-	const { data: teacherGroup } = useQuery({
-		enabled: !id,
-		queryKey: ["teacherGroups"],
-		queryFn: async () => teacherService.getTeacherGroups(),
-	});
-
-	const { data: groupDetailsForTeacher } = useQuery({
-		enabled: !!id,
-		queryKey: ["groupDetailsForTeacher", id],
-		queryFn: async () => teacherService.getGroupDetailsForTeacher(id),
-	});
-
 	const useTeacherCreate = () => {
 		return useMutation({
 			mutationFn: async (data: any) => teacherService.createTeacher(data),
@@ -48,6 +26,15 @@ export const useTeachers = (params: ParamsType | {}, id: number = 0,) => {
 		return useMutation({
 			mutationFn: async ({ id, data }: { id: number; data: any }) =>
 				teacherService.updateTeacher(id, data),
+			onSuccess: () => {
+				queryClient.invalidateQueries({ queryKey: ["teacher"] });
+			},
+		});
+	};
+	const useTeacherChangePassword = () => {
+		return useMutation({
+			mutationFn: async ({ id, data }: { id: number; data: any }) =>
+				teacherService.changePassword(id, data),
 			onSuccess: () => {
 				queryClient.invalidateQueries({ queryKey: ["teacher"] });
 			},
@@ -73,12 +60,42 @@ export const useTeachers = (params: ParamsType | {}, id: number = 0,) => {
 	return {
 		useTeacherCreate,
 		data,
-		// teacherGroups,
-		groupDetailsForTeacher,
 		useTeacherUpdate,
+		useTeacherChangePassword,
 		useTeacherDelete,
-		teacherDataById,
 		useTeacherUploadAvatar,
-		teacherGroup
 	};
 };
+export const useTeacherById = (id: number) => {
+	const queryKey = ["teacher", "byId", id];
+	const { data: teacherDataById } = useQuery({
+		enabled: !!id,
+		queryKey,
+		queryFn: async () => teacherService.getTeacherById(id),
+		staleTime: 5 * 60 * 1000,
+		gcTime: 10 * 60 * 1000,
+	});
+	return { teacherDataById };
+};
+export const useTeacherGroups = () => {
+	const queryKey = ["teacherGroups"];
+	const { data: teacherGroup } = useQuery({
+		queryKey,
+		queryFn: async () => teacherService.getTeacherGroups(),
+		staleTime: 5 * 60 * 1000,
+		gcTime: 10 * 60 * 1000,
+	});
+	return { teacherGroup };
+};
+export const useGroupDetailsForTeacher = (id: number) => {
+	const queryKey = ["groupDetailsForTeacher", id];
+	const { data: groupDetailsForTeacher } = useQuery({
+		enabled: !!id,
+		queryKey,
+		queryFn: async () => teacherService.getGroupDetailsForTeacher(id),
+		staleTime: 5 * 60 * 1000,
+		gcTime: 10 * 60 * 1000,
+	});
+	return { groupDetailsForTeacher };
+};
+

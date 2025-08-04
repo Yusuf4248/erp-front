@@ -13,7 +13,12 @@ export const lessonsService = {
 		);
 		return res;
 	},
-
+		async getLessonsByGroupId(id: Number) {
+		const res = await apiConfig().getRequest(
+			`${ApiUrls.GROUP_LESSONS}/${id}`
+		);
+		return res;
+	},
 	async deleteLessons(id: number) {
 		const res = await apiConfig().deleteRequest(`${ApiUrls.LESSONS}/${id}`);
 		return res;

@@ -60,10 +60,7 @@ interface GroupProps extends ModalProps {
 }
 
 const GroupModal = ({ open, toggle, update }: GroupProps) => {
-	const { useGroupCreate, useGroupUpdate } = useGroups({
-		page: 1,
-		limit: 10,
-	});
+	const { useGroupCreate, useGroupUpdate } = useGroups({});
 
 	const { data: courseData } = useCourses({});
 	const courses = courseData?.data.courses || [];

@@ -7,3 +7,4 @@ export * from "./teacher.service";
 export * from "./rooms.service";
 export * from "./lessons.service";
 export * from "./attendance.service";
+export * from "./admin.service";

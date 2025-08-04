@@ -23,7 +23,8 @@ const Groups: React.FC = () => {
 		limit: 10,
 	});
 	const navigate = useNavigate();
-	const { data, useGroupDelete } = useGroups(params);
+	const { data } = useGroups(params);
+	const { useGroupDelete } = useGroups(params);
 	const { mutate: deleteGroup, isPending: isDeleting } = useGroupDelete();
 	useEffect(() => {
 		const searchParams = new URLSearchParams(location.search);

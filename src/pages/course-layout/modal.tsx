@@ -15,6 +15,7 @@ const schema = yup.object().shape({
 	price: yup.number().required("Price is required"),
 	duration: yup.number().required("Duration is required"),
 	lessons_in_a_week: yup.number().required("Lesson in a week is required"),
+	lessons_in_a_month: yup.number().required("Lesson in a month is required"),
 	lesson_duration: yup.number().required("Lesson duration is required"),
 });
 interface CourseProps extends ModalProps {
@@ -42,6 +43,7 @@ const CourseModal = ({ open, toggle, update }: CourseProps) => {
 			setValue("price", update.price);
 			setValue("duration", +update.duration);
 			setValue("lessons_in_a_week", +update.lesson_in_a_week);
+			setValue("lessons_in_a_month", +update.lesson_in_a_month);
 			setValue("lesson_duration", +update.lesson_duration);
 		}
 	}, [update]);
@@ -152,6 +154,33 @@ const CourseModal = ({ open, toggle, update }: CourseProps) => {
 									{
 										value: 5,
 										label: 5,
+									},
+								]}
+							/>
+						)}
+					/>
+				</Form.Item>
+				<Form.Item
+					label="Lessons in a Month"
+					name={"lessons_in_a_month"}
+					validateStatus={errors.lessons_in_a_month ? "error" : ""}
+					help={errors.lessons_in_a_month?.message}
+				>
+					<Controller
+						name={"lessons_in_a_month"}
+						control={control}
+						render={({ field }) => (
+							<Select
+								{...field}
+								placeholder="Select lesson in a month..."
+								options={[
+									{
+										value: 12,
+										label: 12,
+									},
+									{
+										value: 20,
+										label: 20,
 									},
 								]}
 							/>

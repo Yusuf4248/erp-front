@@ -18,28 +18,42 @@ const TeacherDashboard = lazy(() => import("./teachers/dashboard"));
 const TeachersLayout = lazy(() => import("./teachers/teacher"));
 const TeacherProfile = lazy(() => import("./teachers/teacher-profil"));
 const TeacherGroups = lazy(() => import("./teachers/groups/my-groups"));
-const TeacherSingleGroupPage = lazy(() => import("./teachers/groups/single-group-page"));
-const ForgotPassword = lazy(() => import("./admin-layout/forgot-password"));
+const TeacherSingleGroupPage = lazy(
+	() => import("./teachers/groups/single-group-page")
+);
+const ForgotPassword = lazy(() => import("./auth/forgot-password"));
+const AdminProfile = lazy(() => import("./admin-layout/admin-profile"));
+const StudentLayout = lazy(() => import("./students/students"));
+const StudentDashboard = lazy(() => import("./students/dashboard"));
+const StudentMyGroups = lazy(() => import("./students/groups/my-group"));
+const StudentSingleGroup = lazy(() => import("./students/groups/single-group"));
+const StudentProfile = lazy(() => import("./students/profile"));
 
 export {
 	Admin,
+	AdminProfile,
 	Courses,
+	ForgotPassword,
 	Groups,
 	NotFound,
 	ProtectLayout,
 	ProtectLogin,
+	Rooms,
 	SignIn,
 	SignUp,
+	SingleGroup,
 	Student,
+	StudentDashboard,
+	StudentLayout,
+	StudentMyGroups,
+	StudentProfile,
+	StudentSingleGroup,
 	StudentsTbl,
 	Teacher,
-	Worker,
-	Rooms,
-	SingleGroup,
 	TeacherDashboard,
-	TeachersLayout,
-	TeacherProfile,
 	TeacherGroups,
+	TeacherProfile,
 	TeacherSingleGroupPage,
-	ForgotPassword,
-	};
+	TeachersLayout,
+	Worker,
+};

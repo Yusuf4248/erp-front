@@ -16,4 +16,18 @@ export const authService = {
 		);
 		return res;
 	},
+	async verifyOtp(model: any) {
+		const res = await apiConfig().postRequest(
+			ApiUrls.VERIFY_OTP,
+			model
+		);
+		return res;
+	},
+	async setNewPassword(model: any) {
+		const res = await apiConfig().postRequest(
+			ApiUrls.SET_NEW_PASSWORD,
+			model
+		);
+		return res;
+	},
 };
