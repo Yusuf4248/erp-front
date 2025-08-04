@@ -62,7 +62,7 @@ const StudentDashboard = () => {
 		name: studentDatas?.first_name + " " + studentDatas?.last_name,
 		id: `ST-2025-${studentDatas?.id}`,
 		course: "Frontend Development",
-		avatar: studentDatas.avatar_url,
+		avatar: studentDatas?.avatar_url,
 	};
 
 	const statistics = {

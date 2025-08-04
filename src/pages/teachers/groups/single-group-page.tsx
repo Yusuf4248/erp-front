@@ -527,7 +527,7 @@ const SingleGroupPage = () => {
 						onClick={handleStartLesson}
 						size="large"
 						className="bg-green-600 hover:bg-green-700"
-						disabled={groupDatas?.data.isAttended}
+						// disabled={groupDatas?.data.isAttended}
 					>
 						Start Lesson
 					</Button>
